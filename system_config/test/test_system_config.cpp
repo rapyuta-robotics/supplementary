@@ -9,7 +9,7 @@ using namespace supplementary;
 TEST(SystemConfigBasics, readValues) {
     // determine the path to the test config
     std::string path = ros::package::getPath("system_config");
-    path = path + "src/supplementary/system_config/test";
+    path = path + "/test";
 
     // bring up the SystemConfig with the corresponding path
     SystemConfig* sc = SystemConfig::getInstance();
