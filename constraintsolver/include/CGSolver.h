@@ -22,7 +22,8 @@ public:
     virtual ~CGSolver();
 
     bool existsSolution(vector<Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls) override;
-    bool getSolution(vector<Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls, vector<void*>& results) override;
+    bool getSolution(
+            vector<Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls, vector<void*>& results) override;
     shared_ptr<SolverVariable> createVariable(long id) override;
 
 protected:
