@@ -2,7 +2,6 @@
 
 #include <engine/AlicaEngine.h>
 #include <engine/teammanager/TeamManager.h>
-#include <engine/IAlicaClock.h>
 #include <supplementary/AgentID.h>
 
 namespace supplementary {
@@ -32,11 +31,11 @@ alica::AlicaEngine* WorldModel::getEngine() {
     return this->alicaEngine;
 }
 
-InfoTime WorldModel::getTime() {
+AlicaTime WorldModel::getTime() {
     if (this->alicaEngine != nullptr) {
-        return this->alicaEngine->getIAlicaClock()->now();
+        return this->alicaEngine->getAlicaClock()->now();
     } else {
-        return 0;
+        return AlicaTime::zero();
     }
 }
 
