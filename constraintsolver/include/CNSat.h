@@ -9,6 +9,7 @@
 #define CNSAT_H_
 
 #include "types/Assignment.h"
+#include "engine/AlicaClock.h"
 
 #include <vector>
 #include <memory>
@@ -16,7 +17,6 @@
 using namespace std;
 
 namespace alica {
-class IAlicaClock;
 
 namespace reasoner {
 class CNSMTGSolver;
@@ -81,7 +81,7 @@ protected:
     std::shared_ptr<DecisionLevel> decisionLevelNull;
     bool recentBacktrack = false;
 
-    IAlicaClock* alicaClock;
+    AlicaClock* alicaClock;
 };
 } /* namespace cnsat */
 } /* namespace reasoner */

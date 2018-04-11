@@ -1,12 +1,15 @@
 #pragma once
 
 #include "ITrigger.h"
+#include "engine/AlicaClock.h"
 
 #include <vector>
-#include <chrono>
 #include <thread>
 #include <condition_variable>
 #include <iostream>
+
+using alica::AlicaTime;
+using alica::AlicaClock;
 
 namespace supplementary {
 
@@ -16,20 +19,21 @@ using t_notificationcallback = void (NotificationClass::*)();
 template <class NotificationClass>
 class NotifyTimer : public virtual ITrigger {
 public:
-    NotifyTimer(long msInterval, t_notificationcallback<NotificationClass> callback, NotificationClass* obj);
+    NotifyTimer(AlicaTime interval, t_notificationcallback<NotificationClass> callback, NotificationClass* obj);
     ~NotifyTimer();
     bool start();
     bool stop();
     bool isRunning();
     bool isStarted();
-    void setInterval(long msInterval);
-    const long getInterval() const;
+    void setInterval(AlicaTime interval);
+    const AlicaTime getInterval() const;
     void run(bool notifyAll = false);
     void registerCV(condition_variable* condVar);
 
 private:
     thread* runThread;
-    chrono::milliseconds msInterval; /** < The time between two fired events */
+    AlicaClock _clock;
+    AlicaTime interval; /** < The time between two fired events */
     bool running, started;
     t_notificationcallback<NotificationClass> callback;
     NotificationClass* obj;
@@ -37,10 +41,10 @@ private:
 
 template <class NotificationClass>
 NotifyTimer<NotificationClass>::NotifyTimer(
-        long msInterval, t_notificationcallback<NotificationClass> callback, NotificationClass* obj) {
+        AlicaTime interval, t_notificationcallback<NotificationClass> callback, NotificationClass* obj) {
     this->started = true;
     this->running = false;
-    this->msInterval = chrono::milliseconds(msInterval);
+    this->interval = interval;
     this->runThread = new thread(&NotifyTimer::run, this, false);
     this->callback = callback;
     this->obj = obj;
@@ -52,16 +56,16 @@ void NotifyTimer<NotificationClass>::run(bool notifyAll) {
         if (!this->started)  // for destroying the NotifyTimer
             return;
 
-        chrono::system_clock::time_point start = std::chrono::high_resolution_clock::now();
+        AlicaTime start = _clock.now();
         if (this->running) {
             (obj->*callback)();
         }
         //			XXX: call function here
-        auto dura = std::chrono::high_resolution_clock::now() - start;
+        AlicaTime dura = _clock.now() - start;
         //			cout << "NotifyTimerEvent: Duration is " <<
-        // chrono::duration_cast<chrono::nanoseconds>(dura).count()
+        // dura.inNanoseconds()
         //					<< " nanoseconds" << endl;
-        this_thread::sleep_for(msInterval - dura);
+        _clock.sleep(interval - dura);
     }
 }
 
@@ -100,13 +104,13 @@ bool NotifyTimer<NotificationClass>::isStarted() {
 }
 
 template <class NotificationClass>
-void NotifyTimer<NotificationClass>::setInterval(long msInterval) {
-    this->msInterval = chrono::milliseconds(msInterval);
+void NotifyTimer<NotificationClass>::setInterval(AlicaTime interval) {
+    this->interval = interval;
 }
 
 template <class NotificationClass>
-const long NotifyTimer<NotificationClass>::getInterval() const {
-    return msInterval.count();
+const AlicaTime NotifyTimer<NotificationClass>::getInterval() const {
+    return interval;
 }
 
 } /* namespace supplementary */
