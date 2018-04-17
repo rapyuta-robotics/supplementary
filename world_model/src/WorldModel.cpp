@@ -1,6 +1,7 @@
 #include "supplementary/WorldModel.h"
 
 #include <engine/AlicaEngine.h>
+#include <engine/AlicaClock.h>
 #include <engine/teammanager/TeamManager.h>
 #include <supplementary/AgentID.h>
 
@@ -35,7 +36,7 @@ AlicaTime WorldModel::getTime() {
     if (this->alicaEngine != nullptr) {
         return this->alicaEngine->getAlicaClock()->now();
     } else {
-        return AlicaTime::zero();
+        return alica::AlicaTime::zero();
     }
 }
 
