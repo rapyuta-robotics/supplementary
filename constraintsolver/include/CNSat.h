@@ -9,7 +9,6 @@
 #define CNSAT_H_
 
 #include "types/Assignment.h"
-#include "engine/AlicaClock.h"
 
 #include <vector>
 #include <memory>
@@ -17,6 +16,7 @@
 using namespace std;
 
 namespace alica {
+class AlicaClock;
 
 namespace reasoner {
 class CNSMTGSolver;
