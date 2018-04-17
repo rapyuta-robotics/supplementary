@@ -17,8 +17,6 @@
 #include <fstream>
 
 using namespace std;
-using alica::AlicaTime;
-using alica::AlicaClock;
 
 namespace alica {
 
