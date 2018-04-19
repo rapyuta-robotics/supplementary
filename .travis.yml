@@ -16,13 +16,14 @@ env:
     - ROSINSTALL_FILE=$CI_SOURCE_PATH/dependencies.rosinstall
     - CATKIN_OPTIONS=$CI_SOURCE_PATH/catkin.options
     - ROS_PARALLEL_JOBS='-j8 -l6'
+    - PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages
     - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 
 
 ################################################################################
 
 before_install:
-  - docker run -e BRANCH -d --name alica-test -v $CI_SOURCE_PATH:/travis ros:kinetic-ros-core-xenial tail -f /dev/null
+  - docker run -e BRANCH -e PYTHONPATH -d --name alica-test -v $CI_SOURCE_PATH:/travis ros:kinetic-ros-core-xenial tail -f /dev/null
   - docker ps
 
 install:
