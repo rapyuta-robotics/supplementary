@@ -117,7 +117,7 @@ void ProcessManager::handleProcessCommand(process_manager::ProcessCommandPtr pc)
     // check whether this message is for me, 0 is a wild card for all ProcessManagers
     const AgentID* receiverId;
     if (pc->receiverId.type == supplementary::AgentID::BC_TYPE) {
-        receiverId = new supplementary::BroadcastID(nullptr, 0);
+        receiverId = supplementary::BroadcastID(nullptr, 0);
     } else {
         receiverId = this->pmRegistry->getRobotId(pc->receiverId.id);
     }
