@@ -4,6 +4,7 @@
 #include <SystemConfig.h>
 #include <engine/PlanRepository.h>
 #include <engine/SimplePlanTree.h>
+#include <engine/Types.h>
 #include <engine/containers/PlanTreeInfo.h>
 #include <engine/model/EntryPoint.h>
 #include <engine/model/Plan.h>
@@ -16,7 +17,8 @@
 namespace alica
 {
 
-typedef std::map<const supplementary::AgentID*, std::shared_ptr<SimplePlanTree>, supplementary::AgentIDComparator> SimplePlanTreeMap;
+typedef std::unordered_map<const supplementary::AgentID*, std::shared_ptr<SimplePlanTree>, supplementary::AgentIDHash, supplementary::AgentIDEqualsComparator>
+    SimplePlanTreeMap;
 
 class AgentInfo
 {
@@ -32,7 +34,53 @@ class AgentInfo
     int id;
     std::string name;
 };
-typedef std::map<const supplementary::AgentID*, AgentInfo, supplementary::AgentIDComparator> AgentInfoMap;
+typedef std::unordered_map<const supplementary::AgentID*, AgentInfo, supplementary::AgentIDHash, supplementary::AgentIDEqualsComparator> AgentInfoMap;
+
+class CombinedSimplePlanTree
+{
+  public:
+    CombinedSimplePlanTree(const std::shared_ptr<SimplePlanTree> spt)
+        : _spt(spt)
+    {
+        addRobot(spt->getRobotId());
+    }
+
+    const std::unordered_set<std::shared_ptr<CombinedSimplePlanTree>>& getChildren() const { return _children; }
+
+    std::unordered_set<std::shared_ptr<CombinedSimplePlanTree>>& editChildren() { return _children; }
+
+    const std::shared_ptr<SimplePlanTree> getSpt() const { return _spt; }
+
+    const AgentGrp& getRobotsSorted()
+    {
+        std::sort(_robotIds.begin(), _robotIds.end(), supplementary::AgentIDComparator());
+        return _robotIds;
+    }
+
+    void addRobot(const supplementary::AgentID* robotId)
+    {
+        if (robotId) {
+            _robotIds.push_back(robotId);
+        }
+    }
+
+  private:
+    const std::shared_ptr<SimplePlanTree> _spt;
+    std::unordered_set<std::shared_ptr<CombinedSimplePlanTree>> _children;
+    AgentGrp _robotIds;
+};
+
+struct StateHash
+{
+    std::size_t operator()(const State* const obj) const { return std::hash<int64_t>{}(obj->getId()); }
+};
+
+struct StateEqualsComparator
+{
+    bool operator()(const State* a, const State* b) const { return a->getId() == b->getId(); }
+};
+
+typedef std::unordered_map<const State*, std::shared_ptr<CombinedSimplePlanTree>, StateHash, StateEqualsComparator> CombinedSimplePlanTreeMap;
 
 class AlicaPlan
 {
@@ -40,6 +88,7 @@ class AlicaPlan
     AlicaPlan(int argc, char* argv[])
         : _planParser(&_planRepository)
         , _agentIDManager(new supplementary::AgentIDFactory())
+        , _rootState(new State(-1))
     {
         if (argc < 2) {
             std::cout << "Usage: Base -m [Masterplan] -rd [rolesetdir] -r [roleset]" << std::endl;
@@ -55,7 +104,6 @@ class AlicaPlan
                 masterPlanName = argv[i + 1];
                 ++i;
             }
-
             if (std::string(argv[i]) == "-rd" || std::string(argv[i]) == "-rolesetdir") {
                 roleSetDir = argv[i + 1];
                 ++i;
@@ -84,11 +132,42 @@ class AlicaPlan
         }
     }
 
+    ~AlicaPlan() { delete _rootState; }
+
+    void addSptToCspt(std::shared_ptr<CombinedSimplePlanTree> parent, const std::shared_ptr<SimplePlanTree> spt)
+    {
+        const State* state = spt->getState();
+        std::shared_ptr<CombinedSimplePlanTree> cur;
+        CombinedSimplePlanTreeMap::iterator csptEntry = _combinedSimplePlanTree.find(state);
+        if (csptEntry == _combinedSimplePlanTree.end()) {
+            cur = std::make_shared<CombinedSimplePlanTree>(spt);
+            _combinedSimplePlanTree.emplace(state, cur);
+            parent->editChildren().insert(cur);
+        } else {
+            cur = csptEntry->second;
+            cur->addRobot(spt->getRobotId());
+        }
+        for (const std::shared_ptr<SimplePlanTree>& child_spt : spt->getChildren()) {
+            addSptToCspt(cur, child_spt);
+        }
+    }
+
+    const CombinedSimplePlanTreeMap& getCombinedSimplePlanTree()
+    {
+        _combinedSimplePlanTree.clear();
+        std::shared_ptr<CombinedSimplePlanTree> root = std::make_shared<CombinedSimplePlanTree>(std::make_shared<SimplePlanTree>());
+        _combinedSimplePlanTree.emplace(_rootState, root);
+        for (const auto& sptMapPair : _simplePlanTrees) {
+            addSptToCspt(root, sptMapPair.second);
+        }
+        return _combinedSimplePlanTree;
+    }
+
     void handlePlanTreeInfo(const PlanTreeInfo& incoming)
     {
         std::shared_ptr<SimplePlanTree> spt = sptFromMessage(incoming.senderID, incoming.stateIDs);
         if (spt != nullptr) {
-            auto sptEntry = _simplePlanTrees.find(incoming.senderID);
+            SimplePlanTreeMap::iterator sptEntry = _simplePlanTrees.find(incoming.senderID);
             if (sptEntry != _simplePlanTrees.end()) {
                 sptEntry->second = spt;
             } else {
@@ -103,19 +182,16 @@ class AlicaPlan
             std::cout << "Unknown state." << std::endl;
             return false;
         }
-
         const EntryPoint* entryPoint = nullptr;
         for (const EntryPoint* ep : state->getInPlan()->getEntryPoints()) {
             if (std::find(ep->getReachableStates().begin(), ep->getReachableStates().end(), state) != ep->getReachableStates().end()) {
                 entryPoint = ep;
             }
         }
-
         if (entryPoint == nullptr) {
             std::cout << "Entrypoint unknown for state (" << state << ")." << std::endl;
             return false;
         }
-
         spt->setState(state);
         spt->setEntryPoint(entryPoint);
         return true;
@@ -173,11 +249,13 @@ class AlicaPlan
         return root;
     }
 
+    const State* getRootState() const { return _rootState; }
+
     const SimplePlanTreeMap& getSimplePlanTrees() const { return _simplePlanTrees; }
 
     const AgentInfo* getAgentInfo(const supplementary::AgentID* agentID) const
     {
-        auto agentInfoEntry = _agentInfos.find(agentID);
+        AgentInfoMap::const_iterator agentInfoEntry = _agentInfos.find(agentID);
         if (agentInfoEntry != _agentInfos.end()) {
             return &agentInfoEntry->second;
         }
@@ -185,9 +263,11 @@ class AlicaPlan
     }
 
   private:
+    const State* _rootState;
     PlanRepository _planRepository;
     PlanParser _planParser;
     SimplePlanTreeMap _simplePlanTrees;
+    CombinedSimplePlanTreeMap _combinedSimplePlanTree;
     AgentInfoMap _agentInfos;
     supplementary::AgentIDManager _agentIDManager;
 };

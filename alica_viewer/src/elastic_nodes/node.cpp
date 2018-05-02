@@ -59,9 +59,14 @@
 namespace elastic_nodes
 {
 
-QRectF Node::_nodeShape(-LONG_AXIS, -SHORT_AXIS, 2 * LONG_AXIS, 2 * SHORT_AXIS);
+QRectF nodeShape(-Node::WIDTH / 2, -Node::HEIGHT / 2, Node::WIDTH, Node::HEIGHT);
+QRectF ellipseShape(nodeShape.topLeft(), QSizeF(2 * Node::LONG_AXIS, 2 * Node::SHORT_AXIS));
+QRectF infoShape(ellipseShape.bottomRight(), QSizeF(Node::WIDTH - 2 * Node::LONG_AXIS, Node::HEIGHT - 2 * Node::SHORT_AXIS));
 
-Node::Node(const std::string& state, const std::string& task, const std::string& plan)
+QPointF Node::arrowStartPos = (ellipseShape.bottomLeft() + ellipseShape.bottomRight()) / 2;
+QPointF Node::arrowEndPos = (ellipseShape.topLeft() + ellipseShape.topRight()) / 2;
+
+Node::Node(const std::string& state, const std::string& task, const std::string& plan, const std::string& info)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
@@ -70,6 +75,7 @@ Node::Node(const std::string& state, const std::string& task, const std::string&
     _stateName = QString::fromStdString(state);
     _taskName = QString::fromStdString(task);
     _planName = QString::fromStdString(plan);
+    _info = QString::fromStdString(info);
     QString tool_tip = QString("Plan: ") + _planName + (", Task: ") + _taskName;
     setToolTip(tool_tip);
 }
@@ -88,14 +94,7 @@ QList<Edge*> Node::edges() const
 QRectF Node::boundingRect() const
 {
     qreal buffer = 2;
-    return _nodeShape.adjusted(-buffer, -buffer, buffer, buffer);
-}
-
-QPainterPath Node::shape() const
-{
-    QPainterPath path;
-    path.addEllipse(_nodeShape);
-    return path;
+    return nodeShape.adjusted(-buffer, -buffer, buffer, buffer);
 }
 
 void Node::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget*)
@@ -103,33 +102,32 @@ void Node::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
     // Draw ellipse representing state
     painter->setPen(Qt::NoPen);
     painter->setBrush(Qt::yellow);
-    painter->drawEllipse(_nodeShape);
+    painter->drawEllipse(ellipseShape);
     // Draw enclosing eclipse
     qreal buffer = 1;
     painter->setPen(QPen(Qt::black, 0));
-    painter->drawEllipse(_nodeShape.adjusted(-buffer, -buffer, buffer, buffer));
+    painter->drawEllipse(ellipseShape.adjusted(-buffer, -buffer, buffer, buffer));
     // Add text with bounding rectangle
-    float factor = _nodeShape.width() / painter->fontMetrics().width(_stateName);
+    float factor = ellipseShape.width() / painter->fontMetrics().width(_stateName);
     if ((factor > 0.5 && factor < 1)) {
         QFont f = painter->font();
         f.setPointSizeF(f.pointSizeF() * factor);
         painter->setFont(f);
     }
-    painter->drawText(_nodeShape, Qt::AlignCenter | Qt::TextDontClip | Qt::TextWordWrap, _stateName);
+    painter->drawText(ellipseShape, Qt::AlignCenter | Qt::TextDontClip | Qt::TextWordWrap, _stateName);
+
+    // Add aditional information besides the node
+    painter->setPen(Qt::black);
+    painter->setFont(QFont("Arial", 10));
+    painter->drawText(infoShape, Qt::AlignLeft | Qt::TextDontClip | Qt::TextWordWrap, _info);
 }
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant& value)
 {
-    switch (change) {
-    case ItemPositionHasChanged:
+    if (change == ItemPositionHasChanged) {
         foreach (Edge* edge, _edgeList)
             edge->adjust();
-        // graph->itemMoved();
-        break;
-    default:
-        break;
-    };
-
+    }
     return QGraphicsItem::itemChange(change, value);
 }
 

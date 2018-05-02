@@ -59,15 +59,20 @@
 namespace elastic_nodes
 {
 
-#define LONG_AXIS 50
-#define SHORT_AXIS 30
-
 class Edge;
 
 class Node : public QGraphicsItem
 {
   public:
-    Node(const std::string& state, const std::string& task, const std::string& plan);
+    static constexpr int LONG_AXIS = 50;
+    static constexpr int SHORT_AXIS = 30;
+    static constexpr int WIDTH = 200;
+    static constexpr int HEIGHT = 200;
+
+    static QPointF arrowStartPos;
+    static QPointF arrowEndPos;
+
+    Node(const std::string& state, const std::string& task, const std::string& plan, const std::string& info);
 
     void addEdge(Edge* edge);
     QList<Edge*> edges() const;
@@ -78,7 +83,6 @@ class Node : public QGraphicsItem
     };
     int type() const override { return Type; }
     QRectF boundingRect() const override;
-    QPainterPath shape() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
   protected:
@@ -88,11 +92,11 @@ class Node : public QGraphicsItem
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
   private:
-    static QRectF _nodeShape;
     QList<Edge*> _edgeList;
     QString _stateName;
     QString _taskName;
     QString _planName;
+    QString _info;
 };
 
 } // namespace elastic_nodes

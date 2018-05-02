@@ -34,6 +34,7 @@ class AlicaViewerMainWindow : public QMainWindow
 
   private:
     elastic_nodes::Node* addStateToScene(const std::shared_ptr<SimplePlanTree>& spt, int x, int y);
+    elastic_nodes::Node* addStateToScene(const std::shared_ptr<CombinedSimplePlanTree>& spt, int x, int y);
     void updateNodes();
 
     Ui::AlicaViewerMainWindow _ui;
