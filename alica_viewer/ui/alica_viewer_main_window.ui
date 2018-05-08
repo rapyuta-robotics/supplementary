@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>500</height>
+    <width>1234</width>
+    <height>1044</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,8 +27,11 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QGraphicsView" name="graphicsView"/>
+    </item>
+    <item row="0" column="0">
+     <widget class="QComboBox" name="agentIdComboBox"/>
     </item>
    </layout>
   </widget>

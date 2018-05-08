@@ -3,7 +3,6 @@
 
 #include <SystemConfig.h>
 #include <engine/PlanRepository.h>
-#include <engine/SimplePlanTree.h>
 #include <engine/Types.h>
 #include <engine/containers/PlanTreeInfo.h>
 #include <engine/model/EntryPoint.h>
@@ -16,9 +15,6 @@
 
 namespace alica
 {
-
-typedef std::unordered_map<const supplementary::AgentID*, std::shared_ptr<SimplePlanTree>, supplementary::AgentIDHash, supplementary::AgentIDEqualsComparator>
-    SimplePlanTreeMap;
 
 class AgentInfo
 {
@@ -36,59 +32,143 @@ class AgentInfo
 };
 typedef std::unordered_map<const supplementary::AgentID*, AgentInfo, supplementary::AgentIDHash, supplementary::AgentIDEqualsComparator> AgentInfoMap;
 
-class CombinedSimplePlanTree
+class PlanTree
 {
   public:
-    CombinedSimplePlanTree(const std::shared_ptr<SimplePlanTree> spt)
-        : _spt(spt)
+    PlanTree()
+        : _parent(nullptr)
+        , _state(nullptr)
+        , _entryPoint(nullptr)
     {
-        addRobot(spt->getRobotId());
     }
 
-    const std::unordered_set<std::shared_ptr<CombinedSimplePlanTree>>& getChildren() const { return _children; }
-
-    std::unordered_set<std::shared_ptr<CombinedSimplePlanTree>>& editChildren() { return _children; }
-
-    const std::shared_ptr<SimplePlanTree> getSpt() const { return _spt; }
-
-    const AgentGrp& getRobotsSorted()
+    explicit PlanTree(const PlanTree* other)
+        : _state(other->_state)
+        , _entryPoint(other->_entryPoint)
+        , _robotIds(other->_robotIds)
     {
-        std::sort(_robotIds.begin(), _robotIds.end(), supplementary::AgentIDComparator());
-        return _robotIds;
+        for (PlanTree* child : other->_children) {
+            addChildren(new PlanTree(child));
+        }
+    }
+
+    ~PlanTree()
+    {
+        if (!_children.empty()) {
+            for (PlanTree* child : _children) {
+                delete child;
+            }
+        }
+    }
+
+    static bool compare(const PlanTree* a, const PlanTree* b)
+    {
+        if (a == nullptr || b == nullptr) {
+            return false;
+        }
+        if (a->getState() == nullptr || b->getState() == nullptr) {
+            return false;
+        }
+        return a->getState() == b->getState();
+    }
+
+    const std::vector<PlanTree*>& getChildren() const { return _children; }
+
+    void addChildren(PlanTree* child)
+    {
+        if (child != nullptr) {
+            child->setParent(this);
+            _children.push_back(child);
+        }
+    }
+
+    void getRobotsSorted(AgentGrp& robotIds) const
+    {
+        robotIds = _robotIds;
+        std::sort(robotIds.begin(), robotIds.end(), supplementary::AgentIDComparator());
+    }
+
+    const AgentGrp& getRobots() const { return _robotIds; }
+
+    void mergeRobots(const AgentGrp& robotIds)
+    {
+        // Here we assume that no duplicate robotID are present
+        for (const supplementary::AgentID* robotId : robotIds) {
+            addRobot(robotId);
+        }
     }
 
     void addRobot(const supplementary::AgentID* robotId)
     {
-        if (robotId) {
+        if (robotId != nullptr) {
             _robotIds.push_back(robotId);
         }
     }
 
+    void setParent(PlanTree* parent) { _parent = parent; }
+
+    const PlanTree* getParent() const { return _parent; }
+
+    const EntryPoint* getEntryPoint() const { return _entryPoint; }
+
+    const State* getState() const { return _state; }
+
+    bool setState(const State* state)
+    {
+        if (state == nullptr) {
+            std::cout << "Unknown state." << std::endl;
+            return false;
+        }
+        const EntryPoint* entryPoint = nullptr;
+        for (const EntryPoint* ep : state->getInPlan()->getEntryPoints()) {
+            if (std::find(ep->getReachableStates().begin(), ep->getReachableStates().end(), state) != ep->getReachableStates().end()) {
+                entryPoint = ep;
+            }
+        }
+        if (entryPoint == nullptr) {
+            std::cout << "Entrypoint unknown for state (" << state << ")." << std::endl;
+            return false;
+        }
+        _state = state;
+        _entryPoint = entryPoint;
+        return true;
+    }
+
+    void mergePlanTree(const PlanTree* src)
+    {
+        if (src != nullptr && src->getState() != nullptr) {
+            if (!_children.empty()) {
+                std::vector<PlanTree*>::iterator iter =
+                    std::find_if(_children.begin(), _children.end(), [&](PlanTree* pt) { return PlanTree::compare(pt, src); });
+                if (iter != _children.end()) {
+                    (*iter)->mergeRobots(src->getRobots());
+                    for (PlanTree* child : src->getChildren()) {
+                        (*iter)->mergePlanTree(child);
+                    }
+                    return;
+                }
+            }
+            addChildren(new PlanTree(src));
+        }
+    }
+
   private:
-    const std::shared_ptr<SimplePlanTree> _spt;
-    std::unordered_set<std::shared_ptr<CombinedSimplePlanTree>> _children;
+    PlanTree* _parent;
+    std::vector<PlanTree*> _children;
+    const State* _state;
+    const EntryPoint* _entryPoint;
     AgentGrp _robotIds;
 };
 
-struct StateHash
-{
-    std::size_t operator()(const State* const obj) const { return std::hash<int64_t>{}(obj->getId()); }
-};
-
-struct StateEqualsComparator
-{
-    bool operator()(const State* a, const State* b) const { return a->getId() == b->getId(); }
-};
-
-typedef std::unordered_map<const State*, std::shared_ptr<CombinedSimplePlanTree>, StateHash, StateEqualsComparator> CombinedSimplePlanTreeMap;
+typedef std::unordered_map<const supplementary::AgentID*, PlanTree*, supplementary::AgentIDHash, supplementary::AgentIDEqualsComparator> PlanTreeMap;
 
 class AlicaPlan
 {
   public:
     AlicaPlan(int argc, char* argv[])
         : _planParser(&_planRepository)
+        , _combinedPlanTree(nullptr)
         , _agentIDManager(new supplementary::AgentIDFactory())
-        , _rootState(new State(-1))
     {
         if (argc < 2) {
             std::cout << "Usage: Base -m [Masterplan] -rd [rolesetdir] -r [roleset]" << std::endl;
@@ -101,16 +181,13 @@ class AlicaPlan
 
         for (int i = 1; i < argc; ++i) {
             if (std::string(argv[i]) == "-m" || std::string(argv[i]) == "-masterplan") {
-                masterPlanName = argv[i + 1];
-                ++i;
+                masterPlanName = argv[++i];
             }
             if (std::string(argv[i]) == "-rd" || std::string(argv[i]) == "-rolesetdir") {
-                roleSetDir = argv[i + 1];
-                ++i;
+                roleSetDir = argv[++i];
             }
             if (std::string(argv[i]) == "-r" || std::string(argv[i]) == "-roleset") {
-                roleSetName = argv[i + 1];
-                ++i;
+                roleSetName = argv[++i];
             }
         }
 
@@ -132,99 +209,68 @@ class AlicaPlan
         }
     }
 
-    ~AlicaPlan() { delete _rootState; }
-
-    void addSptToCspt(std::shared_ptr<CombinedSimplePlanTree> parent, const std::shared_ptr<SimplePlanTree> spt)
+    ~AlicaPlan()
     {
-        const State* state = spt->getState();
-        std::shared_ptr<CombinedSimplePlanTree> cur;
-        CombinedSimplePlanTreeMap::iterator csptEntry = _combinedSimplePlanTree.find(state);
-        if (csptEntry == _combinedSimplePlanTree.end()) {
-            cur = std::make_shared<CombinedSimplePlanTree>(spt);
-            _combinedSimplePlanTree.emplace(state, cur);
-            parent->editChildren().insert(cur);
-        } else {
-            cur = csptEntry->second;
-            cur->addRobot(spt->getRobotId());
+        if (_combinedPlanTree) {
+            delete _combinedPlanTree;
         }
-        for (const std::shared_ptr<SimplePlanTree>& child_spt : spt->getChildren()) {
-            addSptToCspt(cur, child_spt);
+        for (const auto& ptMapPair : _planTrees) {
+            delete ptMapPair.second;
         }
     }
 
-    const CombinedSimplePlanTreeMap& getCombinedSimplePlanTree()
+    const PlanTree* getCombinedPlanTree()
     {
-        _combinedSimplePlanTree.clear();
-        std::shared_ptr<CombinedSimplePlanTree> root = std::make_shared<CombinedSimplePlanTree>(std::make_shared<SimplePlanTree>());
-        _combinedSimplePlanTree.emplace(_rootState, root);
-        for (const auto& sptMapPair : _simplePlanTrees) {
-            addSptToCspt(root, sptMapPair.second);
+        if (_combinedPlanTree) {
+            delete _combinedPlanTree;
         }
-        return _combinedSimplePlanTree;
+        _combinedPlanTree = new PlanTree();
+        for (const auto& ptMapPair : _planTrees) {
+            _combinedPlanTree->mergePlanTree(ptMapPair.second);
+        }
+        return _combinedPlanTree;
     }
 
     void handlePlanTreeInfo(const PlanTreeInfo& incoming)
     {
-        std::shared_ptr<SimplePlanTree> spt = sptFromMessage(incoming.senderID, incoming.stateIDs);
-        if (spt != nullptr) {
-            SimplePlanTreeMap::iterator sptEntry = _simplePlanTrees.find(incoming.senderID);
-            if (sptEntry != _simplePlanTrees.end()) {
-                sptEntry->second = spt;
+        PlanTree* pt = planTreeFromMessage(incoming.senderID, incoming.stateIDs);
+        if (pt != nullptr) {
+            PlanTreeMap::iterator ptEntry = _planTrees.find(incoming.senderID);
+            if (ptEntry != _planTrees.end()) {
+                ptEntry->second = pt;
             } else {
-                _simplePlanTrees.emplace(incoming.senderID, spt);
+                _planTrees.emplace(incoming.senderID, pt);
             }
         }
-    }
-
-    bool addState(std::shared_ptr<SimplePlanTree> spt, const State* state) const
-    {
-        if (state == nullptr) {
-            std::cout << "Unknown state." << std::endl;
-            return false;
-        }
-        const EntryPoint* entryPoint = nullptr;
-        for (const EntryPoint* ep : state->getInPlan()->getEntryPoints()) {
-            if (std::find(ep->getReachableStates().begin(), ep->getReachableStates().end(), state) != ep->getReachableStates().end()) {
-                entryPoint = ep;
-            }
-        }
-        if (entryPoint == nullptr) {
-            std::cout << "Entrypoint unknown for state (" << state << ")." << std::endl;
-            return false;
-        }
-        spt->setState(state);
-        spt->setEntryPoint(entryPoint);
-        return true;
     }
 
     /**
-     * Constructs a SimplePlanTree from a received message
-     * @param robotId The id of the other robot.
-     * @param ids The list of long encoding another robot's plantree as received in a PlanTreeInfo message.
-     * @return shared_ptr of a SimplePlanTree
+     * Constructs a PlanTree from a received message
+     * @param robotId The id of the robot.
+     * @param ids The list of long encoding of a robot's plantree as received in a PlanTreeInfo message.
+     * @return PlanTree*
      */
-    std::shared_ptr<SimplePlanTree> sptFromMessage(const supplementary::AgentID* robotId, const std::list<int64_t>& ids)
+    PlanTree* planTreeFromMessage(const supplementary::AgentID* robotId, const std::list<int64_t>& ids)
     {
         if (ids.size() == 0) {
             std::cerr << "Empty state list for robot " << robotId << std::endl;
             return nullptr;
         }
 
-        std::shared_ptr<SimplePlanTree> root = std::make_shared<SimplePlanTree>();
-        root->setRobotId(robotId);
-        root->setStateIds(ids);
+        PlanTree* root = new PlanTree();
+        root->addRobot(robotId);
 
         std::list<int64_t>::const_iterator iter = ids.begin();
         const PlanRepository::Accessor<State>& validStates = _planRepository.getStates();
-        if (!addState(root, validStates.find(*iter))) {
+        if (!root->setState(validStates.find(*iter))) {
             std::cout << "Unable to add State (" << *iter << ") received from " << robotId << std::endl;
             return nullptr;
         }
 
         if (ids.size() > 1) {
             ++iter;
-            std::shared_ptr<SimplePlanTree> curParent;
-            std::shared_ptr<SimplePlanTree> cur = root;
+            PlanTree* curParent;
+            PlanTree* cur = root;
             for (; iter != ids.end(); ++iter) {
                 if (*iter == -1) {
                     curParent = cur;
@@ -236,10 +282,10 @@ class AlicaPlan
                         return nullptr;
                     }
                 } else {
-                    cur = std::make_shared<SimplePlanTree>();
-                    cur->setRobotId(robotId);
-                    curParent->editChildren().insert(cur);
-                    if (!addState(cur, validStates.find(*iter))) {
+                    cur = new PlanTree();
+                    cur->addRobot(robotId);
+                    curParent->addChildren(cur);
+                    if (!cur->setState(validStates.find(*iter))) {
                         std::cout << "Unable to add State (" << *iter << ") received from " << robotId << std::endl;
                         return nullptr;
                     }
@@ -249,9 +295,9 @@ class AlicaPlan
         return root;
     }
 
-    const State* getRootState() const { return _rootState; }
+    const PlanTreeMap& getPlanTrees() const { return _planTrees; }
 
-    const SimplePlanTreeMap& getSimplePlanTrees() const { return _simplePlanTrees; }
+    const AgentInfoMap& getAgentInfoMap() const { return _agentInfos; }
 
     const AgentInfo* getAgentInfo(const supplementary::AgentID* agentID) const
     {
@@ -263,11 +309,10 @@ class AlicaPlan
     }
 
   private:
-    const State* _rootState;
     PlanRepository _planRepository;
     PlanParser _planParser;
-    SimplePlanTreeMap _simplePlanTrees;
-    CombinedSimplePlanTreeMap _combinedSimplePlanTree;
+    PlanTreeMap _planTrees;
+    PlanTree* _combinedPlanTree;
     AgentInfoMap _agentInfos;
     supplementary::AgentIDManager _agentIDManager;
 };
