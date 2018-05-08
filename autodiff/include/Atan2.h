@@ -1,36 +1,26 @@
-/*
- * Atan2.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef ATAN2_H_
-#define ATAN2_H_
+#pragma once
 
 #include "Term.h"
 
-#include <iostream>
+namespace autodiff
+{
 
-using namespace std;
-
-namespace autodiff {
-
-class Atan2 : public Term {
-public:
-    Atan2(shared_ptr<Term> left, shared_ptr<Term> right);
-
-    shared_ptr<Term> left;
-    shared_ptr<Term> right;
-
+class Atan2 : public Term
+{
+  public:
     int accept(shared_ptr<ITermVisitor> visitor);
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
 
-    string toString();
+    std::string toString() const override;
+
+  private:
+    friend TermHolder;
+    Atan2(TermPtr left, TermPtr right, TermHolder* owner);
+
+    TermPtr _left;
+    TermPtr _right;
 };
 
 } /* namespace autodiff */
-
-#endif /* ATAN2_H_ */

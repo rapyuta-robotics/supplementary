@@ -9,21 +9,31 @@
 #define TERM_H_
 
 #include "ITermVisitor.h"
+#include "Types.h"
 #include <engine/constraintmodul/SolverTerm.h>
 
-#include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
-using namespace std;
+namespace autodiff
+{
 
-namespace autodiff {
-enum AndType { MIN, AND };
-enum OrType { MAX, OR };
+class TermHolder;
 
-class Term : public enable_shared_from_this<Term>, public alica::SolverTerm {
-public:
-    Term();
+enum AndType
+{
+    MIN,
+    AND
+};
+enum OrType
+{
+    MAX,
+    OR
+};
+
+class Term /*: public alica::SolverTerm */
+{
+  public:
     virtual ~Term();
 
     /**
@@ -31,29 +41,9 @@ public:
      *
      * @param visitor The term visitor to accept
      */
-    virtual int accept(shared_ptr<ITermVisitor> visitor) = 0;
+    virtual int accept(ITermVisitor* visitor) = 0;
 
-    int getId() const;
-
-    // Additions by Carpe Noctem:
-    double min;
-    double max;
-
-    shared_ptr<Term> prev;
-    shared_ptr<Term> next;
-
-    vector<shared_ptr<Term>> parents;
-
-    // Extension to Term for fuzzy constraints:
-    static const shared_ptr<Term> TRUE;
-    static const shared_ptr<Term> FALSE;
-    static const double EPSILON;
-
-    virtual shared_ptr<Term> aggregateConstants() = 0;
-    virtual shared_ptr<Term> derivative(shared_ptr<Variable> v) = 0;
-    virtual shared_ptr<Term> negate();
-
-    virtual string toString() = 0;
+    int getId() const { return _id; }
 
     static AndType getAnd();
     static void setAnd(AndType a);
@@ -62,46 +52,64 @@ public:
     static double getConstraintSteepness();
     static void setConstraintSteepness(double constraintSteepness);
 
-private:
-    const int m_id;
-    static int m_nextId;
+    virtual TermPtr aggregateConstants() = 0;
+    virtual TermPtr derivative(VarPtr v) const = 0;
+    virtual TermPtr negate() const;
 
+    virtual std::string toString() const = 0;
+    virtual bool isConstant() const { return false; }
+
+    TermHolder* getOwner() const { return _owner; }
+
+  protected:
+    Term(TermHolder* owner);
+
+    TermHolder* _owner;
+    TermPtr _prev;
+    TermPtr _next;
+
+    std::vector<TermPtr> _parents;
+    double _min;
+    double _max;
+
+    // static const TermPtr TRUE;
+    // static const TermPtr FALSE;
+    static constexpr double EPSILON;
+
+  private:
+    const int _id;
+
+    static int _nextId;
     static OrType _orop;
     static AndType _andop;
-
     static double _constraintSteepness;
 };
 
-shared_ptr<Term> operator+(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator*(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator/(const shared_ptr<Term>& numerator, const shared_ptr<Term>& denominator);
-shared_ptr<Term> operator-(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
+TermPtr operator+(const TermPtr left, const TermPtr right);
+TermPtr operator*(const TermPtr left, const TermPtr right);
+TermPtr operator/(const TermPtr numerator, const TermPtr denominator);
+TermPtr operator-(const TermPtr left, const TermPtr right);
 
-shared_ptr<Term> operator+(const double left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator*(const double left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator/(const double numerator, const shared_ptr<Term>& denominator);
-shared_ptr<Term> operator-(const double left, const shared_ptr<Term>& right);
+TermPtr operator+(const double left, const TermPtr right);
+TermPtr operator*(const double left, const TermPtr right);
+TermPtr operator/(const double numerator, const TermPtr denominator);
+TermPtr operator-(const double left, const TermPtr right);
 
-shared_ptr<Term> operator+(const shared_ptr<Term>& left, const double right);
-shared_ptr<Term> operator*(const shared_ptr<Term>& left, const double right);
-shared_ptr<Term> operator/(const shared_ptr<Term>& numerator, const double denominator);
-shared_ptr<Term> operator-(const shared_ptr<Term>& left, const double right);
+TermPtr operator+(const TermPtr left, const double right);
+TermPtr operator*(const TermPtr left, const double right);
+TermPtr operator/(const TermPtr numerator, const double denominator);
+TermPtr operator-(const TermPtr left, const double right);
 
-shared_ptr<Term> operator-(const shared_ptr<Term>& term);
+TermPtr operator-(const TermPtr term);
 
-shared_ptr<Term> operator!(const shared_ptr<Term>& term);
-shared_ptr<Term> operator&(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator|(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator%(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator^(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
+TermPtr operator!(const TermPtr term);
+TermPtr operator&(const TermPtr left, const TermPtr right);
+TermPtr operator|(const TermPtr left, const TermPtr right);
 
-shared_ptr<Term> operator>(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator<(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator<=(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator>=(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-
-shared_ptr<Term> operator&=(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
-shared_ptr<Term> operator|=(const shared_ptr<Term>& left, const shared_ptr<Term>& right);
+TermPtr operator>(const TermPtr left, const TermPtr right);
+TermPtr operator<(const TermPtr left, const TermPtr right);
+TermPtr operator<=(const TermPtr left, const TermPtr right);
+TermPtr operator>=(const TermPtr left, const TermPtr right);
 
 } /* namespace autodiff */
 

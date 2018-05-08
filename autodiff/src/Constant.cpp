@@ -6,40 +6,42 @@
  */
 
 #include "Constant.h"
-
-#include "TermBuilder.h"
-#include "Constant.h"
+#include "TermHolder.h"
 
 #include <cmath>
 
-namespace autodiff {
+namespace autodiff
+{
 
-Constant::Constant(double value)
-        : Term() {
-    this->value = value;
+Constant::Constant(double value, TermHolder* owner)
+    : Term(owner)
+    , _value(value)
+{
 }
 
-int Constant::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<Constant> thisCasted = dynamic_pointer_cast<Constant>(shared_from_this());
-    return visitor->visit(thisCasted);
+int Constant::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-shared_ptr<Term> Constant::aggregateConstants() {
-    return shared_from_this();
+TermPtr Constant::aggregateConstants() const
+{
+    return this;
 }
 
-shared_ptr<Term> Constant::derivative(shared_ptr<Variable> v) {
-    return 0;
+TermPtr Constant::derivative(shared_ptr<Variable> v) const
+{
+    return owner->zeroConstant();
 }
 
-string Constant::toString() {
-    if (shared_from_this() == Term::TRUE)
+std::string Constant::toString() const
+{
+    if (this == owner->trueConstant()) {
         return "true";
-    else if (shared_from_this() == Term::FALSE)
+    } else if (this == owner->falseConstant()) {
         return "false";
+    }
 
-    string str;
-    str.append(to_string(value));
-    return str;
+    return std::to_string(value);
 }
 } /* namespace autodiff */

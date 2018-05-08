@@ -1,37 +1,27 @@
-/*
- * ConstraintUtility.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef CONSTRAINTUTILITY_H_
-#define CONSTRAINTUTILITY_H_
+#pragma once
 
 #include "Term.h"
 
-#include <iostream>
+namespace autodiff
+{
 
-using namespace std;
+class ConstraintUtility : public Term
+{
+  public:
+    int accept(shared_ptr<ITermVisitor> visitor) override;
 
-namespace autodiff {
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(shared_ptr<Variable> v) const override;
+    TermPtr negate() const override;
 
-class ConstraintUtility : public Term {
-public:
-    ConstraintUtility(shared_ptr<Term> constraint, shared_ptr<Term> utility);
+    std::string toString() override;
 
-    shared_ptr<Term> constraint;
-    shared_ptr<Term> utility;
+  private:
+    friend TermHolder;
+    ConstraintUtility(TermPtr constraint, TermPtr utility, TermHolder* owner);
 
-    int accept(shared_ptr<ITermVisitor> visitor);
-
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
-    shared_ptr<Term> negate();
-
-    string toString();
+    TermPtr _constraint;
+    TermPtr _utility;
 };
 
 } /* namespace autodiff */
-
-#endif /* CONSTRAINTUTILITY_H_ */

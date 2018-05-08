@@ -1,35 +1,25 @@
-/*
- * Cos.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef COS_H_
-#define COS_H_
+#pragma once
 
 #include "Term.h"
 
-#include <iostream>
+namespace autodiff
+{
 
-using namespace std;
+class Cos : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-namespace autodiff {
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(shared_ptr<Variable> v) const override;
 
-class Cos : public Term {
-public:
-    Cos(shared_ptr<Term> arg);
+    std::string toString() const override;
 
-    shared_ptr<Term> arg;
+  private:
+    friend TermHolder;
+    Cos(TermPtr arg, TermHolder* owner);
 
-    int accept(shared_ptr<ITermVisitor> visitor);
-
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
-
-    string toString();
+    TermPtr _arg;
 };
 
 } /* namespace autodiff */
-
-#endif /* COS_H_ */

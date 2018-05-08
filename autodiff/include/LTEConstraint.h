@@ -1,36 +1,31 @@
-/*
- * LTEConstraint.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef LTECONSTRAINT_H_
-#define LTECONSTRAINT_H_
+#pragma once
 
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class LTEConstraint : public Term {
-public:
-    LTEConstraint(shared_ptr<Term> x, shared_ptr<Term> y, double steppness);
-    LTEConstraint(shared_ptr<Term> x, shared_ptr<Term> y, double steppness, shared_ptr<Term> negatedForm);
+class LTEConstraint : public Term
+{
+  public:
+    void setNegation(LTConstraint* negation) { _negatedForm = negation; }
 
-    shared_ptr<Term> left;
-    shared_ptr<Term> right;
-    double steppness;
-    shared_ptr<Term> negatedform;
+    int accept(ITermVisitor* visitor) override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
+    TermPtr negate() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
-    shared_ptr<Term> negate();
+    std::string toString() const override;
 
-    string toString();
+  private:
+    friend TermHolder;
+    LTEConstraint(TermPtr x, TermPtr y, double steppness, TermHolder* owner);
+
+    TermPtr _left;
+    TermPtr _right;
+    double _steepness;
+    mutable TermPtr _negatedform;
 };
 
 } /* namespace autodiff */
-
-#endif /* LTECONSTRAINT_H_ */

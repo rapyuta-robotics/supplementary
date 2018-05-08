@@ -7,66 +7,64 @@
 
 #include "LTConstraint.h"
 
-#include "TermBuilder.h"
 #include "Constant.h"
 #include "LTEConstraint.h"
+#include "TermHolder.h"
 
 #include <cmath>
+#include <sstream>
 
-namespace autodiff {
-LTConstraint::LTConstraint(shared_ptr<Term> x, shared_ptr<Term> y, double steppness)
-        : Term() {
-    this->left = x;
-    this->right = y;
-    this->steppness = steppness;
-    this->negatedform = nullptr;
+namespace autodiff
+{
+LTConstraint::LTConstraint(TermPtr x, TermPtr y, double steepness, TermHolder* owner)
+    : Term(owner)
+    , _left(x)
+    , _right(y)
+    , _steepness(steepness)
+    , _negatedform(nullptr)
+{
 }
 
-LTConstraint::LTConstraint(shared_ptr<Term> x, shared_ptr<Term> y, double steppness, shared_ptr<Term> negatedForm)
-        : Term() {
-    this->left = x;
-    this->right = y;
-    this->steppness = steppness;
-    this->negatedform = negatedForm;
+int LTConstraint::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-int LTConstraint::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<LTConstraint> thisCasted = dynamic_pointer_cast<LTConstraint>(shared_from_this());
-    return visitor->visit(thisCasted);
-}
-
-shared_ptr<Term> LTConstraint::aggregateConstants() {
-    left = left->aggregateConstants();
-    right = right->aggregateConstants();
-    if (dynamic_pointer_cast<Constant>(left) != 0 && dynamic_pointer_cast<Constant>(right) != 0) {
-        shared_ptr<Constant> x = dynamic_pointer_cast<Constant>(left);
-        shared_ptr<Constant> y = dynamic_pointer_cast<Constant>(right);
-        if (x->value < y->value) {
-            return Term::TRUE;
+TermPtr LTConstraint::aggregateConstants()
+{
+    _left = _left->aggregateConstants();
+    _right = _right->aggregateConstants();
+    if (_left->isConstant() && _right->isConstant()) {
+        if (static_cast<Constant*>(_left)->getValue() < static_cast<Constant*>(_right)->getValue()) {
+            return _owner->trueConstant();
         } else {
-            return Term::FALSE;
+            return _owner->falseConstant();
         }
     } else {
-        return shared_from_this();
+        return this;
     }
 }
 
-shared_ptr<Term> LTConstraint::derivative(shared_ptr<Variable> v) {
+TermPtr LTConstraint::derivative(VarPtr v) const
+{
     throw "Symbolic Derivation of Less-Than not supported.";
+    return nullptr;
 }
 
-shared_ptr<Term> LTConstraint::negate() {
-    if (!(negatedform != nullptr)) {
-        negatedform = make_shared<LTEConstraint>(right, left, steppness, shared_from_this());
+TermPtr LTConstraint::negate() const
+{
+    if (_negatedform == nullptr) {
+        _negatedform = _owner->lessThanEqual(_right, _left, _steepness);
+        _negatedform->setNegation(this);
     }
     return negatedform;
 }
 
-string LTConstraint::toString() {
-    string str;
-    str.append(left->toString());
-    str.append(" < ");
-    str.append(right->toString());
-    return str;
+std::string LTConstraint::toString() const
+{
+    std::stringstream str;
+    str << left->toString() << " < " << right->toString();
+    return str.str();
 }
+
 } /* namespace autodiff */

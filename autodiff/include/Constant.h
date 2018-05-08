@@ -1,35 +1,27 @@
-/*
- * Constant.h
- *
- *  Created on: Jun 12, 2014
- *      Author: psp
- */
-
-#ifndef CONSTANT_H_
-#define CONSTANT_H_
+#pragma once
 
 #include "Term.h"
 
-#include <iostream>
+namespace autodiff
+{
 
-using namespace std;
+class Constant : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-namespace autodiff {
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(shared_ptr<Variable> v) const override;
 
-class Constant : public Term {
-public:
-    Constant(double value);
+    std::string toString() const override;
+    double getValue() const { return _value; }
 
-    double value;
+    virtual bool isConstant() const override { return true; }
 
-    int accept(shared_ptr<ITermVisitor> visitor);
-
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
-
-    string toString();
+  private:
+    friend TermHolder;
+    Constant(double value, TermHolder* owner);
+    double _value;
 };
 
 } /* namespace autodiff */
-
-#endif /* CONSTANT_H_ */

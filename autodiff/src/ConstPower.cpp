@@ -7,68 +7,59 @@
 
 #include "ConstPower.h"
 
-#include "TermBuilder.h"
 #include "Constant.h"
-#include "Zero.h"
+#include "TermHolder.h"
 
 #include <cmath>
-#include <string>
+#include <sstringstream>
 
-namespace autodiff {
-ConstPower::ConstPower(shared_ptr<Term> baseTerm, double exponent)
-        : Term() {
-    this->base = baseTerm;
-    this->exponent = exponent;
+namespace autodiff
+{
+ConstPower::ConstPower(TermPtr baseTerm, double exponent, TermHolder* owner)
+    : Term(owner)
+    , _base(baseTerm)
+    , _exponent(exponent)
+{
 }
 
-int ConstPower::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<ConstPower> thisCasted = dynamic_pointer_cast<ConstPower>(shared_from_this());
-    return visitor->visit(thisCasted);
+int ConstPower::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-shared_ptr<Term> ConstPower::aggregateConstants() {
-    base = base->aggregateConstants();  // all your base are belong to us
-    auto constBase = dynamic_pointer_cast<Constant>(this->base);
+TermPtr ConstPower::aggregateConstants()
+{
+    _base = _base->aggregateConstants(); // all your base are belong to us
 
-    if (constBase) {
-        return TermBuilder::constant(pow(constBase->value, exponent));
+    if (_base->isConstant()) {
+        return _owner->constant(pow(static_cast<Constant*>(_base)->getValue(), exponent));
     }
 
-    auto zeroBase = dynamic_pointer_cast<Zero>(base);
+    ConstPower* constPowerBase = dynamic_cast<ConstPower>(base);
 
-    if (zeroBase) {
-        if (exponent >= 0) {
-            return zeroBase;
-        } else {
-            throw "ConstPower: Divide By Zero";
-        }
+    if (constPowerBase != nullptr) {
+        _exponent *= constPowerBase->exponent;
+        _base = constPowerBase->base;
     }
 
-    auto constPowerBase = dynamic_pointer_cast<ConstPower>(base);
+    return this;
+}
 
-    if (constPowerBase) {
-        this->exponent *= constPowerBase->exponent;
-        this->base = constPowerBase->base;
-        return shared_from_this();
+TermPtr ConstPower::derivative(VarPtr v) const
+{
+    return _owner->constant(exponent) * owner->constPower(base, exponent - 1) * base->derivative(v);
+}
+
+std::string ConstPower::toString() const
+{
+    std::stringstream str;
+    str << "constPower( ";
+    if (base != nullptr) {
+        std << base->toString();
+    } else {
+        str << "nullptr";
     }
-
-    return shared_from_this();
-}
-
-shared_ptr<Term> ConstPower::derivative(shared_ptr<Variable> v) {
-    return TermBuilder::constant(exponent) * make_shared<ConstPower>(base, exponent - 1) * base->derivative(v);
-}
-
-string ConstPower::toString() {
-    string str;
-    str.append("constPower( ");
-    if (base != nullptr)
-        str.append(base->toString());
-    else
-        str.append("nullptr");
-    str.append(", ");
-    str.append(std::to_string(exponent));
-    str.append(" )");
-    return str;
+    str << ", " << exponent << " )";
+    return str.str();
 }
 } /* namespace autodiff */

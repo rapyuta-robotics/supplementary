@@ -1,31 +1,24 @@
-/*
- * Log.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef LOG_H_
-#define LOG_H_
-
+#pragma once
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class Log : public Term {
-public:
-    Log(shared_ptr<Term> arg);
+class Log : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-    shared_ptr<Term> arg;
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    std::string toString() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
+  private:
+    friend TermHolder;
+    Log(TermPtr arg, TermHolder* owner);
 
-    string toString();
+    TermPtr _arg;
 };
 
 } /* namespace autodiff */
-
-#endif /* LOG_H_ */

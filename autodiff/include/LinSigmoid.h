@@ -1,31 +1,25 @@
-/*
- * LinSigmoid.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef LINSIGMOID_H_
-#define LINSIGMOID_H_
+#pragma once
 
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class LinSigmoid : public Term {
-public:
-    LinSigmoid(shared_ptr<Term> arg);
+class LinSigmoid : public Term
+{
+  public:
+    int accept(shared_ptr<ITermVisitor> visitor) override;
 
-    shared_ptr<Term> arg;
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(shared_ptr<Variable> v) const override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    std::string toString() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
+  private:
+    friend TermHolder;
+    LinSigmoid(TermPtr arg, TermHolder* owner);
 
-    string toString();
+    TermPtr _arg;
 };
 
 } /* namespace autodiff */
-
-#endif /* LINSIGMOID_H_ */

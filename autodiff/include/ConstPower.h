@@ -1,36 +1,26 @@
-/*
- * ConstPower.h
- *
- *  Created on: Jun 16, 2014
- *      Author: psp
- */
-
-#ifndef CONSTPOWER_H_
-#define CONSTPOWER_H_
+#pragma once
 
 #include "Term.h"
 
-#include <iostream>
+namespace autodiff
+{
 
-using namespace std;
+class ConstPower : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-namespace autodiff {
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
 
-class ConstPower : public Term {
-public:
-    ConstPower(shared_ptr<Term> baseTerm, double exponent);
+    std::string toString() const overrides;
 
-    shared_ptr<Term> base;
-    double exponent;
+  private:
+    friend TermHolder;
+    ConstPower(TermPtr baseTerm, double exponent, TermHolder* owner);
 
-    int accept(shared_ptr<ITermVisitor> visitor);
-
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
-
-    string toString();
+    TermPtr _base;
+    double _exponent;
 };
 
 } /* namespace autodiff */
-
-#endif /* CONSTPOWER_H_ */
