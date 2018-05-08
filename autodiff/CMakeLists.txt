@@ -10,6 +10,15 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 
+set(CMAKE_CXX_FLAGS "-Werror-implicit-function-declaration -Werror=return-type -Wno-reorder ${CMAKE_CXX_FLAGS}") #-Wall 
+
+set(OPTIMIZATION "-O2 -finline-functions -funroll-loops -fomit-frame-pointer")
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG ${CPP_STD} ${OPTIMIZATION}")
+
+
+
+
 find_package(catkin REQUIRED COMPONENTS
  fsystem
  alica_engine
@@ -80,6 +89,11 @@ add_library(autodiff
 )
 
 target_link_libraries(autodiff ${catkin_LIBRARIES})
+
+
+add_executable(sine_benchmark test/test_benchmark.cpp)
+
+target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}-test test/test_autodiff.cpp)
