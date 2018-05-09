@@ -1,34 +1,28 @@
-/*
- * Sigmoid.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef SIGMOID_H_
-#define SIGMOID_H_
+#pragma once
 
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class Sigmoid : public Term {
-public:
-    Sigmoid(shared_ptr<Term> arg, shared_ptr<Term> mid);
-    Sigmoid(shared_ptr<Term> arg, shared_ptr<Term> mid, double steppness);
+class Sigmoid : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-    shared_ptr<Term> arg;
-    shared_ptr<Term> mid;
-    double steepness;
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    std::string toString() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
+  private:
+    friend TermHolder;
+    Sigmoid(TermPtr arg, TermPtr mid, TermHolder* owner);
+    Sigmoid(TermPtr arg, TermPtr mid, double steepness, TermHolder* owner);
 
-    string toString();
+    TermPtr _arg;
+    TermPtr _mid;
+    double _steepness;
 };
 
 } /* namespace autodiff */
-
-#endif /* SIGMOID_H_ */

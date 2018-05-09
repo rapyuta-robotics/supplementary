@@ -1,52 +1,45 @@
-/*
- * Sin.cpp
- *
- *  Created on: Jul 18, 2014
- *      Author: psp
- */
 
 #include "Sin.h"
 
-#include "TermBuilder.h"
 #include "Constant.h"
 #include "Cos.h"
+#include "TermHolder.h"
 #include "Zero.h"
 
 #include <cmath>
+#include <sstream>
 
-namespace autodiff {
-Sin::Sin(shared_ptr<Term> arg)
-        : Term() {
-    this->arg = arg;
+namespace autodiff
+{
+Sin::Sin(TermPtr arg, TermHolder* owner)
+    : Term(owner)
+    , _arg(arg)
+{
 }
 
-int Sin::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<Sin> thisCasted = dynamic_pointer_cast<Sin>(shared_from_this());
-    return visitor->visit(thisCasted);
+int Sin::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-shared_ptr<Term> Sin::aggregateConstants() {
-    arg = arg->aggregateConstants();
-    if (dynamic_pointer_cast<Constant>(arg) != 0) {
-        shared_ptr<Constant> arg = dynamic_pointer_cast<Constant>(arg);
-        return TermBuilder::constant(sin(arg->value));
-    } else {
-        if (dynamic_pointer_cast<Zero>(arg) != 0) {
-            return TermBuilder::constant(0);
-        }
-        return shared_from_this();
+TermPtr Sin::aggregateConstants()
+{
+    _arg = _arg->aggregateConstants();
+    if (arg->isConstant()) {
+        return _owner->constant(sin(static_cast<Constant*>(arg)->getValue()));
     }
+    return this;
 }
 
-shared_ptr<Term> Sin::derivative(shared_ptr<Variable> v) {
-    return make_shared<Cos>(arg) * arg->derivative(v);
+TermPtr Sin::derivative(VarPtr v) const
+{
+    return _owner->cos(arg) * arg->derivative(v);
 }
 
-string Sin::toString() {
-    string str;
-    str.append("sin( ");
-    str.append(arg->toString());
-    str.append(" )");
-    return str;
+std::string Sin::toString() const
+{
+    std::stringstream str;
+    str << "sin( " << arg->toString() << " )";
+    return str.str();
 }
 } /* namespace autodiff */

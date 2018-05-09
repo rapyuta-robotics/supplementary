@@ -3,7 +3,7 @@
 
 #include "Constant.h"
 #include "LTConstraint.h"
-#include "TermBuilder.h"
+#include "TermHolder.h"
 
 #include <cmath>
 #include <sstream>

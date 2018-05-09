@@ -1,43 +1,38 @@
-/*
- * Reification.cpp
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
 
 #include "Reification.h"
+#include <sstream>
 
-namespace autodiff {
-Reification::Reification(shared_ptr<Term> condition, double min, double max)
-        : Term() {
-    this->condition = condition;
-    this->negatedCondition = condition->negate();
-    this->min = min;
-    this->max = max;
+namespace autodiff
+{
+Reification::Reification(TermPtr condition, double min, double max, TermHolder* owner)
+    : Term(owner)
+    , _condition(condition)
+    , _negatedCondition(condition->negate())
+    , _min(min)
+    , _max(max)
+{
 }
 
-int Reification::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<Reification> thisCasted = dynamic_pointer_cast<Reification>(shared_from_this());
-    return visitor->visit(thisCasted);
+int Reification::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-shared_ptr<Term> Reification::aggregateConstants() {
-    return shared_from_this();
+TermPtr Reification::aggregateConstants()
+{
+    return this;
 }
 
-shared_ptr<Term> Reification::derivative(shared_ptr<Variable> v) {
+TermPtr Reification::derivative(VarPtr v) const
+{
     throw "Symbolic Derivation of Discretizer not supported.";
+    return nullptr;
 }
 
-string Reification::toString() {
-    string str;
-    str.append("Discretizer( ");
-    str.append(condition->toString());
-    str.append(", ");
-    str.append("", min);
-    str.append(", ");
-    str.append("", max);
-    str.append(" )");
-    return str;
+std::string Reification::toString() const
+{
+    std::stringstream str;
+    str << "Discretizer( " << condition->toString() << ", " << min << ", " << max << " )";
+    return str.str();
 }
 } /* namespace autodiff */

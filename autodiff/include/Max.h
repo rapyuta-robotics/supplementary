@@ -1,33 +1,27 @@
-/*
- * Max.h
- *
- *  Created on: Jul 17, 2014
- *      Author: psp
- */
-
-#ifndef MAX_H_
-#define MAX_H_
+#pragma once
 
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class Max : public Term {
-public:
-    Max(shared_ptr<Term> left, shared_ptr<Term> right);
+class Max : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-    shared_ptr<Term> left;
-    shared_ptr<Term> right;
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
+    TermPtr negate() const override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    std::string toString() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
-    shared_ptr<Term> negate();
+  private:
+    friend TermHolder;
+    Max(TermPtr left, TermPtr right, TermHolder* owner);
 
-    string toString();
+    TermPtr _left;
+    TermPtr _right;
 };
 
 } /* namespace autodiff */
-
-#endif /* MAX_H_ */

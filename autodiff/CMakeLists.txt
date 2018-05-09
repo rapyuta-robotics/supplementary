@@ -43,7 +43,6 @@ add_library(autodiff
   src/ConstraintUtility.cpp
   src/Cos.cpp
   src/Exp.cpp
-  src/Gp.cpp
   src/LinSigmoid.cpp
   src/Log.cpp
   src/LTConstraint.cpp
@@ -58,34 +57,11 @@ add_library(autodiff
   src/Sum.cpp
   src/Term.cpp
   src/TermBuilder.cpp
+  src/TermHolder.cpp
   src/TermPower.cpp
   src/TermUtils.cpp
   src/TVec.cpp
   src/Variable.cpp
-  src/Zero.cpp
-  src/compiled/CompiledAbs.cpp
-  src/compiled/CompiledAnd.cpp
-  src/compiled/CompiledAtan2.cpp
-  src/compiled/CompiledConstant.cpp
-  src/compiled/CompiledConstPower.cpp
-  src/compiled/CompiledConstraintUtility.cpp
-  src/compiled/CompiledCos.cpp
-  src/compiled/CompiledExp.cpp
-  src/compiled/CompiledGp.cpp
-  src/compiled/CompiledLinSigmoid.cpp
-  src/compiled/CompiledLog.cpp
-  src/compiled/CompiledLTConstraint.cpp
-  src/compiled/CompiledLTEConstraint.cpp
-  src/compiled/CompiledMax.cpp
-  src/compiled/CompiledMin.cpp
-  src/compiled/CompiledOr.cpp
-  src/compiled/CompiledProduct.cpp
-  src/compiled/CompiledReification.cpp
-  src/compiled/CompiledSigmoid.cpp
-  src/compiled/CompiledSin.cpp
-  src/compiled/CompiledSum.cpp
-  src/compiled/CompiledTermPower.cpp
-  src/compiled/CompiledVariable.cpp
 )
 
 target_link_libraries(autodiff ${catkin_LIBRARIES})

@@ -7,59 +7,55 @@
 
 #include "TermPower.h"
 
-#include "TermBuilder.h"
+#include "ConstPower.h"
 #include "Constant.h"
 #include "Log.h"
+#include "TermHolder.h"
 #include "Zero.h"
 
 #include <cmath>
+#include <sstream>
 
-namespace autodiff {
-TermPower::TermPower(shared_ptr<Term> baseTerm, shared_ptr<Term> exponent)
-        : Term() {
-    this->base = baseTerm;
-    this->exponent = exponent;
+namespace autodiff
+{
+TermPower::TermPower(TermPtr baseTerm, TermPtr exponent, TermHolder* owner)
+    : Term(owner)
+    , _base(baseTerm)
+    , _exponent(exponent)
+{
 }
 
-int TermPower::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<TermPower> thisCasted = dynamic_pointer_cast<TermPower>(shared_from_this());
-    return visitor->visit(thisCasted);
+int TermPower::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-shared_ptr<Term> TermPower::aggregateConstants() {
-    base = base->aggregateConstants();
-    exponent = exponent->aggregateConstants();
-    if (dynamic_pointer_cast<Zero>(exponent) != 0) {
-        return TermBuilder::constant(1);
+TermPtr TermPower::aggregateConstants()
+{
+    _base = _base->aggregateConstants();
+    _exponent = _exponent->aggregateConstants();
+    TermPower* basetp = dynamic_cast<TermPower*>(_base);
+
+    if (_base.isConstant() && _exponent.isConstant()) {
+        return _owner->constant(pow(static_cast<Constant*>(_base)->getValue(), static_cast<Constant*>(_exponent)->getValue()));
+    } else if (_exponent.isConstant()) {
+        return _owner->constPower(_base, static_cast<Constant*>(_exponent)->getValue());
+    } else if (basetp != nullptr) {
+        _exponent = _exponent * basetp->_exponent;
+        _base = basetp->_base;
     }
-    if (dynamic_pointer_cast<Constant>(base) != 0 && dynamic_pointer_cast<Constant>(exponent) != 0) {
-        shared_ptr<Constant> base = dynamic_pointer_cast<Constant>(base);
-        shared_ptr<Constant> exponent = dynamic_pointer_cast<Constant>(exponent);
-        return TermBuilder::constant(pow(base->value, exponent->value));
-    } else if (dynamic_pointer_cast<Zero>(base) != 0) {
-        return base;
-    } else if (dynamic_pointer_cast<TermPower>(base) != 0) {
-        shared_ptr<TermPower> base = dynamic_pointer_cast<TermPower>(base);
-        this->exponent = exponent * base->exponent;
-        this->base = base->base;
-        return shared_from_this();
-    } else {
-        return shared_from_this();
-    }
+    return this;
 }
 
-shared_ptr<Term> TermPower::derivative(shared_ptr<Variable> v) {
-    return make_shared<TermPower>(base, exponent - 1) *
-           (exponent * base->derivative(v) + base * make_shared<Log>(base) * exponent->derivative(v));
+TermPtr TermPower::derivative(VarPtr v) const
+{
+    return _owner->termPower(base, exponent - 1) * (exponent * base->derivative(v) + base * _owner->log(base) * exponent->derivative(v));
 }
 
-string TermPower::toString() {
-    string str;
-    str.append("termPower( ");
-    str.append(base->toString());
-    str.append(", ");
-    str.append(exponent->toString());
-    str.append(" )");
-    return str;
+std::string TermPower::toString() const
+{
+    std::stringstream str;
+    str << "termPower( " << base->toString() << ", " << exponent->toString() << " )";
+    return str.str();
 }
 } /* namespace autodiff */

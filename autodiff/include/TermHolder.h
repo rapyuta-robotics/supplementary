@@ -28,8 +28,10 @@ class TermHolder
     TermPtr constant(double value);
     TermPtr abs(TermPtr arg);
     TermPtr constPower(TermPtr arg, double exponent);
+    TermPtr termPower(TermPtr arg, TermPtr exponent);
     TermPtr sin(TermPtr arg);
     TermPtr cos(TermPtr arg);
+    TermPtr exp(TermPtr arg);
 
   private:
     void handleNewTerm(TermPtr t);

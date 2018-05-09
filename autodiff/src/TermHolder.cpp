@@ -111,16 +111,30 @@ TermPtr TermHolder::constPower(TermPtr arg, double exponent)
     return ret;
 }
 
+TermPtr termPower(TermPtr arg, TermPtr exponent)
+{
+    TermPtr ret = new TermPower(arg, exponent, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
 TermPtr TermHolder::sin(TermPtr arg)
 {
-    TermPtr ret = new sin(arg, this);
+    TermPtr ret = new Sin(arg, this);
     handleNewTerm(ret);
     return ret;
 }
 
 TermPtr TermHolder::cos(TermPtr arg)
 {
-    TermPtr ret = new cos(arg, this);
+    TermPtr ret = new Cos(arg, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
+TermPtr TermHolder::exp(TermPtr arg)
+{
+    TermPtr ret = new Exp(arg, this);
     handleNewTerm(ret);
     return ret;
 }

@@ -1,31 +1,25 @@
-/*
- * Sin.h
- *
- *  Created on: Jul 18, 2014
- *      Author: psp
- */
-
-#ifndef SIN_H_
-#define SIN_H_
+#pragma once
 
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class Sin : public Term {
-public:
-    Sin(shared_ptr<Term> arg);
+class Sin : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-    shared_ptr<Term> arg;
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    string toString() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
+  private:
+    friend TermHolder;
+    Sin(TermPtr arg, TermHolder* owner);
 
-    string toString();
+    TermPtr _arg;
 };
 
 } /* namespace autodiff */
-
-#endif /* SIN_H_ */

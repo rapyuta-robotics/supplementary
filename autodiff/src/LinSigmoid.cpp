@@ -42,9 +42,9 @@ TermPtr LinSigmoid::aggregateConstants()
 
 TermPtr LinSigmoid::derivative(VarPtr v) const
 {
-    TermPtr e = _owner->exp(-arg);
-    return e / _owner->constantPower(e + 1.0, 2.0);
-    // previously: _arg->derivative(v);
+    // TermPtr e = _owner->exp(-arg);
+    // return e / _owner->constantPower(e + 1.0, 2.0);
+    return _arg->derivative(v);
 }
 
 std::string LinSigmoid::toString() const

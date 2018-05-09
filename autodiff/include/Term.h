@@ -72,8 +72,6 @@ class Term /*: public alica::SolverTerm */
     double _min;
     double _max;
 
-    // static const TermPtr TRUE;
-    // static const TermPtr FALSE;
     static constexpr double EPSILON;
 
   private:

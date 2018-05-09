@@ -1,32 +1,25 @@
-/*
- * TermPower.h
- *
- *  Created on: Jul 18, 2014
- *      Author: psp
- */
-
-#ifndef TERMPOWER_H_
-#define TERMPOWER_H_
-
+#pragma once
 #include "Term.h"
 
-namespace autodiff {
+namespace autodiff
+{
 
-class TermPower : public Term {
-public:
-    TermPower(shared_ptr<Term> baseTerm, shared_ptr<Term> exponent);
+class TermPower : public Term
+{
+  public:
+    int accept(ITermVisitor* visitor) override;
 
-    shared_ptr<Term> base;
-    shared_ptr<Term> exponent;
+    TermPtr aggregateConstants() override;
+    TermPtr derivative(VarPtr v) const override;
 
-    int accept(shared_ptr<ITermVisitor> visitor);
+    std::string toString() const override;
 
-    shared_ptr<Term> aggregateConstants();
-    shared_ptr<Term> derivative(shared_ptr<Variable> v);
+  private:
+    friend TermHolder;
+    TermPower(TermPtr baseTerm, TermPtr exponent, TermHolder* owner);
 
-    string toString();
+    TermPtr _base;
+    TermPtr _exponent;
 };
 
 } /* namespace autodiff */
-
-#endif /* TERMPOWER_H_ */

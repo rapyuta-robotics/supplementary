@@ -7,54 +7,56 @@
 
 #include "Or.h"
 
-#include "TermBuilder.h"
 #include "Constant.h"
+#include "TermBuilder.h"
 
 #include <cmath>
+#include <sstream>
 
-namespace autodiff {
-Or::Or(shared_ptr<Term> left, shared_ptr<Term> right)
-        : Term() {
-    this->left = left;
-    this->right = right;
+namespace autodiff
+{
+Or::Or(TermPtr left, TermPtr right, TermHolder* owner)
+    : Term(owner)
+    , _left(left)
+    , _right(right)
+{
 }
 
-int Or::accept(shared_ptr<ITermVisitor> visitor) {
-    shared_ptr<Or> thisCasted = dynamic_pointer_cast<Or>(shared_from_this());
-    return visitor->visit(thisCasted);
+int Or::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
 }
 
-shared_ptr<Term> Or::aggregateConstants() {
-    left = left->aggregateConstants();
-    right = right->aggregateConstants();
-    if (dynamic_pointer_cast<Constant>(left) != 0 && dynamic_pointer_cast<Constant>(right) != 0) {
-        shared_ptr<Constant> leftConstant = dynamic_pointer_cast<Constant>(left);
-        shared_ptr<Constant> rightConstant = dynamic_pointer_cast<Constant>(right);
-        if (leftConstant->value > 0.75 || rightConstant->value > 0.75) {
-            return Term::TRUE;
+TermPtr Or::aggregateConstants()
+{
+    _left = _left->aggregateConstants();
+    _right = _right->aggregateConstants();
+    if (_left->isConstant() && _right->isConstant()) {
+        if (static_cast<Constant*>(_left)->getValue() > 0.75 || static_cast<Constant*>(_right)->getValue() > 0.75) {
+            return _owner->trueConstant();
         } else {
-            return Term::FALSE;
+            return _owner->falseConstant();
         }
     } else {
-        return shared_from_this();
+        return this;
     }
 }
 
-shared_ptr<Term> Or::derivative(shared_ptr<Variable> v) {
+TermPtr Or::derivative(VarPtr v) const
+{
     throw "Symbolic Derivation of Or not supported.";
+    return nullptr;
 }
 
-shared_ptr<Term> Or::negate() {
+TermPtr Or::negate() const
+{
     return left->negate() & right->negate();
 }
 
-string Or::toString() {
-    string str;
-    str.append("or( ");
-    str.append(left->toString());
-    str.append(", ");
-    str.append(right->toString());
-    str.append(" )");
-    return str;
+std::string Or::toString() const
+{
+    std::stringstream str;
+    str << "or( " << _left->toString() << ", " << _right->toString() << " )");
+    return str.str();
 }
 } /* namespace autodiff */
