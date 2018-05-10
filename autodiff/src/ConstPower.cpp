@@ -71,7 +71,7 @@ void ConstPower::Eval(const Tape& tape, const Parameter* params, double* result,
 
     result[0] = pow(l[0], v);
     for (int i = 1; i <= dim; ++i) {
-        result[i] = v * pow(l[i], v - 1.0);
+        result[i] = v * pow(l[0], v - 1.0);
     }
 }
 

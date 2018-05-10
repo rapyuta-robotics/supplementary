@@ -18,7 +18,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG ${CPP_STD} ${OP
 
 
 
-#set(CMAKE_CXX_FLAGS "-g -fnon-call-exceptions -ggdb -Werror-implicit-function-declaration -Werror=return-type -Wall -Wno-reorder ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-g -fnon-call-exceptions -ggdb -Werror-implicit-function-declaration -Werror=return-type -Wall -Wno-reorder ${CMAKE_CXX_FLAGS}")
 
 
 find_package(catkin REQUIRED COMPONENTS

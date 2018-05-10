@@ -41,11 +41,14 @@ class TermHolder
     TermPtr cos(TermPtr arg);
     TermPtr exp(TermPtr arg);
     TermPtr log(TermPtr arg);
+    TermPtr atan2(TermPtr left, TermPtr right);
 
     TermPtr constraintUtility(TermPtr constraint, TermPtr utility);
 
     void compile(TermPtr top) { _tape.createFrom(top, _vars); }
     void evaluate(const double* input, double* output) const { return _tape.evaluate(input, output); }
+
+    int getDim() const { return static_cast<int>(_vars.size()); }
 
   private:
     void handleNewTerm(TermPtr t);

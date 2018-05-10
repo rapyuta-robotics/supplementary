@@ -33,7 +33,7 @@ void Tape::evaluate(const double* input, double* output) const
     for (int i = 0; i < _tapeLength; ++i) {
         _functions[i](*this, _params + i * MAXARITY, _values + i * _tapeWidth, input, dim);
     }
-    memcpy(output, _values + (_tapeLength - 1), _tapeWidth);
+    memcpy(output, _values + (_tapeLength - 1) * _tapeWidth, _tapeWidth * sizeof(double));
 }
 
 void Tape::createFrom(TermPtr top, const std::vector<VarPtr>& vars)

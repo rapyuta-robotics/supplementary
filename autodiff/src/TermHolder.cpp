@@ -2,6 +2,7 @@
 
 #include "Abs.h"
 #include "And.h"
+#include "Atan2.h"
 #include "ConstPower.h"
 #include "Constant.h"
 #include "ConstraintUtility.h"
@@ -184,6 +185,13 @@ TermPtr TermHolder::exp(TermPtr arg)
 TermPtr TermHolder::log(TermPtr arg)
 {
     TermPtr ret = new Log(arg, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
+TermPtr TermHolder::atan2(TermPtr left, TermPtr right)
+{
+    TermPtr ret = new Atan2(left, right, this);
     handleNewTerm(ret);
     return ret;
 }
