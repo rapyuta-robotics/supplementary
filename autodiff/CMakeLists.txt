@@ -12,7 +12,7 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 set(CMAKE_CXX_FLAGS "-Werror-implicit-function-declaration -Werror=return-type -Wno-reorder ${CMAKE_CXX_FLAGS}") #-Wall 
 
-set(OPTIMIZATION "-O2 -finline-functions -funroll-loops -fomit-frame-pointer")
+set(OPTIMIZATION "-O2 -finline-functions -funroll-loops -fomit-frame-pointer -ffast-math")
 #--ffast-math
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG ${CPP_STD} ${OPTIMIZATION}")
 
