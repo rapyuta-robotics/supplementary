@@ -46,6 +46,7 @@ qt5_wrap_ui(UIS_HEADERS ui/alica_viewer_main_window.ui)
 set(CMAKE_CURRENT_BINARY_DIR "${_cmake_current_binary_dir}")
 
 set(QT_CPP_SOURCES 
+        src/elastic_nodes/block.cpp
         src/elastic_nodes/edge.cpp
         src/elastic_nodes/node.cpp
         src/alica_viewer_main_window.cpp

@@ -58,8 +58,9 @@
 namespace elastic_nodes
 {
 
-Edge::Edge(Node* sourceNode, Node* destNode)
+Edge::Edge(Node* sourceNode, Node* destNode, Direction direction)
     : _arrowSize(10)
+    , _direction(direction)
 {
     setAcceptedMouseButtons(0);
     _source = sourceNode;
@@ -74,7 +75,12 @@ void Edge::adjust()
     if (!_source || !_dest)
         return;
 
-    QLineF line(mapFromItem(_source, Node::arrowStartPos), mapFromItem(_dest, Node::arrowEndPos));
+    QLineF line;
+    if (_direction == Direction::DOWN) {
+        line = QLineF(mapFromItem(_source, Node::ellipseBottomCenter), mapFromItem(_dest, Node::ellipseTopCenter));
+    } else {
+        line = QLineF(mapFromItem(_source, Node::ellipseRightCenter), mapFromItem(_dest, Node::ellipseLeftCenter));
+    }
     qreal length = line.length();
 
     prepareGeometryChange();

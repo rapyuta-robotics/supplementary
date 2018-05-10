@@ -69,8 +69,13 @@ class Node : public QGraphicsItem
     static constexpr int WIDTH = 200;
     static constexpr int HEIGHT = 200;
 
-    static QPointF arrowStartPos;
-    static QPointF arrowEndPos;
+    static QPointF nodeStartPos;
+    static QPointF nodeEndPos;
+
+    static QPointF ellipseBottomCenter;
+    static QPointF ellipseTopCenter;
+    static QPointF ellipseRightCenter;
+    static QPointF ellipseLeftCenter;
 
     Node(const std::string& state, const std::string& task, const std::string& plan, const std::string& info);
 
@@ -84,6 +89,7 @@ class Node : public QGraphicsItem
     int type() const override { return Type; }
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    const QString& getPlanName() const { return _planName; }
 
   protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;

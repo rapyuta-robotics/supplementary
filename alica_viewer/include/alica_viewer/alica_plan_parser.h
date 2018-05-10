@@ -35,20 +35,36 @@ typedef std::unordered_map<const supplementary::AgentID*, AgentInfo, supplementa
 class PlanTree
 {
   public:
+    static bool compare(const PlanTree* a, const PlanTree* b)
+    {
+        if (a == nullptr || b == nullptr) {
+            return false;
+        }
+        if (a->getState() == nullptr || b->getState() == nullptr) {
+            return false;
+        }
+        return a->getState() == b->getState();
+    }
+
     PlanTree()
         : _parent(nullptr)
         , _state(nullptr)
         , _entryPoint(nullptr)
+        , _x(0)
+        , _y(0)
     {
     }
 
-    explicit PlanTree(const PlanTree* other)
+    explicit PlanTree(const PlanTree* other, PlanTree* parent)
         : _state(other->_state)
         , _entryPoint(other->_entryPoint)
         , _robotIds(other->_robotIds)
+        , _x(other->_x)
+        , _y(other->_y)
     {
+        setParent(parent);
         for (PlanTree* child : other->_children) {
-            addChildren(new PlanTree(child));
+            addChildren(new PlanTree(child, this));
         }
     }
 
@@ -61,15 +77,24 @@ class PlanTree
         }
     }
 
-    static bool compare(const PlanTree* a, const PlanTree* b)
+    void setParent(PlanTree* parent)
     {
-        if (a == nullptr || b == nullptr) {
-            return false;
+        _parent = parent;
+        if (_parent != nullptr) {
+            _x = parent->_x;
+            _y = parent->_y;
+            if (_entryPoint != nullptr && parent->_entryPoint != nullptr && _entryPoint->getPlan()->getId() == parent->_entryPoint->getPlan()->getId()) {
+                _x++;
+            } else {
+                _y++;
+                _x += static_cast<int>(parent->_children.size());
+            }
         }
-        if (a->getState() == nullptr || b->getState() == nullptr) {
-            return false;
-        }
-        return a->getState() == b->getState();
+        if (_state)
+            std::cout << _state->getName() << " ( " << _x << " " << _y << " )";
+        if (parent->_state)
+            std::cout << " ::Parent:: " << parent->_state->getName() << " ( " << parent->_x << " " << parent->_y << " )";
+        std::cout << std::endl;
     }
 
     const std::vector<PlanTree*>& getChildren() const { return _children; }
@@ -77,7 +102,6 @@ class PlanTree
     void addChildren(PlanTree* child)
     {
         if (child != nullptr) {
-            child->setParent(this);
             _children.push_back(child);
         }
     }
@@ -104,8 +128,6 @@ class PlanTree
             _robotIds.push_back(robotId);
         }
     }
-
-    void setParent(PlanTree* parent) { _parent = parent; }
 
     const PlanTree* getParent() const { return _parent; }
 
@@ -148,12 +170,17 @@ class PlanTree
                     return;
                 }
             }
-            addChildren(new PlanTree(src));
+            addChildren(new PlanTree(src, this));
         }
     }
 
+    int getX() const { return _x; }
+    int getY() const { return _y; }
+
   private:
     PlanTree* _parent;
+    int _x;
+    int _y;
     std::vector<PlanTree*> _children;
     const State* _state;
     const EntryPoint* _entryPoint;
@@ -233,6 +260,10 @@ class AlicaPlan
 
     void handlePlanTreeInfo(const PlanTreeInfo& incoming)
     {
+        PlanTreeMap::iterator ptEntry = _planTrees.find(incoming.senderID);
+        if (ptEntry != _planTrees.end()) {
+            return;
+        }
         PlanTree* pt = planTreeFromMessage(incoming.senderID, incoming.stateIDs);
         if (pt != nullptr) {
             PlanTreeMap::iterator ptEntry = _planTrees.find(incoming.senderID);
@@ -284,11 +315,12 @@ class AlicaPlan
                 } else {
                     cur = new PlanTree();
                     cur->addRobot(robotId);
-                    curParent->addChildren(cur);
                     if (!cur->setState(validStates.find(*iter))) {
                         std::cout << "Unable to add State (" << *iter << ") received from " << robotId << std::endl;
                         return nullptr;
                     }
+                    cur->setParent(curParent);
+                    curParent->addChildren(cur);
                 }
             }
         }

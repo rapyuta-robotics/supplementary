@@ -63,8 +63,13 @@ QRectF nodeShape(-Node::WIDTH / 2, -Node::HEIGHT / 2, Node::WIDTH, Node::HEIGHT)
 QRectF ellipseShape(nodeShape.topLeft(), QSizeF(2 * Node::LONG_AXIS, 2 * Node::SHORT_AXIS));
 QRectF infoShape(ellipseShape.bottomRight(), QSizeF(Node::WIDTH - 2 * Node::LONG_AXIS, Node::HEIGHT - 2 * Node::SHORT_AXIS));
 
-QPointF Node::arrowStartPos = (ellipseShape.bottomLeft() + ellipseShape.bottomRight()) / 2;
-QPointF Node::arrowEndPos = (ellipseShape.topLeft() + ellipseShape.topRight()) / 2;
+QPointF Node::nodeStartPos = nodeShape.topLeft();
+QPointF Node::nodeEndPos = nodeShape.bottomRight();
+
+QPointF Node::ellipseBottomCenter = (ellipseShape.bottomLeft() + ellipseShape.bottomRight()) / 2;
+QPointF Node::ellipseTopCenter = (ellipseShape.topLeft() + ellipseShape.topRight()) / 2;
+QPointF Node::ellipseRightCenter = (ellipseShape.bottomRight() + ellipseShape.topRight()) / 2;
+QPointF Node::ellipseLeftCenter = (ellipseShape.bottomLeft() + ellipseShape.topLeft()) / 2;
 
 Node::Node(const std::string& state, const std::string& task, const std::string& plan, const std::string& info)
 {
