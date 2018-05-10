@@ -25,6 +25,7 @@ class TermPtr
         : _ptr(const_cast<Term*>(t))
     {
     }
+
     Term* get() const { return _ptr; }
     Term* operator->() const { return _ptr; }
 

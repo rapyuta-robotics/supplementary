@@ -1,14 +1,4 @@
-/*
- * ITermVisitor.h
- *
- *  Created on: Jun 16, 2014
- *      Author: psp
- */
-
-#ifndef ITERMVISITOR_H_
-#define ITERMVISITOR_H_
-
-#include <memory>
+#pragma once
 
 namespace autodiff
 {
@@ -65,5 +55,3 @@ class ITermVisitor
 };
 
 } /* namespace autodiff */
-
-#endif /* ITERMVISITOR_H_ */

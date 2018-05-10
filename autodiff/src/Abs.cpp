@@ -2,6 +2,7 @@
 #include "Abs.h"
 
 #include "Constant.h"
+#include "Tape.h"
 #include "TermHolder.h"
 
 #include <cmath>
@@ -11,13 +12,13 @@ namespace autodiff
 {
 
 Abs::Abs(TermPtr arg, TermHolder* owner)
-    : Term(owner)
-    , _arg(arg)
+    : UnaryFunction(arg, owner)
 {
 }
 
 int Abs::accept(ITermVisitor* visitor)
 {
+    _arg->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -41,5 +42,15 @@ std::string Abs::toString() const
     std::stringstream str;
     str << "abs( " << _arg->toString() << " )";
     return str.str();
+}
+
+void Abs::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* arg = tape.getValues(params[0].asIdx);
+    result[0] = fabs(arg[0]);
+    double sign = std::copysign(1.0, arg[0]);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = arg[i] * sign;
+    }
 }
 } /* namespace autodiff */

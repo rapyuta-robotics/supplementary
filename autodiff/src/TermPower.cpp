@@ -18,43 +18,55 @@
 namespace autodiff
 {
 TermPower::TermPower(TermPtr baseTerm, TermPtr exponent, TermHolder* owner)
-    : Term(owner)
-    , _base(baseTerm)
-    , _exponent(exponent)
+    : BinaryFunction(baseTerm, exponent, owner)
 {
 }
 
 int TermPower::accept(ITermVisitor* visitor)
 {
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 
 TermPtr TermPower::aggregateConstants()
 {
-    _base = _base->aggregateConstants();
-    _exponent = _exponent->aggregateConstants();
-    TermPower* basetp = dynamic_cast<TermPower*>(_base.get());
+    _left = _left->aggregateConstants();
+    _right = _right->aggregateConstants();
+    TermPower* basetp = dynamic_cast<TermPower*>(_left.get());
 
-    if (_base->isConstant() && _exponent->isConstant()) {
-        return _owner->constant(pow(static_cast<Constant*>(_base)->getValue(), static_cast<Constant*>(_exponent)->getValue()));
-    } else if (_exponent->isConstant()) {
-        return _owner->constPower(_base, static_cast<Constant*>(_exponent)->getValue());
+    if (_left->isConstant() && _right->isConstant()) {
+        return _owner->constant(pow(static_cast<Constant*>(_left)->getValue(), static_cast<Constant*>(_right)->getValue()));
+    } else if (_right->isConstant()) {
+        return _owner->constPower(_left, static_cast<Constant*>(_right)->getValue());
     } else if (basetp != nullptr) {
-        _exponent = _exponent * basetp->_exponent;
-        _base = basetp->_base;
+        _right = _right * basetp->_right;
+        _left = basetp->_left;
     }
     return this;
 }
 
 TermPtr TermPower::derivative(VarPtr v) const
 {
-    return _owner->termPower(_base, _exponent - 1) * (_exponent * _base->derivative(v) + _base * _owner->log(_base) * _exponent->derivative(v));
+    return _owner->termPower(_left, _right - 1) * (_right * _left->derivative(v) + _left * _owner->log(_left) * _right->derivative(v));
 }
 
 std::string TermPower::toString() const
 {
     std::stringstream str;
-    str << "termPower( " << _base->toString() << ", " << _exponent->toString() << " )";
+    str << "termPower( " << _left->toString() << ", " << _right->toString() << " )";
     return str.str();
 }
+
+void TermPower::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+    result[0] = pow(l[0], r[0]);
+    const double outer = pow(l[0], r[0] - 1.0);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = outer * (r[0] * l[i] + l[0] * log(l[0] * r[i]));
+    }
+}
+
 } /* namespace autodiff */

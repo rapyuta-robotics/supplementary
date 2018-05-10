@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Term.h"
+#include "BinaryFunction.h"
 
 namespace autodiff
 {
 
-class Product : public Term
+class Product : public BinaryFunction
 {
   public:
     int accept(ITermVisitor* visitor) override;
@@ -15,12 +15,13 @@ class Product : public Term
 
     std::string toString() const override;
 
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+
   private:
     friend TermHolder;
     Product(TermPtr left, TermPtr right, TermHolder* owner);
-
-    TermPtr _left;
-    TermPtr _right;
 };
 
 } /* namespace autodiff */

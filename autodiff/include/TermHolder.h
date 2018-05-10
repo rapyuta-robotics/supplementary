@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Tape.h"
 #include "TermPtr.h"
 #include "Types.h"
 #include <vector>
@@ -23,8 +24,8 @@ class TermHolder
     TermPtr max(TermPtr left, TermPtr right);
     TermPtr and_(TermPtr left, TermPtr right);
     TermPtr or_(TermPtr left, TermPtr right);
-    TermPtr lessThan(TermPtr left, TermPtr right, double steepness);
-    TermPtr lessThanEqual(TermPtr left, TermPtr right, double steepness);
+    TermPtr lessThan(TermPtr left, TermPtr right);
+    TermPtr lessThanEqual(TermPtr left, TermPtr right);
 
     TermPtr constant(double value);
     TermPtr abs(TermPtr arg);
@@ -33,6 +34,7 @@ class TermHolder
     TermPtr power(TermPtr arg, double exponent) { return constPower(arg, exponent); }
     TermPtr power(TermPtr arg, TermPtr exponent) { return termPower(arg, exponent); }
     TermPtr sigmoid(TermPtr arg, TermPtr mid, double steepness);
+    TermPtr sigmoid(TermPtr arg, double steepness);
 
     TermPtr sin(TermPtr arg);
     TermPtr cos(TermPtr arg);
@@ -41,7 +43,8 @@ class TermHolder
 
     TermPtr constraintUtility(TermPtr constraint, TermPtr utility);
 
-    // void compile(TermPtr top);
+    void compile(TermPtr top) { _tape.createFrom(top, _vars); }
+    void evaluate(const double* input, double* output) const { return _tape.evaluate(input, output); }
 
   private:
     void handleNewTerm(TermPtr t);
@@ -50,5 +53,6 @@ class TermHolder
     TermPtr _true;
     TermPtr _false;
     TermPtr _zero;
+    Tape _tape;
 };
 }

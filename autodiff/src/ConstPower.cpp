@@ -24,6 +24,7 @@ ConstPower::ConstPower(TermPtr baseTerm, double exponent, TermHolder* owner)
 
 int ConstPower::accept(ITermVisitor* visitor)
 {
+    _base->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -62,4 +63,16 @@ std::string ConstPower::toString() const
     str << ", " << _exponent << " )";
     return str.str();
 }
+
+void ConstPower::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double v = params[1].asDouble;
+
+    result[0] = pow(l[0], v);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = v * pow(l[i], v - 1.0);
+    }
+}
+
 } /* namespace autodiff */

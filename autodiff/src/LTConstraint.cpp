@@ -16,17 +16,16 @@
 
 namespace autodiff
 {
-LTConstraint::LTConstraint(TermPtr x, TermPtr y, double steepness, TermHolder* owner)
-    : Term(owner)
-    , _left(x)
-    , _right(y)
-    , _steepness(steepness)
+LTConstraint::LTConstraint(TermPtr x, TermPtr y, TermHolder* owner)
+    : BinaryFunction(x, y, owner)
     , _negatedForm(nullptr)
 {
 }
 
 int LTConstraint::accept(ITermVisitor* visitor)
 {
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -54,7 +53,7 @@ TermPtr LTConstraint::derivative(VarPtr v) const
 TermPtr LTConstraint::negate() const
 {
     if (_negatedForm == nullptr) {
-        _negatedForm = _owner->lessThanEqual(_right, _left, _steepness);
+        _negatedForm = _owner->lessThanEqual(_right, _left);
         _negatedForm->setNegation(this);
     }
     return _negatedForm;
@@ -65,6 +64,26 @@ std::string LTConstraint::toString() const
     std::stringstream str;
     str << _left->toString() << " < " << _right->toString();
     return str.str();
+}
+
+void LTConstraint::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+
+    double val = r[0] - l[0];
+    if (val > 0.0) {
+        result[0] = 1.0;
+        for (int i = 1; i <= dim; ++i) {
+            result[i] = 0.0;
+        }
+    } else {
+        const double steep = Term::getConstraintSteepness();
+        result[0] = val;
+        for (int i = 1; i <= dim; ++i) {
+            result[i] = (r[i] - l[i]) * steep;
+        }
+    }
 }
 
 } /* namespace autodiff */

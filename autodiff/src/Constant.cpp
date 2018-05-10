@@ -1,15 +1,9 @@
-/*
- * Constant.cpp
- *
- *  Created on: Jun 12, 2014
- *      Author: psp
- */
 
 #include "Constant.h"
 #include "TermHolder.h"
 
 #include <cmath>
-
+#include <cstring>
 namespace autodiff
 {
 
@@ -44,4 +38,10 @@ std::string Constant::toString() const
 
     return std::to_string(_value);
 }
+
+void Constant::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    result[0] = params[0].asDouble;
+}
+
 } /* namespace autodiff */

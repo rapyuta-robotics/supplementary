@@ -5,6 +5,7 @@ namespace autodiff
 class Term;
 class TermPtr;
 class Variable;
+class Tape;
 
 class Abs;
 class And;
@@ -28,4 +29,12 @@ class TermPower;
 
 // using TermPtr = Term*;
 using VarPtr = Variable*;
+
+union Parameter
+{
+    double asDouble;
+    int asIdx;
+};
+
+typedef void (*EvalFunction)(const Tape&, const Parameter*, double*, const double*, int);
 }

@@ -6,30 +6,33 @@
 #include <random>
 using namespace autodiff;
 
-double sampleTerm(TermPtr t, std::shared_ptr<std::vector<VarPtr>>& vars, int num, std::mt19937& gen)
+double sampleTerm(TermPtr t, TermHolder& holder, int dim, int num, std::mt19937& gen)
 {
     double ret = 0.0f;
     std::uniform_real_distribution<> doubleDistri(-1.0, 1.0);
-    std::shared_ptr<std::vector<double>> point = std::make_shared<std::vector<double>>(vars->size());
+    std::vector<double> point = std::vector<double>(dim);
+    std::vector<double> res = std::vector<double>(dim + 1);
+    holder.compile(t);
     for (int i = 0; i < num; ++i) {
-        for (int j = vars->size() - 1; j >= 0; --j) {
-            (*point)[j] = doubleDistri(gen);
+        for (int j = dim - 1; j >= 0; --j) {
+            point[j] = doubleDistri(gen);
         }
-        ret += TermUtils::evaluate(t, vars, point);
+        holder.evaluate(&point[0], &res[0]);
+        ret += res[0];
     }
     return ret / num;
 }
 
-std::shared_ptr<Term> makeTest(int64_t seed, std::shared_ptr<std::vector<VarPtr>>& vars, int dim, int numLits, int numClauses)
+TermPtr makeTest(int64_t seed, TermHolder& holder, int dim, int numLits, int numClauses)
 {
     std::mt19937 gen(seed);
     std::uniform_real_distribution<> doubleDistri(-1.0, 1.0);
     std::uniform_int_distribution<> dimDistri(0, dim - 1);
 
-    vars = std::make_shared<std::vector<VarPtr>>(dim);
+    std::vector<VarPtr> vars(dim);
     // generate variables
-    for (VarPtr& vp : *vars) {
-        vp = std::make_shared<Variable>();
+    for (VarPtr& vp : vars) {
+        vp = holder.createVariable();
     }
     // generate literals:
     std::vector<TermPtr> lits;
@@ -44,7 +47,7 @@ std::shared_ptr<Term> makeTest(int64_t seed, std::shared_ptr<std::vector<VarPtr>
                 double a = doubleDistri(gen);
                 int idx = dimDistri(gen);
                 double b = doubleDistri(gen) * 2.0 * M_PI;
-                TermPtr t = TermBuilder::constant(a) * TermBuilder::sin((*vars)[idx] * TermBuilder::constant(2.0 * M_PI) + TermBuilder::constant(b));
+                TermPtr t = holder.constant(a) * holder.sin(vars[idx] * holder.constant(2.0 * M_PI) + holder.constant(b));
                 if (product.get() == nullptr) {
                     product = t;
                 } else {
@@ -59,10 +62,10 @@ std::shared_ptr<Term> makeTest(int64_t seed, std::shared_ptr<std::vector<VarPtr>
             }
             k += ks;
         }
-        TermPtr lit = TermBuilder::constant(1.0 / k) * sum;
+        TermPtr lit = holder.constant(1.0 / k) * sum;
 
-        double theta = sampleTerm(lit, vars, 100, gen);
-        lits.push_back(lit < TermBuilder::constant(theta));
+        double theta = sampleTerm(lit, holder, dim, 100, gen);
+        lits.push_back(lit < holder.constant(theta));
     }
     std::uniform_int_distribution<> litDistri(0, numLits - 1);
     // generate clauses:
@@ -116,17 +119,19 @@ int main(int argc, char** argv)
     std::cout << "Performing " << numRuns << " runs with " << numDims << " dimensions " << numLits << " literals " << numClauses << " clauses." << std::endl;
     std::cout << "Seed is: " << seed << std::endl;
 
-    std::shared_ptr<std::vector<VarPtr>> vars;
+    // std::shared_ptr<std::vector<VarPtr>> vars;
     int64_t t1 = (std::chrono::system_clock::now().time_since_epoch().count());
-    TermPtr term = makeTest(seed, vars, numDims, numLits, numClauses);
+
+    TermHolder hot;
+    TermPtr term = makeTest(seed, hot, numDims, numLits, numClauses);
     int64_t t2 = (std::chrono::system_clock::now().time_since_epoch().count());
     std::cout << "Done generating in " << toMs(t1, t2) << "ms" << std::endl;
-    shared_ptr<ICompiledTerm> compiled = TermUtils::compile(term, vars);
+    hot.compile(term);
     t1 = (std::chrono::system_clock::now().time_since_epoch().count());
     std::cout << "Done compiling in " << toMs(t2, t1) << "ms" << std::endl;
     // std::cout << "Term: "<<term->toString()<<std::endl;
-    std::shared_ptr<std::vector<double>> point = std::make_shared<std::vector<double>>(numDims);
-    std::pair<std::shared_ptr<std::vector<double>>, double> result;
+    std::vector<double> point(numDims);
+    std::vector<double> result(numDims + 1);
     std::mt19937 gen(seed);
     std::uniform_real_distribution<> doubleDistri(-1.0, 1.0);
 
@@ -134,13 +139,13 @@ int main(int argc, char** argv)
 
     for (int i = numRuns - 1; i >= 0; --i) {
         for (int d = numDims - 1; d >= 0; --d) {
-            (*point)[d] = doubleDistri(gen);
+            point[d] = doubleDistri(gen);
         }
-        result = compiled->differentiate(point);
+        hot.evaluate(&point[0], &result[0]);
     }
     t2 = (std::chrono::system_clock::now().time_since_epoch().count());
     std::cout << "Done in " << toMs(t1, t2) << "ms" << std::endl;
     std::cout << numRuns / toMs(t1, t2) * 1000.0 << " evaluations per second" << std::endl;
-    std::cout << "Last value: " << result.second << std::endl;
+    std::cout << "Last value: " << result[0] << std::endl;
     return 0;
 }

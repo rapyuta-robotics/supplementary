@@ -7,13 +7,12 @@
 
 namespace autodiff
 {
-int Variable::var_id = 0;
 
 Variable::Variable(TermHolder* owner)
     : Term(owner)
     , _globalMin(-std::numeric_limits<double>::infinity())
     , _globalMax(std::numeric_limits<double>::infinity())
-    , _ownId(var_id++)
+    , _varId(-1)
 {
 }
 
@@ -39,13 +38,15 @@ TermPtr Variable::derivative(VarPtr v) const
 std::string Variable::toString() const
 {
     std::stringstream str;
-    if (_ownId < 0) {
-        str << "Var_";
-        str << -_ownId;
-    } else {
-        str << "Var";
-        str << std::to_string(_ownId);
-    }
+    str << "Var";
+    str << std::to_string(_varId);
     return str.str();
 }
+
+void Variable::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    result[0] = vars[params[0].asIdx];
+    result[params[0].asIdx + 1] = 1.0;
+}
+
 } /* namespace autodiff */

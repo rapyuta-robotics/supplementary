@@ -24,8 +24,8 @@ class TVec
     {
     }
 
-    TermPtr normSquared() const;
-    TVec<DIM> normalize() const;
+    inline TermPtr normSquared() const;
+    inline TVec<DIM> normalize() const;
     int dimension() const { return DIM; }
 
     TermPtr getX() const { return _terms[0]; }
@@ -68,34 +68,34 @@ TermPtr operator*(const TVec<DIM>& left, const TVec<DIM>& o);
 
 // Helpers:
 template <int DIM>
-TVec<DIM> crossProduct(const TVec<DIM>& t1, const TVec<DIM>& t2);
+inline TVec<DIM> crossProduct(const TVec<DIM>& t1, const TVec<DIM>& t2);
 template <int DIM>
-TermPtr distance(const TVec<DIM>& t1, const TVec<DIM>& t2);
+inline TermPtr distance(const TVec<DIM>& t1, const TVec<DIM>& t2);
 template <int DIM>
-TermPtr distanceSqr(const TVec<DIM>& t1, const TVec<DIM>& t2);
+inline TermPtr distanceSqr(const TVec<DIM>& t1, const TVec<DIM>& t2);
 template <int DIM>
-TVec<DIM> rotate(const TVec<DIM>& vec, double alpha);
+inline TVec<DIM> rotate(const TVec<DIM>& vec, double alpha);
 template <int DIM>
-TermPtr projectVectorOntoX(const TVec<DIM>& origin, const TVec<DIM>& dir, TermPtr x);
+inline TermPtr projectVectorOntoX(const TVec<DIM>& origin, const TVec<DIM>& dir, TermPtr x);
 template <int DIM>
-TVec<DIM> inCoordsOf(const TVec<DIM>& point, const TVec<DIM>& vec);
+inline TVec<DIM> inCoordsOf(const TVec<DIM>& point, const TVec<DIM>& vec);
 template <int DIM>
-TermPtr leftOf(const TVec<DIM>& vec, const TVec<DIM>& toCheck);
+inline TermPtr leftOf(const TVec<DIM>& vec, const TVec<DIM>& toCheck);
 template <int DIM>
-TermPtr rightOf(const TVec<DIM>& vec, const TVec<DIM>& toCheck);
+inline TermPtr rightOf(const TVec<DIM>& vec, const TVec<DIM>& toCheck);
 template <int DIM>
-TermPtr equals(const TVec<DIM>& t1, const TVec<DIM>& t2, double tolerance);
+inline TermPtr equals(const TVec<DIM>& t1, const TVec<DIM>& t2, double tolerance);
 
 /// Implementation:
 
 template <>
-TermPtr TVec<1>::normSquared() const
+inline TermPtr TVec<1>::normSquared() const
 {
     return _terms[0]->getOwner()->constPower(_terms[0], 2);
 }
 
 template <int DIM>
-TermPtr TVec<DIM>::normSquared() const
+inline TermPtr TVec<DIM>::normSquared() const
 {
     TermHolder* h = _terms[0]->getOwner();
     TermPtr ret = h->constPower(_terms[0], 2.0);
@@ -124,11 +124,6 @@ TermPtr TVec<DIM>::innerProduct(const TVec<DIM>& o) const
         ret = ret + (_terms[i] * o._terms[i]);
     }
     return ret;
-}
-template <>
-TVec<3> crossProduct(const TVec<3>& t1, const TVec<3>& t2)
-{
-    return TVec<3>(t1.getY() * t2.getZ() - t1.getZ() * t2.getY(), t1.getZ() * t2.getX() - t1.getX() * t2.getZ(), t1.getX() * t2.getY() - t1.getY() * t2.getX());
 }
 
 template <int DIM>
@@ -195,20 +190,26 @@ TermPtr operator*(const TVec<DIM>& left, const TVec<DIM>& right)
     return left.innerProduct(right);
 }
 
+template <>
+inline TVec<3> crossProduct(const TVec<3>& t1, const TVec<3>& t2)
+{
+    return TVec<3>(t1.getY() * t2.getZ() - t1.getZ() * t2.getY(), t1.getZ() * t2.getX() - t1.getX() * t2.getZ(), t1.getX() * t2.getY() - t1.getY() * t2.getX());
+}
+
 template <int DIM>
-TermPtr distanceSqr(const TVec<DIM>& one, const TVec<DIM>& two)
+inline TermPtr distanceSqr(const TVec<DIM>& one, const TVec<DIM>& two)
 {
     return (one - two).normSquared();
 }
 
 template <int DIM>
-TermPtr distance(const TVec<DIM>& one, const TVec<DIM>& two)
+inline TermPtr distance(const TVec<DIM>& one, const TVec<DIM>& two)
 {
     return one[0]->getOwner()->constPower(distanceSqr(one, two), 0.5);
 }
 
 template <>
-TVec<2> rotate(const TVec<2>& vec, double alpha)
+inline TVec<2> rotate(const TVec<2>& vec, double alpha)
 {
     TermHolder* h = vec[0]->getOwner();
     TermPtr at = h->constant(alpha);
@@ -218,7 +219,7 @@ TVec<2> rotate(const TVec<2>& vec, double alpha)
     return TVec<2>(cosA * vec.getX() - sinA * vec.getY(), sinA * vec.getX() + cosA * vec.getY());
 }
 template <>
-TermPtr projectVectorOntoX(const TVec<2>& origin, const TVec<2>& dir, TermPtr x)
+inline TermPtr projectVectorOntoX(const TVec<2>& origin, const TVec<2>& dir, TermPtr x)
 {
     return origin.getY() + dir.getY() * (x - origin.getX()) * x->getOwner()->constPower(dir.getX(), -1);
 }
@@ -232,7 +233,7 @@ TermPtr projectVectorOntoX(const TVec<2>& origin, const TVec<2>& dir, TermPtr x)
  * @return A two-dimensional TVec
  */
 template <>
-TVec<2> inCoordsOf(const TVec<2>& point, const TVec<2>& vec)
+inline TVec<2> inCoordsOf(const TVec<2>& point, const TVec<2>& vec)
 {
     TermPtr quo = point[0]->getOwner()->constPower(vec.normSquared(), -1.0);
     return TVec<2>((point.getX() * vec.getX() + point.getY() * vec.getY()) * quo, (point.getX() * vec.getY() - point.getY() * vec.getX()) * quo);
@@ -248,7 +249,7 @@ TVec<2> inCoordsOf(const TVec<2>& point, const TVec<2>& vec)
  * @result A Term
  */
 template <>
-TermPtr leftOf(const TVec<2>& vec, const TVec<2>& toCheck)
+inline TermPtr leftOf(const TVec<2>& vec, const TVec<2>& toCheck)
 {
     return ((toCheck.getX() * vec.getY()) - (toCheck.getY() * vec.getX())) < vec[0]->getOwner()->zeroConstant();
 }
@@ -263,7 +264,7 @@ TermPtr leftOf(const TVec<2>& vec, const TVec<2>& toCheck)
  * @return A Term
  */
 template <>
-TermPtr rightOf(const TVec<2>& vec, const TVec<2>& toCheck)
+inline TermPtr rightOf(const TVec<2>& vec, const TVec<2>& toCheck)
 {
     return ((toCheck.getX() * vec.getY()) - (toCheck.getY() * vec.getX())) > vec[0]->getOwner()->zeroConstant();
 }
@@ -278,7 +279,7 @@ TermPtr rightOf(const TVec<2>& vec, const TVec<2>& toCheck)
  * @return A Term
  */
 template <int DIM>
-TermPtr equals(const TVec<DIM>& t1, const TVec<DIM>& t2, double tolerance)
+inline TermPtr equals(const TVec<DIM>& t1, const TVec<DIM>& t2, double tolerance)
 {
     return distanceSqr(t1, t2) < t1[0]->getOwner()->constant(tolerance * tolerance);
 }

@@ -16,9 +16,9 @@ class TermBuilder
     template <int DIM>
     static TermPtr gaussian(const TVec<DIM>& args, const TVec<DIM>& mean, double variance);
     static TermPtr sigmoid(const TermPtr arg, const TermPtr upperBound, const TermPtr lowerBound, const TermPtr mid, double steepness);
-    static TermPtr boundedValue(const TermPtr arg, const TermPtr leftBound, const TermPtr rightBound, double steepness);
+    static TermPtr boundedValue(const TermPtr arg, const TermPtr leftBound, const TermPtr rightBound);
 
-    static TermPtr boundedRectangle(const TVec<2>& arg, const TVec<2>& leftLower, const TVec<2>& rightUpper, double steepness);
+    static TermPtr boundedRectangle(const TVec<2>& arg, const TVec<2>& leftLower, const TVec<2>& rightUpper);
 
     template <int DIM>
     static TermPtr polynom(const TVec<DIM>& input, int degree, const TVec<DIM>& param);

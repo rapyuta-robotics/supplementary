@@ -12,33 +12,31 @@
 namespace autodiff
 {
 
-Sigmoid::Sigmoid(TermPtr arg, TermPtr mid, TermHolder* owner)
+Sigmoid::Sigmoid(TermPtr arg, TermHolder* owner)
     : Term(owner)
     , _arg(arg)
-    , _mid(mid)
     , _steepness(1.0)
 {
 }
 
-Sigmoid::Sigmoid(TermPtr arg, TermPtr mid, double steepness, TermHolder* owner)
+Sigmoid::Sigmoid(TermPtr arg, double steepness, TermHolder* owner)
     : Term(owner)
     , _arg(arg)
-    , _mid(mid)
     , _steepness(steepness)
 {
 }
 
 int Sigmoid::accept(ITermVisitor* visitor)
 {
+    _arg->accept(visitor);
     return visitor->visit(this);
 }
 
 TermPtr Sigmoid::aggregateConstants()
 {
     _arg = _arg->aggregateConstants();
-    _mid = _mid->aggregateConstants();
-    if (_arg->isConstant() && _mid->isConstant()) {
-        double e = exp(_steepness * (-static_cast<Constant*>(_arg)->getValue() + static_cast<Constant*>(_mid)->getValue()));
+    if (_arg->isConstant()) {
+        double e = exp(-_steepness * static_cast<Constant*>(_arg)->getValue());
         if (e == std::numeric_limits<double>::infinity()) {
             return _owner->constant(Term::EPSILON);
         } else {
@@ -56,14 +54,28 @@ TermPtr Sigmoid::aggregateConstants()
 
 TermPtr Sigmoid::derivative(VarPtr v) const
 {
-    TermPtr t = _steepness * (_arg->derivative(v) - _mid->derivative(v)) * _owner->exp(_steepness * (-1 * _arg + _mid));
-    return t / _owner->constPower(_owner->exp(_steepness * _arg) + _owner->exp(_steepness * _mid), 2);
+    TermPtr epos = _owner->exp(_steepness * _arg);
+    TermPtr t = _steepness * _arg->derivative(v) * epos;
+    return t / _owner->constPower(epos + _owner->constant(1.0), 2);
 }
 
 std::string Sigmoid::toString() const
 {
     std::stringstream str;
-    str << "sigmoid( " << _arg->toString() << ", " << _mid->toString() << ", " << _steepness << " )";
+    str << "sigmoid( " << _arg->toString() << ", " << _steepness << " )";
     return str.str();
 }
+
+void Sigmoid::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double steep = params[1].asDouble;
+    const double e = exp(steep * -l[0]);
+    const double epos = exp(steep * l[0]);
+    result[0] = 1.0 / (1.0 + e);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = steep * l[i] * epos / pow(epos + 1.0, 2);
+    }
+}
+
 } /* namespace autodiff */

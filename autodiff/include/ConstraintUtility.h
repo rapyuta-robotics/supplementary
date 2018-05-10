@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Term.h"
+#include "BinaryFunction.h"
 
 namespace autodiff
 {
 
-class ConstraintUtility : public Term
+class ConstraintUtility : public BinaryFunction
 {
   public:
     int accept(ITermVisitor* visitor) override;
@@ -16,12 +16,13 @@ class ConstraintUtility : public Term
 
     std::string toString() const override;
 
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+
   private:
     friend TermHolder;
     ConstraintUtility(TermPtr constraint, TermPtr utility, TermHolder* owner);
-
-    TermPtr _constraint;
-    TermPtr _utility;
 };
 
 } /* namespace autodiff */

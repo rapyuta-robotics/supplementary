@@ -16,21 +16,22 @@
 namespace autodiff
 {
 ConstraintUtility::ConstraintUtility(TermPtr constraint, TermPtr utility, TermHolder* owner)
-    : Term(owner)
-    , _constraint(constraint)
-    , _utility(utility)
+    : BinaryFunction(constraint, utility, owner)
+
 {
 }
 
 int ConstraintUtility::accept(ITermVisitor* visitor)
 {
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 
 TermPtr ConstraintUtility::aggregateConstants()
 {
-    _constraint = _constraint->aggregateConstants();
-    _utility = _utility->aggregateConstants();
+    _left = _left->aggregateConstants();
+    _right = _right->aggregateConstants();
     return this;
 }
 
@@ -49,8 +50,24 @@ TermPtr ConstraintUtility::negate() const
 std::string ConstraintUtility::toString() const
 {
     std::stringstream str;
-    str << "[ConstraintUtility: Constraint=" << _constraint->toString();
-    str << ", Utility=" << _utility->toString() << "]";
+    str << "[ConstraintUtility: Constraint=" << _left->toString();
+    str << ", Utility=" << _right->toString() << "]";
     return str.str();
 }
+
+void ConstraintUtility::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+    if (l[0] > 0.75) {
+        for (int i = 0; i <= dim; ++i) {
+            result[i] = r[i];
+        }
+    } else {
+        for (int i = 0; i <= dim; ++i) {
+            result[i] = l[i];
+        }
+    }
+}
+
 } /* namespace autodiff */

@@ -15,6 +15,8 @@ Reification::Reification(TermPtr condition, double min, double max, TermHolder* 
 
 int Reification::accept(ITermVisitor* visitor)
 {
+    _condition->accept(visitor);
+    _negatedCondition->accept(visitor);
     return visitor->visit(this);
 }
 

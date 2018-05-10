@@ -15,6 +15,16 @@ class ConstPower : public Term
 
     std::string toString() const override;
 
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+
+    virtual void fillParameters(Parameter* params) const override
+    {
+        params[0].asIdx = _base->getTapeIdx();
+        params[1].asDouble = _exponent;
+    }
+
   private:
     friend TermHolder;
     ConstPower(TermPtr baseTerm, double exponent, TermHolder* owner);

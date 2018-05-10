@@ -1,11 +1,11 @@
 #pragma once
-#include "Term.h"
+#include "BinaryFunction.h"
 
 namespace autodiff
 {
 class LTEConstraint;
 
-class LTConstraint : public Term
+class LTConstraint : public BinaryFunction
 {
   public:
     int accept(ITermVisitor* visitor) override;
@@ -17,13 +17,14 @@ class LTConstraint : public Term
     std::string toString() const override;
     void setNegation(const LTEConstraint* negation) const { _negatedForm = negation; }
 
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+
   private:
     friend TermHolder;
-    LTConstraint(TermPtr x, TermPtr y, double steepness, TermHolder* owner);
+    LTConstraint(TermPtr x, TermPtr y, TermHolder* owner);
 
-    TermPtr _left;
-    TermPtr _right;
-    double _steepness;
     mutable const LTEConstraint* _negatedForm;
 };
 

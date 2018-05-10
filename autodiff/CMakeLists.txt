@@ -13,10 +13,12 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 set(CMAKE_CXX_FLAGS "-Werror-implicit-function-declaration -Werror=return-type -Wno-reorder ${CMAKE_CXX_FLAGS}") #-Wall 
 
 set(OPTIMIZATION "-O2 -finline-functions -funroll-loops -fomit-frame-pointer")
-
+#--ffast-math
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG ${CPP_STD} ${OPTIMIZATION}")
 
 
+
+#set(CMAKE_CXX_FLAGS "-g -fnon-call-exceptions -ggdb -Werror-implicit-function-declaration -Werror=return-type -Wall -Wno-reorder ${CMAKE_CXX_FLAGS}")
 
 
 find_package(catkin REQUIRED COMPONENTS
@@ -54,6 +56,7 @@ add_library(autodiff
   src/Sigmoid.cpp
   src/Sin.cpp
   src/Sum.cpp
+  src/Tape.cpp
   src/Term.cpp
   src/TermBuilder.cpp
   src/TermHolder.cpp
@@ -63,10 +66,14 @@ add_library(autodiff
 
 target_link_libraries(autodiff ${catkin_LIBRARIES})
 
+add_executable(test_tape test/test_tape.cpp)
 
-#add_executable(sine_benchmark test/test_benchmark.cpp)
+target_link_libraries(test_tape ${PROJECT_NAME} ${catkin_LIBRARIES})
 
-#target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
+
+add_executable(sine_benchmark test/test_benchmark.cpp)
+
+target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}-test test/test_autodiff.cpp)

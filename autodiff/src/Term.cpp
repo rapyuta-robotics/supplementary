@@ -35,8 +35,9 @@ namespace autodiff
 {
 int Term::_nextId = 0;
 
-double Term::_constraintSteepness = 0.01;
+constexpr double Term::CONSTRAINTSTEEPNESS;
 constexpr double Term::EPSILON;
+
 OrType Term::_orop = OrType::MAX;
 AndType Term::_andop = AndType::MIN;
 
@@ -193,22 +194,22 @@ TermPtr operator|(const TermPtr left, const TermPtr right)
 
 TermPtr operator>(const TermPtr left, const TermPtr right)
 {
-    return left->getOwner()->lessThan(right, left, Term::getConstraintSteepness());
+    return left->getOwner()->lessThan(right, left);
 }
 
 TermPtr operator<(const TermPtr left, const TermPtr right)
 {
-    return left->getOwner()->lessThan(left, right, Term::getConstraintSteepness());
+    return left->getOwner()->lessThan(left, right);
 }
 
 TermPtr operator<=(const TermPtr left, const TermPtr right)
 {
-    return left->getOwner()->lessThanEqual(left, right, Term::getConstraintSteepness());
+    return left->getOwner()->lessThanEqual(left, right);
 }
 
 TermPtr operator>=(const TermPtr left, const TermPtr right)
 {
-    return left->getOwner()->lessThanEqual(right, left, Term::getConstraintSteepness());
+    return left->getOwner()->lessThanEqual(right, left);
 }
 
 // some static dirt...
@@ -230,15 +231,6 @@ OrType Term::getOr()
 void Term::setOr(OrType o)
 {
     _orop = o;
-}
-double Term::getConstraintSteepness()
-{
-    return _constraintSteepness;
-}
-
-void Term::setConstraintSteepness(double constraintSteepness)
-{
-    _constraintSteepness = constraintSteepness;
 }
 
 } /* namespace autodiff */

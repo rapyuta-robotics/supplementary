@@ -1,10 +1,10 @@
 #pragma once
-#include "Term.h"
+#include "UnaryFunction.h"
 
 namespace autodiff
 {
 
-class Exp : public Term
+class Exp : public UnaryFunction
 {
   public:
     int accept(ITermVisitor* visitor);
@@ -14,10 +14,13 @@ class Exp : public Term
 
     std::string toString() const override;
 
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+
   private:
     friend TermHolder;
     Exp(TermPtr arg, TermHolder* owner);
-    TermPtr _arg;
 };
 
 } /* namespace autodiff */

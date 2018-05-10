@@ -19,6 +19,8 @@ Atan2::Atan2(TermPtr left, TermPtr right, TermHolder* owner)
 
 int Atan2::accept(ITermVisitor* visitor)
 {
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 

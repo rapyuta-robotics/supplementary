@@ -108,15 +108,15 @@ TermPtr TermHolder::or_(TermPtr left, TermPtr right)
     handleNewTerm(ret);
     return ret;
 }
-TermPtr TermHolder::lessThan(TermPtr left, TermPtr right, double steepness)
+TermPtr TermHolder::lessThan(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new LTConstraint(left, right, steepness, this);
+    TermPtr ret = new LTConstraint(left, right, this);
     handleNewTerm(ret);
     return ret;
 }
-TermPtr TermHolder::lessThanEqual(TermPtr left, TermPtr right, double steepness)
+TermPtr TermHolder::lessThanEqual(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new LTEConstraint(left, right, steepness, this);
+    TermPtr ret = new LTEConstraint(left, right, this);
     handleNewTerm(ret);
     return ret;
 }
@@ -142,13 +142,16 @@ TermPtr TermHolder::termPower(TermPtr arg, TermPtr exponent)
     return ret;
 }
 
-TermPtr TermHolder::sigmoid(TermPtr arg, TermPtr mid, double steepness)
+TermPtr TermHolder::sigmoid(TermPtr arg, double steepness)
 {
-    TermPtr ret = new Sigmoid(arg, mid, steepness, this);
+    TermPtr ret = new Sigmoid(arg, steepness, this);
     handleNewTerm(ret);
     return ret;
 }
-
+TermPtr TermHolder::sigmoid(TermPtr arg, TermPtr mid, double steepness)
+{
+    return sigmoid(arg - mid, steepness);
+}
 TermPtr TermHolder::sin(TermPtr arg)
 {
     TermPtr ret = new Sin(arg, this);

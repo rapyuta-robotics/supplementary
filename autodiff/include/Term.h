@@ -50,8 +50,7 @@ class Term /*: public alica::SolverTerm */
     static void setAnd(AndType a);
     static OrType getOr();
     static void setOr(OrType o);
-    static double getConstraintSteepness();
-    static void setConstraintSteepness(double constraintSteepness);
+    static inline constexpr double getConstraintSteepness() { return CONSTRAINTSTEEPNESS; }
 
     virtual TermPtr aggregateConstants() = 0;
     virtual TermPtr derivative(VarPtr v) const = 0;
@@ -62,18 +61,23 @@ class Term /*: public alica::SolverTerm */
 
     TermHolder* getOwner() const { return _owner; }
 
+    void setTapeIdx(int idx) { _tapeIdx = idx; }
+    int getTapeIdx() const { return _tapeIdx; }
+    virtual EvalFunction getEvalFunction() const = 0;
+    virtual void fillParameters(Parameter* params) const = 0;
+
   protected:
     Term(TermHolder* owner);
-
+    int _tapeIdx;
+    static constexpr double EPSILON = 1e-10;
+    static constexpr double CONSTRAINTSTEEPNESS = .01;
+    // members below are not in use by autodiff
     TermHolder* _owner;
     TermPtr _prev;
     TermPtr _next;
-
     std::vector<TermPtr> _parents;
     double _min;
     double _max;
-
-    static constexpr double EPSILON = 10.0e-10;
 
   private:
     const int _id;
@@ -81,7 +85,6 @@ class Term /*: public alica::SolverTerm */
     static int _nextId;
     static OrType _orop;
     static AndType _andop;
-    static double _constraintSteepness;
 };
 
 TermPtr operator+(const TermPtr left, const TermPtr right);

@@ -11,13 +11,13 @@
 namespace autodiff
 {
 Sin::Sin(TermPtr arg, TermHolder* owner)
-    : Term(owner)
-    , _arg(arg)
+    : UnaryFunction(arg, owner)
 {
 }
 
 int Sin::accept(ITermVisitor* visitor)
 {
+    _arg->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -41,4 +41,15 @@ std::string Sin::toString() const
     str << "sin( " << _arg->toString() << " )";
     return str.str();
 }
+
+void Sin::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* arg = tape.getValues(params[0].asIdx);
+    result[0] = sin(arg[0]);
+    const double s = cos(arg[0]);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = arg[i] * s;
+    }
+}
+
 } /* namespace autodiff */

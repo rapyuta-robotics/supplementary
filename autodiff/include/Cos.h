@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Term.h"
+#include "UnaryFunction.h"
 
 namespace autodiff
 {
 
-class Cos : public Term
+class Cos : public UnaryFunction
 {
   public:
     int accept(ITermVisitor* visitor) override;
@@ -15,11 +15,13 @@ class Cos : public Term
 
     std::string toString() const override;
 
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+
   private:
     friend TermHolder;
     Cos(TermPtr arg, TermHolder* owner);
-
-    TermPtr _arg;
 };
 
 } /* namespace autodiff */

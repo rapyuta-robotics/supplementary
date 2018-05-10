@@ -50,13 +50,13 @@ TermPtr TermBuilder::sigmoid(const TermPtr arg, const TermPtr upperBound, const 
     return (upperBound - lowerBound) * (arg->getOwner()->sigmoid(arg, mid, steepness)) + lowerBound;
 }
 
-TermPtr TermBuilder::boundedValue(TermPtr arg, TermPtr leftBound, TermPtr rightBound, double steepness)
+TermPtr TermBuilder::boundedValue(TermPtr arg, TermPtr leftBound, TermPtr rightBound)
 {
-    return arg->getOwner()->lessThan(leftBound, arg, steepness) & arg->getOwner()->lessThan(arg, rightBound, steepness);
+    return arg->getOwner()->lessThan(leftBound, arg) & arg->getOwner()->lessThan(arg, rightBound);
 }
 
-TermPtr TermBuilder::boundedRectangle(const TVec<2>& arg, const TVec<2>& rightLower, const TVec<2>& leftUpper, double steepness)
+TermPtr TermBuilder::boundedRectangle(const TVec<2>& arg, const TVec<2>& rightLower, const TVec<2>& leftUpper)
 {
-    return boundedValue(arg.getX(), rightLower.getX(), leftUpper.getX(), steepness) & boundedValue(arg.getY(), rightLower.getY(), leftUpper.getY(), steepness);
+    return boundedValue(arg.getX(), rightLower.getX(), leftUpper.getX()) & boundedValue(arg.getY(), rightLower.getY(), leftUpper.getY());
 }
 } /* namespace autodiff */

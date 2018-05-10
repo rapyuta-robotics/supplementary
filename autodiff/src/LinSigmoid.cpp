@@ -17,6 +17,7 @@ LinSigmoid::LinSigmoid(TermPtr arg, TermHolder* owner)
 
 int LinSigmoid::accept(ITermVisitor* visitor)
 {
+    _arg->accept(visitor);
     return visitor->visit(this);
 }
 

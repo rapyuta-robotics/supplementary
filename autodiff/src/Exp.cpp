@@ -17,13 +17,13 @@ namespace autodiff
 {
 
 Exp::Exp(TermPtr arg, TermHolder* owner)
-    : Term(owner)
-    , _arg(arg)
+    : UnaryFunction(arg, owner)
 {
 }
 
 int Exp::accept(ITermVisitor* visitor)
 {
+    _arg->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -46,6 +46,15 @@ std::string Exp::toString() const
     std::stringstream str;
     str << "exp( " << _arg->toString() << " )";
     return str.str();
+}
+
+void Exp::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* arg = tape.getValues(params[0].asIdx);
+    result[0] = exp(arg[0]);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = arg[i] * result[0];
+    }
 }
 
 } /* namespace autodiff */

@@ -15,13 +15,18 @@ class Variable : public Term, public alica::SolverVariable
     TermPtr derivative(VarPtr v) const override;
 
     std::string toString() const override;
+    static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
+
+    void setVarId(int id) { _varId = id; }
+
+    virtual EvalFunction getEvalFunction() const override { return &Eval; }
+    virtual void fillParameters(Parameter* params) const override { params[0].asIdx = _varId; }
 
   private:
     friend TermHolder;
     Variable(TermHolder* owner);
     double _globalMin;
     double _globalMax;
-    int _ownId;
-    static int var_id;
+    int _varId;
 };
 } /* namespace autodiff */

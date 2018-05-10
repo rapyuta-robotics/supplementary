@@ -16,14 +16,14 @@
 namespace autodiff
 {
 Or::Or(TermPtr left, TermPtr right, TermHolder* owner)
-    : Term(owner)
-    , _left(left)
-    , _right(right)
+    : BinaryFunction(left, right, owner)
 {
 }
 
 int Or::accept(ITermVisitor* visitor)
 {
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -59,4 +59,22 @@ std::string Or::toString() const
     str << "or( " << _left->toString() << ", " << _right->toString() << " )";
     return str.str();
 }
+
+void Or::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+
+    if (l[0] < 0.0 && r[0] < 0.0) {
+        for (int i = 0; i <= dim; ++i) {
+            result[i] = l[i] + r[i];
+        }
+    } else {
+        result[0] = 1.0;
+        for (int i = 1; i <= dim; ++i) {
+            result[i] = 0.0;
+        }
+    }
+}
+
 } /* namespace autodiff */

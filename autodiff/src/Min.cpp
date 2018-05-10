@@ -11,14 +11,14 @@
 namespace autodiff
 {
 Min::Min(TermPtr left, TermPtr right, TermHolder* owner)
-    : Term(owner)
-    , _left(left)
-    , _right(right)
+    : BinaryFunction(left, right, owner)
 {
 }
 
 int Min::accept(ITermVisitor* visitor)
 {
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -50,4 +50,21 @@ std::string Min::toString() const
     str << "min( " << _left->toString() << ", " << _right->toString() << " )";
     return str.str();
 }
+
+void Min::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+
+    if (l[0] < r[0]) {
+        for (int i = 0; i <= dim; ++i) {
+            result[i] = l[i];
+        }
+    } else {
+        for (int i = 0; i <= dim; ++i) {
+            result[i] = r[i];
+        }
+    }
+}
+
 } /* namespace autodiff */
