@@ -25,9 +25,18 @@ AlicaViewerMainWindow::AlicaViewerMainWindow(int argc, char* argv[], QWidget* pa
 
     // fill combo box
     const AgentInfoMap& aiMap = _alicaPlan.getAgentInfoMap();
-    _ui.agentIdComboBox->addItem("All");
     for (const auto& agentInfo : aiMap) {
-        _ui.agentIdComboBox->addItem(QString::fromStdString(agentInfo.second.name));
+        _agentIdVector.push_back(agentInfo.first);
+    }
+    std::sort(_agentIdVector.begin(), _agentIdVector.end(), supplementary::AgentIDComparator());
+
+    _ui.agentIdComboBox->addItem("Combined");
+    _ui.agentIdComboBox->addItem("All");
+    for (const supplementary::AgentID* agentId : _agentIdVector) {
+        const AgentInfo* ai = _alicaPlan.getAgentInfo(agentId);
+        if (ai) {
+            _ui.agentIdComboBox->addItem(QString::fromStdString(ai->name));
+        }
     }
 
     // Connect the signals and slots between interface to main window
@@ -68,21 +77,29 @@ elastic_nodes::Node* AlicaViewerMainWindow::addStateToScene(const PlanTree* plan
 void AlicaViewerMainWindow::updateNodes()
 {
     _scene->clear();
+    int indexSelected = _ui.agentIdComboBox->currentIndex();
     int x = 0;
 
-    const PlanTree* planTree = _alicaPlan.getCombinedPlanTree();
-    for (PlanTree* child : planTree->getChildren()) {
-        int y = 0;
-        addStateToScene(child, x, y);
-        x += 300;
-    }
+    const PlanTreeMap& ptMap = _alicaPlan.getPlanTrees();
 
-    // const PlanTreeMap& ptMap = _alicaPlan.getPlanTrees();
-    // for (const auto& ptMapPair : ptMap) {
-    //     const AgentInfo* agentInfo = _alicaPlan.getAgentInfo(ptMapPair.first);
-    //     addStateToScene(ptMapPair.second, x, 0);
-    //     x += 300;
-    // }
+    if (indexSelected == 0) { // Combined
+        const PlanTree* planTree = _alicaPlan.getCombinedPlanTree();
+        for (PlanTree* child : planTree->getChildren()) {
+            int y = 0;
+            addStateToScene(child, x, y);
+            x += 300;
+        }
+    } else if (indexSelected == 1) { // All
+        for (const auto& ptMapPair : ptMap) {
+            addStateToScene(ptMapPair.second, x, 0);
+            x += 300;
+        }
+    } else { // individual agents
+        PlanTreeMap::const_iterator planTreeEntry = ptMap.find(_agentIdVector[indexSelected - 2]);
+        if (planTreeEntry != ptMap.end()) {
+            addStateToScene(planTreeEntry->second, x, 0);
+        }
+    }
 }
 
 AlicaViewerMainWindow::~AlicaViewerMainWindow()

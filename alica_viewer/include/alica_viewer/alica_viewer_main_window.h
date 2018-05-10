@@ -42,6 +42,7 @@ class AlicaViewerMainWindow : public QMainWindow
     GraphicsViewZoom* _zoom;
     AlicaViewerInterface _interfaceNode;
     AlicaPlan _alicaPlan;
+    AgentGrp _agentIdVector;
 };
 
 } // namespace alica
