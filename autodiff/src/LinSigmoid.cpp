@@ -10,8 +10,7 @@
 namespace autodiff
 {
 LinSigmoid::LinSigmoid(TermPtr arg, TermHolder* owner)
-    : Term(owner)
-    , _arg(arg)
+    : UnaryFunction(arg, owner)
 {
 }
 
@@ -52,5 +51,15 @@ std::string LinSigmoid::toString() const
     std::stringstream str;
     str << "sigmoid( " << _arg->toString() << " )";
     return str.str();
+}
+
+void LinSigmoid::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* arg = tape.getValues(params[0].asIdx);
+    const double e = exp(-arg[0]);
+    result[0] = 1.0 / (1.0 + e);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = arg[i];
+    }
 }
 } /* namespace autodiff */

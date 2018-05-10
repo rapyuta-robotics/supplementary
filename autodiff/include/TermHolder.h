@@ -26,6 +26,7 @@ class TermHolder
     TermPtr or_(TermPtr left, TermPtr right);
     TermPtr lessThan(TermPtr left, TermPtr right);
     TermPtr lessThanEqual(TermPtr left, TermPtr right);
+    TermPtr reify(TermPtr arg);
 
     TermPtr constant(double value);
     TermPtr abs(TermPtr arg);

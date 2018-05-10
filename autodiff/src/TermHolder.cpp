@@ -14,6 +14,7 @@
 #include "Min.h"
 #include "Or.h"
 #include "Product.h"
+#include "Reification.h"
 #include "Sigmoid.h"
 #include "Sin.h"
 #include "Sum.h"
@@ -117,6 +118,13 @@ TermPtr TermHolder::lessThan(TermPtr left, TermPtr right)
 TermPtr TermHolder::lessThanEqual(TermPtr left, TermPtr right)
 {
     TermPtr ret = new LTEConstraint(left, right, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
+TermPtr TermHolder::reify(TermPtr arg)
+{
+    TermPtr ret = new Reification(arg, this);
     handleNewTerm(ret);
     return ret;
 }

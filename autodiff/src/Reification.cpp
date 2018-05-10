@@ -1,22 +1,19 @@
 
 #include "Reification.h"
+#include "Tape.h"
 #include <sstream>
 
 namespace autodiff
 {
-Reification::Reification(TermPtr condition, double min, double max, TermHolder* owner)
-    : Term(owner)
-    , _condition(condition)
-    , _negatedCondition(condition->negate())
-    , _min(min)
-    , _max(max)
+Reification::Reification(TermPtr condition, TermHolder* owner)
+    : BinaryFunction(condition, condition->negate(), owner)
 {
 }
 
 int Reification::accept(ITermVisitor* visitor)
 {
-    _condition->accept(visitor);
-    _negatedCondition->accept(visitor);
+    _left->accept(visitor);
+    _right->accept(visitor);
     return visitor->visit(this);
 }
 
@@ -34,7 +31,25 @@ TermPtr Reification::derivative(VarPtr v) const
 std::string Reification::toString() const
 {
     std::stringstream str;
-    str << "Discretizer( " << _condition->toString() << ", " << _min << ", " << _max << " )";
+    str << "Discretizer( " << _left->toString() << " )";
     return str.str();
 }
+
+void Reification::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+    if (l[0] > 0.75) {
+        result[0] = 1.0;
+        for (int i = 1; i <= dim; ++i) {
+            result[i] = -r[i];
+        }
+    } else {
+        result[0] = 0.0;
+        for (int i = 1; i <= dim; ++i) {
+            result[i] = l[i];
+        }
+    }
+}
+
 } /* namespace autodiff */

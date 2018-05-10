@@ -11,9 +11,7 @@
 namespace autodiff
 {
 Atan2::Atan2(TermPtr left, TermPtr right, TermHolder* owner)
-    : Term(owner)
-    , _left(left)
-    , _right(right)
+    : BinaryFunction(left, right, owner)
 {
 }
 
@@ -48,5 +46,16 @@ std::string Atan2::toString() const
     str << ", " << _right->toString();
     str << " )";
     return str.str();
+}
+
+void Atan2::Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim)
+{
+    const double* l = tape.getValues(params[0].asIdx);
+    const double* r = tape.getValues(params[1].asIdx);
+    result[0] = atan2(l[0], r[0]);
+    const double denom = 1.0 / (l[0] * l[0] + r[0] * r[0]);
+    for (int i = 1; i <= dim; ++i) {
+        result[i] = (l[0] * r[i] - r[0] * l[i]) * denom;
+    }
 }
 } /* namespace autodiff */
