@@ -11,7 +11,7 @@
 #include "TermHolder.h"
 
 #include <cmath>
-#include <sstringstream>
+#include <sstream>
 
 namespace autodiff
 {
@@ -32,14 +32,14 @@ TermPtr ConstPower::aggregateConstants()
     _base = _base->aggregateConstants(); // all your base are belong to us
 
     if (_base->isConstant()) {
-        return _owner->constant(pow(static_cast<Constant*>(_base)->getValue(), exponent));
+        return _owner->constant(pow(static_cast<Constant*>(_base)->getValue(), _exponent));
     }
 
-    ConstPower* constPowerBase = dynamic_cast<ConstPower>(base);
+    ConstPower* constPowerBase = dynamic_cast<ConstPower*>(_base.get());
 
     if (constPowerBase != nullptr) {
-        _exponent *= constPowerBase->exponent;
-        _base = constPowerBase->base;
+        _exponent *= constPowerBase->_exponent;
+        _base = constPowerBase->_base;
     }
 
     return this;
@@ -47,19 +47,19 @@ TermPtr ConstPower::aggregateConstants()
 
 TermPtr ConstPower::derivative(VarPtr v) const
 {
-    return _owner->constant(exponent) * owner->constPower(base, exponent - 1) * base->derivative(v);
+    return _owner->constant(_exponent) * _owner->constPower(_base, _exponent - 1) * _base->derivative(v);
 }
 
 std::string ConstPower::toString() const
 {
     std::stringstream str;
     str << "constPower( ";
-    if (base != nullptr) {
-        std << base->toString();
+    if (_base != nullptr) {
+        str << _base->toString();
     } else {
         str << "nullptr";
     }
-    str << ", " << exponent << " )";
+    str << ", " << _exponent << " )";
     return str.str();
 }
 } /* namespace autodiff */

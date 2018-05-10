@@ -24,7 +24,7 @@ TermPtr Log::aggregateConstants()
 {
     _arg = _arg->aggregateConstants();
     if (_arg->isConstant()) {
-        return _owner->constant(log(static_cast<Constant*>(arg)->getValue()));
+        return _owner->constant(log(static_cast<Constant*>(_arg)->getValue()));
     } else {
         return this;
     }
@@ -32,13 +32,13 @@ TermPtr Log::aggregateConstants()
 
 TermPtr Log::derivative(VarPtr v) const
 {
-    return arg->derivative(v) / arg;
+    return _arg->derivative(v) / _arg;
 }
 
 std::string Log::toString() const
 {
     std::stringstream str;
-    str << "log( " << arg->toString()) << " )"
+    str << "log( " << _arg->toString() << " )";
     return str.str();
 }
 } /* namespace autodiff */

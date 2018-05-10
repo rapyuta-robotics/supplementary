@@ -11,7 +11,7 @@ class Constant : public Term
     int accept(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
-    TermPtr derivative(shared_ptr<Variable> v) const override;
+    TermPtr derivative(VarPtr v) const override;
 
     std::string toString() const override;
     double getValue() const { return _value; }

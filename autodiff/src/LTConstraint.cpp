@@ -21,7 +21,7 @@ LTConstraint::LTConstraint(TermPtr x, TermPtr y, double steepness, TermHolder* o
     , _left(x)
     , _right(y)
     , _steepness(steepness)
-    , _negatedform(nullptr)
+    , _negatedForm(nullptr)
 {
 }
 
@@ -53,17 +53,17 @@ TermPtr LTConstraint::derivative(VarPtr v) const
 
 TermPtr LTConstraint::negate() const
 {
-    if (_negatedform == nullptr) {
-        _negatedform = _owner->lessThanEqual(_right, _left, _steepness);
-        _negatedform->setNegation(this);
+    if (_negatedForm == nullptr) {
+        _negatedForm = _owner->lessThanEqual(_right, _left, _steepness);
+        _negatedForm->setNegation(this);
     }
-    return negatedform;
+    return _negatedForm;
 }
 
 std::string LTConstraint::toString() const
 {
     std::stringstream str;
-    str << left->toString() << " < " << right->toString();
+    str << _left->toString() << " < " << _right->toString();
     return str.str();
 }
 

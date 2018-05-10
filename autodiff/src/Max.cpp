@@ -24,8 +24,8 @@ int Max::accept(ITermVisitor* visitor)
 TermPtr Max::aggregateConstants()
 {
     _left = _left->aggregateConstants();
-    if (left == _owner->trueConstant()) {
-        return left;
+    if (_left == _owner->trueConstant()) {
+        return _left;
     }
     _right = _right->aggregateConstants();
     if (_left == _owner->falseConstant()) {
@@ -52,7 +52,7 @@ TermPtr Max::derivative(VarPtr v) const
 
 TermPtr Max::negate() const
 {
-    return left->negate() & right->negate();
+    return _left->negate() & _right->negate();
 }
 
 std::string Max::toString() const

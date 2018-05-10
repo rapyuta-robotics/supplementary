@@ -24,5 +24,3 @@ class Product : public Term
 };
 
 } /* namespace autodiff */
-
-#endif /* PRODUCT_H_ */

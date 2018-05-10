@@ -4,7 +4,6 @@
 #include "Constant.h"
 #include "Cos.h"
 #include "TermHolder.h"
-#include "Zero.h"
 
 #include <cmath>
 #include <sstream>
@@ -25,21 +24,21 @@ int Sin::accept(ITermVisitor* visitor)
 TermPtr Sin::aggregateConstants()
 {
     _arg = _arg->aggregateConstants();
-    if (arg->isConstant()) {
-        return _owner->constant(sin(static_cast<Constant*>(arg)->getValue()));
+    if (_arg->isConstant()) {
+        return _owner->constant(sin(static_cast<Constant*>(_arg)->getValue()));
     }
     return this;
 }
 
 TermPtr Sin::derivative(VarPtr v) const
 {
-    return _owner->cos(arg) * arg->derivative(v);
+    return _owner->cos(_arg) * _arg->derivative(v);
 }
 
 std::string Sin::toString() const
 {
     std::stringstream str;
-    str << "sin( " << arg->toString() << " )";
+    str << "sin( " << _arg->toString() << " )";
     return str.str();
 }
 } /* namespace autodiff */

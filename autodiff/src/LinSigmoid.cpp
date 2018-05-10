@@ -25,7 +25,7 @@ TermPtr LinSigmoid::aggregateConstants()
     _arg = _arg->aggregateConstants();
     if (_arg->isConstant()) {
         double e = exp(-static_cast<Constant*>(_arg)->getValue());
-        if (e == numeric_limits<double>::infinity()) {
+        if (e == std::numeric_limits<double>::infinity()) {
             return _owner->constant(Term::EPSILON);
         } else {
             e = 1.0 / (1.0 + e);
@@ -35,9 +35,8 @@ TermPtr LinSigmoid::aggregateConstants()
         } else {
             return _owner->constant(e);
         }
-    } else {
-        return return this;
     }
+    return this;
 }
 
 TermPtr LinSigmoid::derivative(VarPtr v) const
@@ -50,7 +49,7 @@ TermPtr LinSigmoid::derivative(VarPtr v) const
 std::string LinSigmoid::toString() const
 {
     std::stringstream str;
-    str << "sigmoid( " << arg->toString() << " )";
+    str << "sigmoid( " << _arg->toString() << " )";
     return str.str();
 }
 } /* namespace autodiff */

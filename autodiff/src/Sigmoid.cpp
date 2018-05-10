@@ -38,8 +38,8 @@ TermPtr Sigmoid::aggregateConstants()
     _arg = _arg->aggregateConstants();
     _mid = _mid->aggregateConstants();
     if (_arg->isConstant() && _mid->isConstant()) {
-        double e = exp(steepness * (-static_cast<Constant*>(_arg)->getValue() + static_cast<Constant*>(_mid)->getValue()));
-        if (e == numeric_limits<double>::infinity()) {
+        double e = exp(_steepness * (-static_cast<Constant*>(_arg)->getValue() + static_cast<Constant*>(_mid)->getValue()));
+        if (e == std::numeric_limits<double>::infinity()) {
             return _owner->constant(Term::EPSILON);
         } else {
             e = 1.0 / (1.0 + e);
@@ -54,16 +54,16 @@ TermPtr Sigmoid::aggregateConstants()
     }
 }
 
-TermPtr Sigmoid::derivative(shared_ptr<Variable> v) const
+TermPtr Sigmoid::derivative(VarPtr v) const
 {
-    TermPtr t = steepness * (arg->derivative(v) - mid->derivative(v)) * _owner->exp(steepness * (-1 * arg + mid));
-    return t / _owner->constPower(_owner->exp(steepness * arg) + _owner->exp(steepness * mid), 2);
+    TermPtr t = _steepness * (_arg->derivative(v) - _mid->derivative(v)) * _owner->exp(_steepness * (-1 * _arg + _mid));
+    return t / _owner->constPower(_owner->exp(_steepness * _arg) + _owner->exp(_steepness * _mid), 2);
 }
 
 std::string Sigmoid::toString() const
 {
     std::stringstream str;
-    str << "sigmoid( " << arg->toString() << ", " << mid->toString() << ", " << steepness << " )";
+    str << "sigmoid( " << _arg->toString() << ", " << _mid->toString() << ", " << _steepness << " )";
     return str.str();
 }
 } /* namespace autodiff */

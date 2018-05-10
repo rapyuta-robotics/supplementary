@@ -21,18 +21,18 @@ int And::accept(ITermVisitor* visitor)
 TermPtr And::aggregateConstants()
 {
     _left = _left->aggregateConstants();
-    if (left == _owner->falseConstant()) {
-        return left;
+    if (_left == _owner->falseConstant()) {
+        return _left;
     }
     _right = _right->aggregateConstants();
-    if (left == _owner->trueConstant()) {
-        return right;
+    if (_left == _owner->trueConstant()) {
+        return _right;
     }
     if (_right == _owner->falseConstant()) {
-        return right;
+        return _right;
     }
     if (_right == _owner->trueConstant()) {
-        return left;
+        return _left;
     }
     if (_left->isConstant() && _right->isConstant()) {
         if (static_cast<Constant*>(_left)->getValue() > 0.75 && static_cast<Constant*>(_right)->getValue() > 0.75) {
@@ -45,7 +45,7 @@ TermPtr And::aggregateConstants()
     }
 }
 
-TermPtr And::derivative(shared_ptr<Variable> v) const
+TermPtr And::derivative(VarPtr /*v*/) const
 {
     throw "Symbolic Derivation of And not supported";
     return nullptr;
@@ -53,14 +53,14 @@ TermPtr And::derivative(shared_ptr<Variable> v) const
 
 TermPtr And::negate() const
 {
-    return left->negate() | right->negate();
+    return _left->negate() | _right->negate();
 }
 
 std::string And::toString() const
 {
     std::stringstream str;
-    str << "and( " << left->toString();
-    st << ", " << right->toString();
+    str << "and( " << _left->toString();
+    str << ", " << _right->toString();
     str << " )";
     return str.str();
 }

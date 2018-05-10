@@ -31,20 +31,20 @@ TermPtr Exp::aggregateConstants()
 {
     _arg = _arg->aggregateConstants();
     if (_arg->isConstant()) {
-        return TermBuilder::constant(exp(static_cast<Constant*>(_arg)->getValue()));
+        return _owner->constant(exp(static_cast<Constant*>(_arg)->getValue()));
     }
     return this;
 }
 
 TermPtr Exp::derivative(VarPtr v) const
 {
-    return this * arg->derivative(v);
+    return this * _arg->derivative(v);
 }
 
 std::string Exp::toString() const
 {
     std::stringstream str;
-    str << "exp( " << arg->toString() << " )";
+    str << "exp( " << _arg->toString() << " )";
     return str.str();
 }
 

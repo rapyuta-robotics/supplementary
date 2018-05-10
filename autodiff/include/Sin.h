@@ -13,7 +13,7 @@ class Sin : public Term
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;
 
-    string toString() const override;
+    std::string toString() const override;
 
   private:
     friend TermHolder;

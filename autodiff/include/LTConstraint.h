@@ -15,7 +15,7 @@ class LTConstraint : public Term
     TermPtr negate() const override;
 
     std::string toString() const override;
-    void setNegation(LTEConstraint* negation) { _negatedForm = negation; }
+    void setNegation(const LTEConstraint* negation) const { _negatedForm = negation; }
 
   private:
     friend TermHolder;
@@ -24,7 +24,7 @@ class LTConstraint : public Term
     TermPtr _left;
     TermPtr _right;
     double _steepness;
-    mutable LTEConstraint* _negatedform;
+    mutable const LTEConstraint* _negatedForm;
 };
 
 } /* namespace autodiff */

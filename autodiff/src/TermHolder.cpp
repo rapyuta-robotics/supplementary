@@ -1,5 +1,28 @@
 #include "TermHolder.h"
+
+#include "Abs.h"
+#include "And.h"
+#include "ConstPower.h"
+#include "Constant.h"
+#include "ConstraintUtility.h"
+#include "Cos.h"
+#include "Exp.h"
+#include "LTConstraint.h"
+#include "LTEConstraint.h"
+#include "Log.h"
+#include "Max.h"
+#include "Min.h"
+#include "Or.h"
+#include "Product.h"
+#include "Sigmoid.h"
+#include "Sin.h"
+#include "Sum.h"
+#include "TermPower.h"
+#include "TermPtr.h"
+#include "Variable.h"
+
 #include <limits>
+
 namespace autodiff
 {
 
@@ -13,17 +36,18 @@ TermHolder::TermHolder()
 TermHolder::~TermHolder()
 {
     for (TermPtr t : _terms) {
-        delete t;
+        delete t.get();
     }
-    delete _true;
-    delete _zero;
-    delete _false;
+    delete _true.get();
+    delete _zero.get();
+    delete _false.get();
 }
 
 VarPtr TermHolder::createVariable()
 {
-    VarPtr ret = new Variable(this) _vars.push_back(ret);
-    _term.push_back(ret);
+    VarPtr ret = new Variable(this);
+    _vars.push_back(ret);
+    _terms.push_back(ret);
     return ret;
 }
 
@@ -72,13 +96,13 @@ TermPtr TermHolder::max(TermPtr left, TermPtr right)
     handleNewTerm(ret);
     return ret;
 }
-TermPtr TermHolder::and(TermPtr left, TermPtr right)
+TermPtr TermHolder::and_(TermPtr left, TermPtr right)
 {
     TermPtr ret = new And(left, right, this);
     handleNewTerm(ret);
     return ret;
 }
-TermPtr TermHolder:: or (TermPtr left, TermPtr right)
+TermPtr TermHolder::or_(TermPtr left, TermPtr right)
 {
     TermPtr ret = new Or(left, right, this);
     handleNewTerm(ret);
@@ -111,9 +135,16 @@ TermPtr TermHolder::constPower(TermPtr arg, double exponent)
     return ret;
 }
 
-TermPtr termPower(TermPtr arg, TermPtr exponent)
+TermPtr TermHolder::termPower(TermPtr arg, TermPtr exponent)
 {
     TermPtr ret = new TermPower(arg, exponent, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
+TermPtr TermHolder::sigmoid(TermPtr arg, TermPtr mid, double steepness)
+{
+    TermPtr ret = new Sigmoid(arg, mid, steepness, this);
     handleNewTerm(ret);
     return ret;
 }
@@ -135,6 +166,20 @@ TermPtr TermHolder::cos(TermPtr arg)
 TermPtr TermHolder::exp(TermPtr arg)
 {
     TermPtr ret = new Exp(arg, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
+TermPtr TermHolder::log(TermPtr arg)
+{
+    TermPtr ret = new Log(arg, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
+TermPtr TermHolder::constraintUtility(TermPtr constraint, TermPtr utility)
+{
+    TermPtr ret = new ConstraintUtility(constraint, utility, this);
     handleNewTerm(ret);
     return ret;
 }

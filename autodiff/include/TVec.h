@@ -1,18 +1,19 @@
 #pragma once
 
+#include "Term.h"
 #include "TermHolder.h"
 #include <array>
-
-#include <iostream>
+#include <type_traits>
 
 namespace autodiff
 {
-class Term;
+
 template <int DIM>
 class TVec
 {
+    static_assert(DIM > 0, "Vector dimensionality must be positive.");
+
   public:
-    //		TVec(initializer_list<TermPtr> terms);
     TVec(const std::array<TermPtr, DIM>& terms)
         : _terms(terms)
     {
@@ -22,31 +23,24 @@ class TVec
         : _terms{{args...}}
     {
     }
-    // TVec(TVec> first, vector<TermPtr> rest);
-    // TVec(vector<TermPtr> left, vector<TermPtr> o,
-    //        function<TermPtr(TermPtr, TermPtr)> elemOp);
-    // TVec(vector<TermPtr> input, function<TermPtr(TermPtr)> elemOp);
 
     TermPtr normSquared() const;
     TVec<DIM> normalize() const;
-    int dimension() const {return DIM};
+    int dimension() const { return DIM; }
 
-    getX() const { return _terms[0]; }
-    template <typename... Dummy, int D = DIM>
-    typename std::enable_if<(D > 1), Termptr> getY() const
+    TermPtr getX() const { return _terms[0]; }
+    template <int D = DIM>
+    typename std::enable_if<(D > 1), TermPtr>::type getY() const
     {
         return _terms[1];
     }
-    template <typename... Dummy, int D = DIM>
-    typename std::enable_if<(D > 2), Termptr> getZ() const
+    template <int D = DIM>
+    typename std::enable_if<(D > 2), TermPtr>::type getZ() const
     {
         return _terms[2];
     }
 
     TermPtr innerProduct(const TVec<DIM>& o) const;
-    TermPtr crossProduct(const TVec<DIM>& o) const;
-
-    // static TVec crossProduct(TVec> left, TVec> o);
 
     TermPtr operator[](int index) const { return _terms[index]; }
     TermPtr& operator[](int index) { return _terms[index]; }
@@ -54,7 +48,7 @@ class TVec
   private:
     std::array<TermPtr, DIM> _terms;
 };
-
+// Operators:
 template <int DIM>
 TVec<DIM> operator+(const TVec<DIM>& left, const TVec<DIM>& o);
 template <int DIM>
@@ -71,6 +65,28 @@ template <int DIM>
 TVec<DIM> operator*(const double scalar, const TVec<DIM>& vector);
 template <int DIM>
 TermPtr operator*(const TVec<DIM>& left, const TVec<DIM>& o);
+
+// Helpers:
+template <int DIM>
+TVec<DIM> crossProduct(const TVec<DIM>& t1, const TVec<DIM>& t2);
+template <int DIM>
+TermPtr distance(const TVec<DIM>& t1, const TVec<DIM>& t2);
+template <int DIM>
+TermPtr distanceSqr(const TVec<DIM>& t1, const TVec<DIM>& t2);
+template <int DIM>
+TVec<DIM> rotate(const TVec<DIM>& vec, double alpha);
+template <int DIM>
+TermPtr projectVectorOntoX(const TVec<DIM>& origin, const TVec<DIM>& dir, TermPtr x);
+template <int DIM>
+TVec<DIM> inCoordsOf(const TVec<DIM>& point, const TVec<DIM>& vec);
+template <int DIM>
+TermPtr leftOf(const TVec<DIM>& vec, const TVec<DIM>& toCheck);
+template <int DIM>
+TermPtr rightOf(const TVec<DIM>& vec, const TVec<DIM>& toCheck);
+template <int DIM>
+TermPtr equals(const TVec<DIM>& t1, const TVec<DIM>& t2, double tolerance);
+
+/// Implementation:
 
 template <>
 TermPtr TVec<1>::normSquared() const
@@ -93,8 +109,8 @@ TVec<DIM> TVec<DIM>::normalize() const
 {
     TermPtr a = normSquared();
     a = a->getOwner()->constPower(a, 0.5);
-    TVect<DIM> ret;
-    for (int i = 0; i < terms.size(); ++i) {
+    TVec<DIM> ret;
+    for (int i = 0; i < DIM; ++i) {
         ret[i] = (_terms[i] / a);
     }
     return ret;
@@ -110,9 +126,9 @@ TermPtr TVec<DIM>::innerProduct(const TVec<DIM>& o) const
     return ret;
 }
 template <>
-TVec<3> TVec<3>::crossProduct(const TVec<DIM>& o) const
+TVec<3> crossProduct(const TVec<3>& t1, const TVec<3>& t2)
 {
-    return TVec(getY() * o->getZ() - getZ() * o->getY(), getZ() * o->getX() - getX() * o->getZ(), getX() * o->getY() - getY() * o->getX());
+    return TVec<3>(t1.getY() * t2.getZ() - t1.getZ() * t2.getY(), t1.getZ() * t2.getX() - t1.getX() * t2.getZ(), t1.getX() * t2.getY() - t1.getY() * t2.getX());
 }
 
 template <int DIM>
@@ -176,7 +192,95 @@ TVec<DIM> operator*(const double scalar, const TVec<DIM>& vector)
 template <int DIM>
 TermPtr operator*(const TVec<DIM>& left, const TVec<DIM>& right)
 {
-    return left->innerProduct(right);
+    return left.innerProduct(right);
+}
+
+template <int DIM>
+TermPtr distanceSqr(const TVec<DIM>& one, const TVec<DIM>& two)
+{
+    return (one - two).normSquared();
+}
+
+template <int DIM>
+TermPtr distance(const TVec<DIM>& one, const TVec<DIM>& two)
+{
+    return one[0]->getOwner()->constPower(distanceSqr(one, two), 0.5);
+}
+
+template <>
+TVec<2> rotate(const TVec<2>& vec, double alpha)
+{
+    TermHolder* h = vec[0]->getOwner();
+    TermPtr at = h->constant(alpha);
+    TermPtr cosA = h->cos(at);
+    TermPtr sinA = h->sin(at);
+
+    return TVec<2>(cosA * vec.getX() - sinA * vec.getY(), sinA * vec.getX() + cosA * vec.getY());
+}
+template <>
+TermPtr projectVectorOntoX(const TVec<2>& origin, const TVec<2>& dir, TermPtr x)
+{
+    return origin.getY() + dir.getY() * (x - origin.getX()) * x->getOwner()->constPower(dir.getX(), -1);
+}
+
+/**
+ * Returns point in the coordinate system defined by vec and its rectangular.
+ *
+ * @param point A two-dimensional TVec
+ * @param vec A two-dimensional TVec
+ *
+ * @return A two-dimensional TVec
+ */
+template <>
+TVec<2> inCoordsOf(const TVec<2>& point, const TVec<2>& vec)
+{
+    TermPtr quo = point[0]->getOwner()->constPower(vec.normSquared(), -1.0);
+    return TVec<2>((point.getX() * vec.getX() + point.getY() * vec.getY()) * quo, (point.getX() * vec.getY() - point.getY() * vec.getX()) * quo);
+}
+
+/**
+ * Two dimensional geometry:
+ * Returns if toCheck is left of vec.
+ *
+ * @param vec A TVec
+ * @param toCheck A TVec
+ *
+ * @result A Term
+ */
+template <>
+TermPtr leftOf(const TVec<2>& vec, const TVec<2>& toCheck)
+{
+    return ((toCheck.getX() * vec.getY()) - (toCheck.getY() * vec.getX())) < vec[0]->getOwner()->zeroConstant();
+}
+
+/**
+ * Two dimensional geometry:
+ * Returns if toCheck is right of vec.
+ *
+ * @param vec A TVec
+ * @param toCheck A TVec
+ *
+ * @return A Term
+ */
+template <>
+TermPtr rightOf(const TVec<2>& vec, const TVec<2>& toCheck)
+{
+    return ((toCheck.getX() * vec.getY()) - (toCheck.getY() * vec.getX())) > vec[0]->getOwner()->zeroConstant();
+}
+
+/**
+ * Returns wether the distance between two n-dimensional vectors is less than tolerance.
+ *
+ * @param t1 A TVec
+ * @param t2 A TVec
+ * @param tolerance A double
+ *
+ * @return A Term
+ */
+template <int DIM>
+TermPtr equals(const TVec<DIM>& t1, const TVec<DIM>& t2, double tolerance)
+{
+    return distanceSqr(t1, t2) < t1[0]->getOwner()->constant(tolerance * tolerance);
 }
 
 } /* namespace autodiff */

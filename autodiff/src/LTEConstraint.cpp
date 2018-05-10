@@ -10,12 +10,12 @@
 
 namespace autodiff
 {
-LTEConstraint::LTEConstraint(TermPtr x, TermPtr y, double steppness, TermHolder* owner)
+LTEConstraint::LTEConstraint(TermPtr x, TermPtr y, double steepness, TermHolder* owner)
     : Term(owner)
     , _left(x)
     , _right(y)
     , _steepness(steepness)
-    , _negatedform(nullptr)
+    , _negatedForm(nullptr)
 {
 }
 
@@ -42,21 +42,22 @@ TermPtr LTEConstraint::aggregateConstants()
 TermPtr LTEConstraint::derivative(VarPtr v) const
 {
     throw "Symbolic Derivation of Less-Than-Or-Equal not supported.";
+    return nullptr;
 }
 
 TermPtr LTEConstraint::negate() const
 {
-    if (_negatedform == nullptr) {
-        _negatedform = _owenr->lessThan(right, left, steepness);
-        _negatedform->setNegation(this);
+    if (_negatedForm == nullptr) {
+        _negatedForm = _owner->lessThan(_right, _left, _steepness);
+        _negatedForm->setNegation(this);
     }
-    return _negatedform;
+    return _negatedForm;
 }
 
 std::string LTEConstraint::toString() const
 {
     std::stringstream str;
-    str << left->toString() << " <= " << right->toString();
+    str << _left->toString() << " <= " << _right->toString();
     return str.str();
 }
 } /* namespace autodiff */

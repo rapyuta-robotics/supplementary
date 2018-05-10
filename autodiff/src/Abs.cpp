@@ -10,34 +10,36 @@
 namespace autodiff
 {
 
-Abs::Abs(TermPtr arg, TermHolder* owner);
-        : Term(owner)
-        , _arg(owner) {}
+Abs::Abs(TermPtr arg, TermHolder* owner)
+    : Term(owner)
+    , _arg(arg)
+{
+}
 
-        int Abs::accept(ITermVisitor* visitor)
-        {
-            return visitor->visit(this);
-        }
+int Abs::accept(ITermVisitor* visitor)
+{
+    return visitor->visit(this);
+}
 
-        TermPtr Abs::aggregateConstants()
-        {
-            arg = arg->aggregateConstants();
-            if (arg->isConstant()) {
-        return owner->constant(fabs(static_cast<Constant*>(arg)->getValue());
-            } else {
-                return this;
-            }
-        }
+TermPtr Abs::aggregateConstants()
+{
+    _arg = _arg->aggregateConstants();
+    if (_arg->isConstant()) {
+        return _owner->constant(fabs(static_cast<Constant*>(_arg)->getValue()));
+    } else {
+        return this;
+    }
+}
 
-        TermPtr Abs::derivative(VarPtr v) const
-        {
-            return arg->derivative(v) * arg / this;
-        }
+TermPtr Abs::derivative(VarPtr v) const
+{
+    return _arg->derivative(v) * _arg / this;
+}
 
-        std::string Abs::toString() const
-        {
-            std::stringstream str;
-            str << "abs( " << arg->toString() << " )";
-            return str.str();
-        }
-        } /* namespace autodiff */
+std::string Abs::toString() const
+{
+    std::stringstream str;
+    str << "abs( " << _arg->toString() << " )";
+    return str.str();
+}
+} /* namespace autodiff */

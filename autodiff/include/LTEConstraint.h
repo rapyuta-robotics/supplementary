@@ -4,11 +4,11 @@
 
 namespace autodiff
 {
-
+class LTConstraint;
 class LTEConstraint : public Term
 {
   public:
-    void setNegation(LTConstraint* negation) { _negatedForm = negation; }
+    void setNegation(const LTConstraint* negation) const { _negatedForm = negation; }
 
     int accept(ITermVisitor* visitor) override;
 
@@ -25,7 +25,7 @@ class LTEConstraint : public Term
     TermPtr _left;
     TermPtr _right;
     double _steepness;
-    mutable TermPtr _negatedform;
+    mutable const LTConstraint* _negatedForm;
 };
 
 } /* namespace autodiff */

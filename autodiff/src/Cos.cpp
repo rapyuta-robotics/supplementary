@@ -30,21 +30,21 @@ int Cos::accept(ITermVisitor* visitor)
 TermPtr Cos::aggregateConstants()
 {
     _arg = _arg->aggregateConstants();
-    if (arg->isConstant()) {
-        return _owner->constant(cos(static_cast<Constant*>(arg)->getValue()));
+    if (_arg->isConstant()) {
+        return _owner->constant(cos(static_cast<Constant*>(_arg)->getValue()));
     }
     return this;
 }
 
 TermPtr Cos::derivative(VarPtr v) const
 {
-    return _owner->sin(arg) * -arg->derivative(v);
+    return _owner->sin(_arg) * -_arg->derivative(v);
 }
 
 std::string Cos::toString() const
 {
     std::stringstream str;
-    str << "cos( " << arg->toString() << " )";
+    str << "cos( " << _arg->toString() << " )";
     return str.str();
 }
 } /* namespace autodiff */

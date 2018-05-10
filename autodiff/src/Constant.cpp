@@ -24,24 +24,24 @@ int Constant::accept(ITermVisitor* visitor)
     return visitor->visit(this);
 }
 
-TermPtr Constant::aggregateConstants() const
+TermPtr Constant::aggregateConstants()
 {
     return this;
 }
 
-TermPtr Constant::derivative(shared_ptr<Variable> v) const
+TermPtr Constant::derivative(VarPtr v) const
 {
-    return owner->zeroConstant();
+    return _owner->zeroConstant();
 }
 
 std::string Constant::toString() const
 {
-    if (this == owner->trueConstant()) {
+    if (this == _owner->trueConstant()) {
         return "true";
-    } else if (this == owner->falseConstant()) {
+    } else if (this == _owner->falseConstant()) {
         return "false";
     }
 
-    return std::to_string(value);
+    return std::to_string(_value);
 }
 } /* namespace autodiff */

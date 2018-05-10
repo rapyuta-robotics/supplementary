@@ -8,7 +8,7 @@ namespace autodiff
 class Atan2 : public Term
 {
   public:
-    int accept(shared_ptr<ITermVisitor> visitor);
+    int accept(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;

@@ -33,7 +33,6 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(autodiff
-  src/CompiledDifferentiator.cpp
   src/Abs.cpp
   src/And.cpp
   src/Atan2.cpp
@@ -59,17 +58,15 @@ add_library(autodiff
   src/TermBuilder.cpp
   src/TermHolder.cpp
   src/TermPower.cpp
-  src/TermUtils.cpp
-  src/TVec.cpp
   src/Variable.cpp
 )
 
 target_link_libraries(autodiff ${catkin_LIBRARIES})
 
 
-add_executable(sine_benchmark test/test_benchmark.cpp)
+#add_executable(sine_benchmark test/test_benchmark.cpp)
 
-target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
+#target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}-test test/test_autodiff.cpp)

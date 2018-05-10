@@ -29,8 +29,8 @@ int ConstraintUtility::accept(ITermVisitor* visitor)
 
 TermPtr ConstraintUtility::aggregateConstants()
 {
-    _constraint = constraint->aggregateConstants();
-    _utility = utility->aggregateConstants();
+    _constraint = _constraint->aggregateConstants();
+    _utility = _utility->aggregateConstants();
     return this;
 }
 
@@ -49,8 +49,8 @@ TermPtr ConstraintUtility::negate() const
 std::string ConstraintUtility::toString() const
 {
     std::stringstream str;
-    str << "[ConstraintUtility: Constraint=" << constraint->toString());
-    str << ", Utility=" << utility->toString() << "]";
+    str << "[ConstraintUtility: Constraint=" << _constraint->toString();
+    str << ", Utility=" << _utility->toString() << "]";
     return str.str();
 }
 } /* namespace autodiff */

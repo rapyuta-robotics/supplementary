@@ -27,7 +27,7 @@ TermPtr Atan2::aggregateConstants()
     _left = _left->aggregateConstants();
     _right = _right->aggregateConstants();
     if (_left->isConstant() && _right->isConstant()) {
-        return TermBuilder::constant(atan2(static_cast<Constant*>(_left)->getValue(), static_cast<Constant*>(_right)->getValue()));
+        return _owner->constant(atan2(static_cast<Constant*>(_left)->getValue(), static_cast<Constant*>(_right)->getValue()));
     } else {
         return this;
     }
@@ -35,15 +35,15 @@ TermPtr Atan2::aggregateConstants()
 
 TermPtr Atan2::derivative(VarPtr v) const
 {
-    TermPtr t = left * right->derivative(v) - right * left->derivative(v);
-    return t / (_owner->constPower(left, 2) + _owner->constPower(right, 2));
+    TermPtr t = _left * _right->derivative(v) - _right * _left->derivative(v);
+    return t / (_owner->constPower(_left, 2) + _owner->constPower(_right, 2));
 }
 
 std::string Atan2::toString() const
 {
     std::stringstream str;
-    str << "atan2( " << left->toString();
-    str << ", " << right->toString();
+    str << "atan2( " << _left->toString();
+    str << ", " << _right->toString();
     str << " )";
     return str.str();
 }

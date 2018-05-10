@@ -16,6 +16,7 @@ class Sum : public Term
     std::string toString() const override;
 
   private:
+    friend TermHolder;
     Sum(TermPtr first, TermPtr second, TermHolder* owner);
 
     TermPtr _left;

@@ -6,9 +6,6 @@
 #include <random>
 using namespace autodiff;
 
-using VarPtr = std::shared_ptr<autodiff::Variable>;
-using TermPtr = std::shared_ptr<autodiff::Term>;
-
 double sampleTerm(TermPtr t, std::shared_ptr<std::vector<VarPtr>>& vars, int num, std::mt19937& gen)
 {
     double ret = 0.0f;

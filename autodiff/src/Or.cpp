@@ -8,7 +8,7 @@
 #include "Or.h"
 
 #include "Constant.h"
-#include "TermBuilder.h"
+#include "TermHolder.h"
 
 #include <cmath>
 #include <sstream>
@@ -50,13 +50,13 @@ TermPtr Or::derivative(VarPtr v) const
 
 TermPtr Or::negate() const
 {
-    return left->negate() & right->negate();
+    return _left->negate() & _right->negate();
 }
 
 std::string Or::toString() const
 {
     std::stringstream str;
-    str << "or( " << _left->toString() << ", " << _right->toString() << " )");
+    str << "or( " << _left->toString() << ", " << _right->toString() << " )";
     return str.str();
 }
 } /* namespace autodiff */

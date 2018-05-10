@@ -20,10 +20,10 @@ class Reification : public Term
     friend TermHolder;
     Reification(TermPtr condition, double min, double max, TermHolder* owner);
 
-    TermPtr condition;
-    TermPtr negatedCondition;
-    double min;
-    double max;
+    TermPtr _condition;
+    TermPtr _negatedCondition;
+    double _min;
+    double _max;
 };
 
 } /* namespace autodiff */

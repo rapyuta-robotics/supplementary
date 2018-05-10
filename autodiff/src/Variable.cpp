@@ -27,12 +27,12 @@ TermPtr Variable::aggregateConstants()
     return this;
 }
 
-TermPtr Variable::derivative(VarPtr v)
+TermPtr Variable::derivative(VarPtr v) const
 {
     if (this == v) {
         return _owner->constant(1);
     } else {
-        return _owner->zeroConstant(0);
+        return _owner->zeroConstant();
     }
 }
 
@@ -41,10 +41,10 @@ std::string Variable::toString() const
     std::stringstream str;
     if (_ownId < 0) {
         str << "Var_";
-        str << -ownId;
+        str << -_ownId;
     } else {
         str << "Var";
-        str << std::to_string(ownId);
+        str << std::to_string(_ownId);
     }
     return str.str();
 }

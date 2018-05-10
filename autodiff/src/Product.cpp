@@ -56,7 +56,7 @@ TermPtr Product::derivative(VarPtr v) const
 std::string Product::toString() const
 {
     std::stringstream str;
-    str << "( " << left->toString() << " * " << right->toString() << " )";
+    str << "( " << _left->toString() << " * " << _right->toString() << " )";
     return str.str();
 }
 

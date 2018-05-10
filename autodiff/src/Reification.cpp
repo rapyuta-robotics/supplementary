@@ -32,7 +32,7 @@ TermPtr Reification::derivative(VarPtr v) const
 std::string Reification::toString() const
 {
     std::stringstream str;
-    str << "Discretizer( " << condition->toString() << ", " << min << ", " << max << " )";
+    str << "Discretizer( " << _condition->toString() << ", " << _min << ", " << _max << " )";
     return str.str();
 }
 } /* namespace autodiff */

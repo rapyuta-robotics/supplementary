@@ -9,6 +9,7 @@
 #define TERM_H_
 
 #include "ITermVisitor.h"
+#include "TermPtr.h"
 #include "Types.h"
 #include <engine/constraintmodul/SolverTerm.h>
 
@@ -72,7 +73,7 @@ class Term /*: public alica::SolverTerm */
     double _min;
     double _max;
 
-    static constexpr double EPSILON;
+    static constexpr double EPSILON = 10.0e-10;
 
   private:
     const int _id;
