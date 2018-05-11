@@ -1,6 +1,7 @@
 #pragma once
 #include "ITermVisitor.h"
 #include "Types.h"
+#include <set>
 #include <vector>
 
 namespace autodiff
@@ -53,6 +54,7 @@ class Tape : public ITermVisitor
     EvalFunction* _functions;
     void* _base;
     std::vector<Term*> _allTerms;
+    std::set<Term*> _allTermSet;
     int _tapeWidth;
     int _tapeLength;
 };
