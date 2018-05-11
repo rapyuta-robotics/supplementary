@@ -28,6 +28,5 @@
 #include "TermHolder.h"
 #include "TermPower.h"
 #include "TermPtr.h"
-#include "TermUtils.h"
 #include "Types.h"
 #include "Variable.h"
