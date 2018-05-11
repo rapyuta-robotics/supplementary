@@ -73,7 +73,7 @@ void LTEConstraint::Eval(const Tape& tape, const Parameter* params, double* resu
         }
     } else {
         const double steep = Term::getConstraintSteepness();
-        result[0] = val;
+        result[0] = val * steep;
         for (int i = 1; i <= dim; ++i) {
             result[i] = (r[i] - l[i]) * steep;
         }

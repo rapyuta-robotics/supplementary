@@ -70,7 +70,7 @@ class Term /*: public alica::SolverTerm */
     Term(TermHolder* owner);
     int _tapeIdx;
     static constexpr double EPSILON = 1e-10;
-    static constexpr double CONSTRAINTSTEEPNESS = .01;
+    static constexpr double CONSTRAINTSTEEPNESS = 0.01;
     // members below are not in use by autodiff
     TermHolder* _owner;
     TermPtr _prev;

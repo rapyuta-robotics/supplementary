@@ -36,6 +36,7 @@ class TermHolder
     TermPtr power(TermPtr arg, TermPtr exponent) { return termPower(arg, exponent); }
     TermPtr sigmoid(TermPtr arg, TermPtr mid, double steepness);
     TermPtr sigmoid(TermPtr arg, double steepness);
+    TermPtr linSigmoid(TermPtr arg);
 
     TermPtr sin(TermPtr arg);
     TermPtr cos(TermPtr arg);

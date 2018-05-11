@@ -75,7 +75,7 @@ TEST(AutoDiffTest, CONSTPOWER)
 
     TermPtr func = h.constPower(x, 2);
 
-    vector<double> point{13};
+    std::vector<double> point{13};
     h.compile(func);
     std::vector<double> gradientAndValue(2);
 
@@ -86,283 +86,251 @@ TEST(AutoDiffTest, CONSTPOWER)
     ASSERT_DOUBLE_EQ(169, eval);
     ASSERT_DOUBLE_EQ(26, gradientAndValue[1]);
 }
-/*
-TEST(AutoDiffTest, CONSTRAINTUTILITY) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
 
-    TermPtr func = make_shared<ConstraintUtility>(x, y);
+TEST(AutoDiffTest, CONSTRAINTUTILITY)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
+    TermPtr y = h.createVariable();
 
-    vector<VarPtr> vars{x, y};
-    vector<double> point{13, 37};
+    TermPtr func = h.constraintUtility(x < h.constant(42), y);
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    std::vector<double> point{13, 37};
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
+
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    double eval = gradientAndValue[0];
 
     ASSERT_DOUBLE_EQ(37, eval);
-    ASSERT_DOUBLE_EQ(0, gradient->at(0));
-    ASSERT_DOUBLE_EQ(1, gradient->at(1));
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[2]);
 }
 
-TEST(AutoDiffTest, COS) {
-    VarPtr x = make_shared<Variable>();
+TEST(AutoDiffTest, COS)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
 
-    TermPtr func = make_shared<Cos>(x);
+    TermPtr func = h.cos(x);
 
-    vector<VarPtr> vars{x};
-    vector<double> point{13};
+    std::vector<double> point{13};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
+    double eval = gradientAndValue[0];
     ASSERT_NEAR(0.907447, eval, 10E-6);
-    ASSERT_NEAR(-0.420167, gradient->at(0), 10E-6);
+    ASSERT_NEAR(-0.420167, gradientAndValue[1], 10E-6);
 }
 
-TEST(AutoDiffTest, EXP) {
-    VarPtr x = make_shared<Variable>();
+TEST(AutoDiffTest, EXP)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
 
-    TermPtr func = make_shared<Exp>(x);
+    TermPtr func = h.exp(x);
 
-    vector<VarPtr> vars{x};
-    vector<double> point{13};
+    std::vector<double> point{13};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(2);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    double eval = gradientAndValue[0];
 
     ASSERT_NEAR(442413, eval, 10E-1);
-    ASSERT_NEAR(442413, gradient->at(0), 10E-1);
+    ASSERT_NEAR(442413, gradientAndValue[0], 10E-1);
 }
 
-TEST(AutoDiffTest, LINSIGMOID) {
-    VarPtr x = make_shared<Variable>();
+TEST(AutoDiffTest, LINSIGMOID)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
 
-    TermPtr func = make_shared<LinSigmoid>(x);
+    TermPtr func = h.linSigmoid(x);
 
-    vector<VarPtr> vars{x};
-    vector<double> point{13};
+    std::vector<double> point{0};
+    h.compile(func);
+    std::vector<double> gradientAndValue(2);
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    double eval = gradientAndValue[0];
 
     ASSERT_DOUBLE_EQ(0.5, eval);
-    ASSERT_DOUBLE_EQ(0, gradient->at(0));
+    ASSERT_DOUBLE_EQ(1.0, gradientAndValue[1]);
 }
 
-TEST(AutoDiffTest, LOG) {
-    VarPtr x = make_shared<Variable>();
+TEST(AutoDiffTest, LOG)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
 
-    TermPtr func = make_shared<Log>(x);
+    TermPtr func = h.log(x);
 
-    vector<VarPtr> vars{x};
-    vector<double> point{13};
+    std::vector<double> point{13};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(2);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    double eval = gradientAndValue[0];
 
     ASSERT_NEAR(2.56495, eval, 10E-5);
-    ASSERT_NEAR(0, gradient->at(0), 10E-1);
+    ASSERT_NEAR(0, gradientAndValue[1], 10E-1);
 }
 
-TEST(AutoDiffTest, LTCONSTRAINT) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
+TEST(AutoDiffTest, LTCONSTRAINT)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
+    TermPtr y = h.createVariable();
 
-    TermPtr func = make_shared<LTConstraint>(x, y, 0.01);
+    TermPtr func = h.lessThan(x, y);
+    std::vector<double> point{13, 37};
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
 
-    vector<VarPtr> vars{x, y};
-    {
-        vector<double> point{13, 37};
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-        shared_ptr<ICompiledTerm> compiledFunc =
-                TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-        pair<shared_ptr<vector<double>>, double> gradientAndValue =
-                compiledFunc->differentiate(make_shared<vector<double>>(point));
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
 
-        double eval = gradientAndValue.second;
-        shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    std::swap(point[0], point[1]);
 
-        ASSERT_DOUBLE_EQ(1, eval);
-        ASSERT_DOUBLE_EQ(0, gradient->at(0));
-        ASSERT_DOUBLE_EQ(0, gradient->at(1));
-    }
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-    {
-        vector<double> point{37, 13};
-
-        shared_ptr<ICompiledTerm> compiledFunc =
-                TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-        pair<shared_ptr<vector<double>>, double> gradientAndValue =
-                compiledFunc->differentiate(make_shared<vector<double>>(point));
-
-        double eval = gradientAndValue.second;
-        shared_ptr<vector<double>> gradient = gradientAndValue.first;
-
-        ASSERT_NEAR(-0.24, eval, 10E-2);
-        ASSERT_DOUBLE_EQ(-0.01, gradient->at(0));
-        ASSERT_DOUBLE_EQ(0.01, gradient->at(1));
-    }
+    ASSERT_NEAR(-0.24, gradientAndValue[0], 10E-2);
+    ASSERT_DOUBLE_EQ(-0.01, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0.01, gradientAndValue[2]);
 }
 
-TEST(AutoDiffTest, LTECONSTRAINT) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
+TEST(AutoDiffTest, LTECONSTRAINT)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
+    TermPtr y = h.createVariable();
 
-    TermPtr func = make_shared<LTEConstraint>(x, y, 0.01);
+    TermPtr func = h.lessThanEqual(x, y);
 
-    vector<VarPtr> vars{x, y};
-    {
-        vector<double> point{13, 37};
+    std::vector<double> point{13, 37};
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
 
-        shared_ptr<ICompiledTerm> compiledFunc =
-                TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-        pair<shared_ptr<vector<double>>, double> gradientAndValue =
-                compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-        double eval = gradientAndValue.second;
-        shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
 
-        ASSERT_DOUBLE_EQ(1, eval);
-        ASSERT_DOUBLE_EQ(0, gradient->at(0));
-        ASSERT_DOUBLE_EQ(0, gradient->at(1));
-    }
+    std::swap(point[0], point[1]);
 
-    {
-        vector<double> point{37, 13};
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-        shared_ptr<ICompiledTerm> compiledFunc =
-                TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-        pair<shared_ptr<vector<double>>, double> gradientAndValue =
-                compiledFunc->differentiate(make_shared<vector<double>>(point));
-
-        double eval = gradientAndValue.second;
-        shared_ptr<vector<double>> gradient = gradientAndValue.first;
-
-        ASSERT_NEAR(-0.24, eval, 10E-2);
-        ASSERT_DOUBLE_EQ(-0.01, gradient->at(0));
-        ASSERT_DOUBLE_EQ(0.01, gradient->at(1));
-    }
+    ASSERT_NEAR(-0.24, gradientAndValue[0], 10E-2);
+    ASSERT_DOUBLE_EQ(-0.01, gradientAndValue[1]);
 }
 
-TEST(AutoDiffTest, MAX) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
+TEST(AutoDiffTest, MAX)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
+    TermPtr y = h.createVariable();
 
-    TermPtr func = make_shared<Max>(x, y);
+    TermPtr func = h.max(x, y);
 
-    vector<VarPtr> vars{x, y};
-    vector<double> point{13, 37};
+    std::vector<double> point{13, 37};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-    ASSERT_DOUBLE_EQ(37, eval);
-    ASSERT_DOUBLE_EQ(0, gradient->at(0));
+    ASSERT_DOUBLE_EQ(37, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
 }
 
-TEST(AutoDiffTest, MIN) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
+TEST(AutoDiffTest, MIN)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
+    TermPtr y = h.createVariable();
 
-    TermPtr func = make_shared<Min>(x, y);
+    TermPtr func = h.min(x, y);
 
-    vector<VarPtr> vars{x, y};
-    vector<double> point{13, 37};
+    std::vector<double> point{13, 37};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
-
-    ASSERT_DOUBLE_EQ(13, eval);
-    ASSERT_DOUBLE_EQ(1, gradient->at(0));
+    h.evaluate(&point[0], &gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(13, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[1]);
 }
 
-TEST(AutoDiffTest, OR) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
+TEST(AutoDiffTest, OR)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
+    TermPtr y = h.createVariable();
 
-    TermPtr func = make_shared<Or>(x, y);
+    TermPtr func = h.or_(x, y);
 
-    vector<VarPtr> vars{x, y};
-    vector<double> point{13, 37};
+    std::vector<double> point{13, 37};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(3);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-    ASSERT_DOUBLE_EQ(1, eval);
-    ASSERT_DOUBLE_EQ(0, gradient->at(0));
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
 }
 
-TEST(AutoDiffTest, REIFICATION) {
-    VarPtr x = make_shared<Variable>();
-    VarPtr y = make_shared<Variable>();
+TEST(AutoDiffTest, REIFICATION)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
 
-    TermPtr func = make_shared<Reification>(x, 5, 25);
+    TermPtr func = h.reify(x > h.constant(3));
 
-    vector<VarPtr> vars{x, y};
-    vector<double> point{13, 37};
+    std::vector<double> point{13};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(2);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-    ASSERT_DOUBLE_EQ(25, eval);
-    ASSERT_DOUBLE_EQ(20, gradient->at(0));
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0.01, gradientAndValue[1]);
 }
 
-TEST(AutoDiffTest, SIN) {
-    VarPtr x = make_shared<Variable>();
+TEST(AutoDiffTest, SIN)
+{
+    TermHolder h;
+    TermPtr x = h.createVariable();
 
-    TermPtr func = make_shared<Sin>(x);
+    TermPtr func = h.sin(x);
 
-    vector<VarPtr> vars{x};
-    vector<double> point{13};
+    std::vector<double> point{13};
 
-    shared_ptr<ICompiledTerm> compiledFunc = TermUtils::compile(func, make_shared<vector<VarPtr>>(vars));
-    pair<shared_ptr<vector<double>>, double> gradientAndValue =
-            compiledFunc->differentiate(make_shared<vector<double>>(point));
+    h.compile(func);
+    std::vector<double> gradientAndValue(2);
 
-    double eval = gradientAndValue.second;
-    shared_ptr<vector<double>> gradient = gradientAndValue.first;
+    h.evaluate(&point[0], &gradientAndValue[0]);
 
-    ASSERT_NEAR(0.420167, eval, 10E-6);
-    ASSERT_NEAR(0.907447, gradient->at(0), 10E-6);
+    ASSERT_NEAR(0.420167, gradientAndValue[0], 10E-6);
+    ASSERT_NEAR(0.907447, gradientAndValue[1], 10E-6);
 }
-
+/*
 TEST(AutoDiffTest, TERMPOWER) {
     VarPtr x = make_shared<Variable>();
     VarPtr y = make_shared<Variable>();

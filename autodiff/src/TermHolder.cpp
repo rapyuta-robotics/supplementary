@@ -10,6 +10,7 @@
 #include "Exp.h"
 #include "LTConstraint.h"
 #include "LTEConstraint.h"
+#include "LinSigmoid.h"
 #include "Log.h"
 #include "Max.h"
 #include "Min.h"
@@ -161,6 +162,14 @@ TermPtr TermHolder::sigmoid(TermPtr arg, TermPtr mid, double steepness)
 {
     return sigmoid(arg - mid, steepness);
 }
+
+TermPtr TermHolder::linSigmoid(TermPtr arg)
+{
+    TermPtr ret = new LinSigmoid(arg, this);
+    handleNewTerm(ret);
+    return ret;
+}
+
 TermPtr TermHolder::sin(TermPtr arg)
 {
     TermPtr ret = new Sin(arg, this);
