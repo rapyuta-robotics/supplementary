@@ -1,6 +1,7 @@
 #pragma once
 #include "ITermVisitor.h"
 #include "Types.h"
+#include <alloca.h>
 #include <set>
 #include <vector>
 
@@ -11,11 +12,20 @@ class Tape;
 class Tape : public ITermVisitor
 {
   public:
+    static constexpr int MAXARITY = 2;
     Tape();
+    Tape(const Tape&) = delete;
+    Tape& operator=(const Tape&) = delete;
+
+    Tape(Tape&& o);
+    Tape& operator=(Tape&& o);
 
     ~Tape();
 
     void evaluate(const double* input, double* output) const;
+
+    template <typename InputIt, typename OutputIt>
+    inline void evaluate(InputIt point_begin, InputIt point_end, OutputIt value_begin) const;
 
     void createFrom(TermPtr top, const std::vector<VarPtr>& vars);
 
@@ -58,4 +68,16 @@ class Tape : public ITermVisitor
     int _tapeWidth;
     int _tapeLength;
 };
+
+template <typename InputIt, typename OutputIt>
+inline void Tape::evaluate(InputIt point_begin, InputIt point_end, OutputIt value_begin) const
+{
+    const int dim = _tapeWidth - 1;
+    double* input = static_cast<double*>(alloca(sizeof(double) * dim));
+    std::copy(point_begin, point_end, input);
+    for (int i = 0; i < _tapeLength; ++i) {
+        _functions[i](*this, _params + i * MAXARITY, _values + i * _tapeWidth, input, dim);
+    }
+    std::copy(_values + (_tapeLength - 1) * _tapeWidth, _values + (_tapeLength)*_tapeWidth, value_begin);
+}
 }

@@ -3,6 +3,8 @@
 #include "Tape.h"
 #include "TermPtr.h"
 #include "Types.h"
+#include <assert.h>
+#include <memory>
 #include <vector>
 
 namespace autodiff
@@ -13,11 +15,17 @@ class TermHolder
   public:
     TermHolder();
     ~TermHolder();
+    TermHolder(const TermHolder&) = delete;
+    TermHolder& operator=(const TermHolder&) = delete;
+
+    TermHolder(TermHolder&& o);
+    TermHolder& operator=(TermHolder&& o);
+
     void addVariable(VarPtr v);
     VarPtr createVariable();
-    TermPtr trueConstant() const;
-    TermPtr zeroConstant() const;
-    TermPtr falseConstant() const;
+    TermPtr trueConstant() const { return _true.get(); }
+    TermPtr zeroConstant() const { return _zero.get(); }
+    TermPtr falseConstant() const { return _false.get(); }
     TermPtr sum(TermPtr left, TermPtr right);
     TermPtr product(TermPtr left, TermPtr right);
     TermPtr min(TermPtr left, TermPtr right);
@@ -48,16 +56,23 @@ class TermHolder
 
     void compile(TermPtr top) { _tape.createFrom(top, _vars); }
     void evaluate(const double* input, double* output) const { return _tape.evaluate(input, output); }
+    template <typename InputIt, typename OutputIt>
+    inline void evaluate(InputIt point_begin, InputIt point_end, OutputIt value_begin, OutputIt value_end) const
+    {
+        assert(std::distance(point_begin, point_end) == static_cast<int>(_vars.size()));
+        assert(std::distance(value_begin, value_end) >= static_cast<int>(_vars.size()) + 1);
+        return _tape.evaluate(point_begin, point_end, value_begin);
+    }
 
     int getDim() const { return static_cast<int>(_vars.size()); }
 
   private:
     void handleNewTerm(TermPtr t);
-    std::vector<TermPtr> _terms;
+    std::vector<std::unique_ptr<Term>> _terms;
     std::vector<VarPtr> _vars;
-    TermPtr _true;
-    TermPtr _false;
-    TermPtr _zero;
+    std::unique_ptr<Term> _true;
+    std::unique_ptr<Term> _false;
+    std::unique_ptr<Term> _zero;
     Tape _tape;
 };
 }

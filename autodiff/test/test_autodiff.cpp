@@ -342,7 +342,7 @@ TEST(AutoDiffTest, TERMPOWER)
     std::vector<double> point{13, 2};
     h.compile(func);
     std::vector<double> gradientAndValue(3);
-    h.evaluate(&point[0], &gradientAndValue[0]);
+    h.evaluate(point.begin(), point.end(), gradientAndValue.begin(), gradientAndValue.end());
 
     ASSERT_DOUBLE_EQ(169, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(26, gradientAndValue[1]);

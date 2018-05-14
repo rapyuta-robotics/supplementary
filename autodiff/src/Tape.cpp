@@ -11,7 +11,7 @@
 
 namespace autodiff
 {
-#define MAXARITY 2
+constexpr int Tape::MAXARITY;
 
 Tape::Tape()
     : _values(nullptr)
@@ -19,6 +19,24 @@ Tape::Tape()
     , _functions(nullptr)
     , _base(nullptr)
 {
+}
+
+Tape::Tape(Tape&& o)
+    : _values(o._values)
+    , _params(o._params)
+    , _functions(o._functions)
+    , _base(o._base)
+{
+    o._base = nullptr;
+}
+
+Tape& Tape::operator=(Tape&& o)
+{
+    std::swap(_values, o._values);
+    std::swap(_params, o._params);
+    std::swap(_functions, o._functions);
+    std::swap(_base, o._base);
+    return *this;
 }
 
 Tape::~Tape()

@@ -36,36 +36,34 @@ TermHolder::TermHolder()
 {
 }
 
-TermHolder::~TermHolder()
+TermHolder::TermHolder(TermHolder&& o)
+    : _true(std::move(o._true))
+    , _zero(std::move(o._zero))
+    , _false(std::move(o._false))
+    , _vars(std::move(o._vars))
+    , _terms(std::move(o._terms))
+    , _tape(std::move(o._tape))
 {
-    for (TermPtr t : _terms) {
-        delete t.get();
-    }
-    delete _true.get();
-    delete _zero.get();
-    delete _false.get();
 }
+TermHolder& TermHolder::operator=(TermHolder&& o)
+{
+    _true = std::move(o._true);
+    _zero = std::move(o._zero);
+    _false = std::move(o._false);
+    _vars = std::move(o._vars);
+    _terms = std::move(o._terms);
+    _tape = std::move(o._tape);
+    return *this;
+}
+
+TermHolder::~TermHolder() {}
 
 VarPtr TermHolder::createVariable()
 {
     VarPtr ret = new Variable(this);
     _vars.push_back(ret);
-    _terms.push_back(ret);
+    handleNewTerm(ret);
     return ret;
-}
-
-TermPtr TermHolder::trueConstant() const
-{
-    return _true;
-}
-
-TermPtr TermHolder::zeroConstant() const
-{
-    return _zero;
-}
-TermPtr TermHolder::falseConstant() const
-{
-    return _false;
 }
 
 TermPtr TermHolder::constant(double v)
@@ -214,6 +212,6 @@ TermPtr TermHolder::constraintUtility(TermPtr constraint, TermPtr utility)
 
 void TermHolder::handleNewTerm(TermPtr t)
 {
-    _terms.push_back(t);
+    _terms.emplace_back(t.get());
 }
 }
