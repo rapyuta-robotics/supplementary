@@ -65,7 +65,7 @@ void TermPower::Eval(const Tape& tape, const Parameter* params, double* result, 
     result[0] = pow(l[0], r[0]);
     const double outer = pow(l[0], r[0] - 1.0);
     for (int i = 1; i <= dim; ++i) {
-        result[i] = outer * (r[0] * l[i] + l[0] * log(l[0] * r[i]));
+        result[i] = outer * (r[0] * l[i] + l[0] * log(l[0]) * r[i]);
     }
 }
 
