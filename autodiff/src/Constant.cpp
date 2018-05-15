@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstring>
+
 namespace autodiff
 {
 

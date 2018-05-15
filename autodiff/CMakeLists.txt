@@ -32,7 +32,7 @@ catkin_package(
  CATKIN_DEPENDS fsystem
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include include/autodiff ${catkin_INCLUDE_DIRS})
 
 add_library(autodiff
   src/Abs.cpp

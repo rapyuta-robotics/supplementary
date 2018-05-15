@@ -1,9 +1,3 @@
-/*
- * ConstPower.cpp
- *
- *  Created on: Jun 16, 2014
- *      Author: psp
- */
 
 #include "ConstPower.h"
 
