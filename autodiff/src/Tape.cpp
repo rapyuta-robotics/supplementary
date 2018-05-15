@@ -193,9 +193,7 @@ int Tape::visit(Variable* var)
 
 int Tape::visitTerm(Term* t)
 {
-    if (!_allTerms.contains(t)) {
-        _allTerms.enqueue(t);
-    }
+    _allTerms.enqueueUnique(t);
     return 0;
 }
 

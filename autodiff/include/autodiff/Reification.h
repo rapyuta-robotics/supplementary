@@ -22,9 +22,6 @@ class Reification : public BinaryFunction
   private:
     friend TermHolder;
     Reification(TermPtr condition, TermHolder* owner);
-
-    TermPtr _condition;
-    TermPtr _negatedCondition;
 };
 
 } /* namespace autodiff */

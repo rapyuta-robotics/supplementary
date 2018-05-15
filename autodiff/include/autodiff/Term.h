@@ -74,7 +74,7 @@ class Term /*: public alica::SolverTerm */
     void setMax(double m) { _max = m; }
     void setMin(double m) { _min = m; }
 
-    const std::vector<TermPtr>& getParent() const { return _parents; }
+    const std::vector<TermPtr>& getParents() const { return _parents; }
     std::vector<TermPtr>& editParents() { return _parents; }
 
   protected:

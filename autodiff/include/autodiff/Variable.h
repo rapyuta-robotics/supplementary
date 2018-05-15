@@ -23,6 +23,12 @@ class Variable : public Term, public alica::SolverVariable
     virtual EvalFunction getEvalFunction() const override { return &Eval; }
     virtual void fillParameters(Parameter* params) const override { params[0].asIdx = _varId; }
 
+    double getGlobalMin() const { return _globalMin; }
+    double getGlobalMax() const { return _globalMax; }
+
+    void setGlobalMin(double m) { _globalMin = m; }
+    void setGlobalMax(double m) { _globalMax = m; }
+
   private:
     friend TermHolder;
     Variable(TermHolder* owner);

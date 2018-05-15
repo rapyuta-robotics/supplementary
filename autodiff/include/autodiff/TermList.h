@@ -39,6 +39,12 @@ class TermList
     bool contains(const TermPtr t) const;
     TermPtr dequeue();
     void enqueue(TermPtr t);
+    void enqueueUnique(TermPtr t)
+    {
+        if (!contains(t)) {
+            enqueue(t);
+        }
+    }
     void clear();
     int size() const { return _size; }
     bool empty() const { return _size == 0; }

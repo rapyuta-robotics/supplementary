@@ -10,8 +10,10 @@ class Tape;
 
 class Abs;
 class And;
+class Atan2;
 class Constant;
 class ConstPower;
+class ConstraintUtility;
 class Cos;
 class Exp;
 class LinSigmoid;
