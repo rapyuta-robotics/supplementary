@@ -11,7 +11,7 @@
 #include "intervals/SetParents.h"
 #include "intervals/UpwardPropagator.h"
 
-#include "autodiff/TermList.h"
+#include "autodiff/AutoDiff.h"
 
 //#define RecPropDEBUG
 using namespace autodiff;
@@ -25,8 +25,8 @@ namespace intervalpropagation
 
 RecursivePropagate::RecursivePropagate()
 {
-    _dp->setTermQueue(_changed);
-    _up->setTermQueue(_changed);
+    _dp.setTermQueue(_changed);
+    _up.setTermQueue(_changed);
 }
 
 RecursivePropagate::~RecursivePropagate() {}
@@ -38,175 +38,174 @@ bool RecursivePropagate::propagate(TermPtr term)
 #ifdef RecPropDEBUG
     std::cout << "Queued Terms: " << std::endl;
     for (TermPtr asd : _changed) {
-        cout << asd->toString() << endl;
+        std::cout << asd->toString() << std::endl;
     }
-    cout << "------------------------------------" << endl;
+    std::cout << "------------------------------------" << std::endl;
 #endif
 
     TermPtr cur = _changed.dequeue();
     while (cur != nullptr) {
         cur->accept(&_dp);
         cur->accept(&_up);
-        cur = _changed->dequeue();
+        cur = _changed.dequeue();
     }
 }
 
 void RecursivePropagate::addToQueue(TermPtr t)
 {
-    if (!_changed.contains(t))
-        _changed.enqueue(t);
+    _changed.enqueueUnique(t);
 }
 
 int RecursivePropagate::visit(Abs* abs)
 {
     addToQueue(abs);
-    abs->accept(_sp);
+    abs->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(And* and_)
 {
     addToQueue(and_);
-    and_->accept(_sp);
+    and_->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Atan2* atan2)
 {
     addToQueue(atan2);
-    atan2->accept(_sp);
+    atan2->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Constant* constant)
 {
-    constant->accept(_sp);
+    constant->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(ConstPower* intPower)
 {
     addToQueue(intPower);
-    intPower->accept(_sp);
+    intPower->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(ConstraintUtility* cu)
 {
     addToQueue(cu);
-    cu->accept(_sp);
+    cu->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Cos* cos)
 {
     addToQueue(cos);
-    cos->accept(_sp);
+    cos->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Exp* exp)
 {
     addToQueue(exp);
-    exp->accept(_sp);
+    exp->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(LinSigmoid* sigmoid)
 {
     addToQueue(sigmoid);
-    sigmoid->accept(_sp);
+    sigmoid->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Log* log)
 {
     addToQueue(log);
-    log->accept(_sp);
+    log->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(LTConstraint* constraint)
 {
     addToQueue(constraint);
-    constraint->accept(_sp);
+    constraint->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(LTEConstraint* constraint)
 {
     addToQueue(constraint);
-    constraint->accept(_sp);
+    constraint->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Max* max)
 {
     addToQueue(max);
-    max->accept(_sp);
+    max->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Min* min)
 {
     addToQueue(min);
-    min->accept(_sp);
+    min->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Or* or_)
 {
     addToQueue(or_);
-    or_->accept(_sp);
+    or_->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Product* product)
 {
     addToQueue(product);
-    product->accept(_sp);
+    product->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Reification* reif)
 {
     addToQueue(reif);
-    reif->accept(_sp);
+    reif->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Sigmoid* sigmoid)
 {
     addToQueue(sigmoid);
-    sigmoid->accept(_sp);
+    sigmoid->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Sin* sin)
 {
     addToQueue(sin);
-    sin->accept(_sp);
+    sin->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Sum* sum)
 {
     addToQueue(sum);
-    sum->accept(_sp);
+    sum->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(TermPower* power)
 {
     addToQueue(power);
-    power->accept(_sp);
+    power->accept(&_sp);
     return 0;
 }
 
 int RecursivePropagate::visit(Variable* var)
 {
     addToQueue(var);
-    var->accept(_sp);
+    var->accept(&_sp);
     return 0;
 }
 
