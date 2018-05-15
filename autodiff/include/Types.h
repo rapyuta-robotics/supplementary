@@ -3,6 +3,7 @@
 namespace autodiff
 {
 class Term;
+class TermList;
 class TermPtr;
 class Variable;
 class Tape;
@@ -27,7 +28,6 @@ class Sin;
 class Sum;
 class TermPower;
 
-// using TermPtr = Term*;
 using VarPtr = Variable*;
 
 union Parameter

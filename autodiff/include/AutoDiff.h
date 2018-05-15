@@ -26,6 +26,7 @@
 #include "Term.h"
 #include "TermBuilder.h"
 #include "TermHolder.h"
+#include "TermList.h"
 #include "TermPower.h"
 #include "TermPtr.h"
 #include "Types.h"
