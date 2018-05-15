@@ -9,6 +9,7 @@ class Max : public BinaryFunction
 {
   public:
     int accept(ITermVisitor* visitor) override;
+    void acceptRecursive(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;

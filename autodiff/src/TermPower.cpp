@@ -24,9 +24,14 @@ TermPower::TermPower(TermPtr baseTerm, TermPtr exponent, TermHolder* owner)
 
 int TermPower::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+
+void TermPower::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr TermPower::aggregateConstants()

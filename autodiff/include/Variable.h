@@ -10,6 +10,7 @@ class Variable : public Term, public alica::SolverVariable
 {
   public:
     int accept(ITermVisitor* visitor) override;
+    void acceptRecursive(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;

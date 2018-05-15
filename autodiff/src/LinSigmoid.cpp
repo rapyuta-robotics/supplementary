@@ -16,8 +16,13 @@ LinSigmoid::LinSigmoid(TermPtr arg, TermHolder* owner)
 
 int LinSigmoid::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+
+void LinSigmoid::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr LinSigmoid::aggregateConstants()

@@ -17,8 +17,13 @@ Sin::Sin(TermPtr arg, TermHolder* owner)
 
 int Sin::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+
+void Sin::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Sin::aggregateConstants()

@@ -20,6 +20,7 @@ namespace autodiff
 {
 
 class TermHolder;
+class TermList;
 
 enum AndType
 {
@@ -42,6 +43,7 @@ class Term /*: public alica::SolverTerm */
      *
      * @param visitor The term visitor to accept
      */
+    virtual void acceptRecursive(ITermVisitor* visitor) = 0;
     virtual int accept(ITermVisitor* visitor) = 0;
 
     int getId() const { return _id; }
@@ -66,18 +68,32 @@ class Term /*: public alica::SolverTerm */
     virtual EvalFunction getEvalFunction() const = 0;
     virtual void fillParameters(Parameter* params) const = 0;
 
+    double getMax() const { return _max; }
+    double getMin() const { return _min; }
+
+    void setMax(double m) { _max = m; }
+    void setMin(double m) { _min = m; }
+
+    const std::vector<TermPtr>& getParent() const { return _parents; }
+    std::vector<TermPtr>& editParents() { return _parents; }
+
   protected:
-    Term(TermHolder* owner);
-    int _tapeIdx;
     static constexpr double EPSILON = 1e-10;
     static constexpr double CONSTRAINTSTEEPNESS = 0.01;
-    // members below are not in use by autodiff
+    friend TermList;
+    Term(TermHolder* owner);
+
     TermHolder* _owner;
+
     TermPtr _prev;
     TermPtr _next;
+
+    // Interval propagation:
     std::vector<TermPtr> _parents;
     double _min;
     double _max;
+
+    int _tapeIdx;
 
   private:
     const int _id;

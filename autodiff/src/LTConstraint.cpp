@@ -24,9 +24,14 @@ LTConstraint::LTConstraint(TermPtr x, TermPtr y, TermHolder* owner)
 
 int LTConstraint::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+
+void LTConstraint::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr LTConstraint::aggregateConstants()

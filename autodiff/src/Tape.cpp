@@ -68,14 +68,8 @@ void Tape::createFrom(TermPtr top, const std::vector<VarPtr>& vars)
 void Tape::prepTerms(TermPtr top, const std::vector<VarPtr>& vars)
 {
     assert(_allTerms.empty());
-    top->accept(this);
+    top->acceptRecursive(this);
 
-    // DEBUG::
-    /*std::cout << "Number of terms: " << _allTerms.size() <<std::endl;
-    for(Term* t : _allTerms) {
-        std::cout << t->toString() <<std::endl;
-    }*/
-    // ENDDEBUG
     int termCount = static_cast<int>(_allTerms.size());
     int varCount = static_cast<int>(vars.size());
     _tapeWidth = varCount + 1;
@@ -86,11 +80,6 @@ void Tape::prepTerms(TermPtr top, const std::vector<VarPtr>& vars)
 
     _base = malloc(doubleCount * sizeof(double) + paramCount * sizeof(Parameter) + termCount * sizeof(EvalFunction));
     assert(_base != nullptr);
-    /*
-    _values =  static_cast<double*>(malloc(doubleCount*sizeof(double)));
-    _params = static_cast<Parameter*>(malloc(paramCount*sizeof(Parameter)));
-    _functions = static_cast<EvalFunction*>(malloc(termCount*sizeof(EvalFunction)));
-    */
 
     _values = static_cast<double*>(_base);
     _params = reinterpret_cast<Parameter*>(_values + doubleCount);

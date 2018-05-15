@@ -8,6 +8,7 @@ class Exp : public UnaryFunction
 {
   public:
     int accept(ITermVisitor* visitor);
+    void acceptRecursive(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;

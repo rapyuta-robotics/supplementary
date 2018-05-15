@@ -17,9 +17,14 @@ Min::Min(TermPtr left, TermPtr right, TermHolder* owner)
 
 int Min::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+
+void Min::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Min::aggregateConstants()

@@ -16,8 +16,13 @@ Log::Log(TermPtr arg, TermHolder* owner)
 
 int Log::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+
+void Log::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Log::aggregateConstants()

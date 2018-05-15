@@ -16,9 +16,14 @@ Max::Max(TermPtr left, TermPtr right, TermHolder* owner)
 
 int Max::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+
+void Max::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Max::aggregateConstants()

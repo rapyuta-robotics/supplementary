@@ -11,6 +11,7 @@ class LTEConstraint : public BinaryFunction
     void setNegation(const LTConstraint* negation) const { _negatedForm = negation; }
 
     int accept(ITermVisitor* visitor) override;
+    void acceptRecursive(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;

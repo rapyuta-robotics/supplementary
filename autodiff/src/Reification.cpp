@@ -12,9 +12,14 @@ Reification::Reification(TermPtr condition, TermHolder* owner)
 
 int Reification::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+
+void Reification::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Reification::aggregateConstants()

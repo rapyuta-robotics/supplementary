@@ -18,6 +18,11 @@ int Constant::accept(ITermVisitor* visitor)
     return visitor->visit(this);
 }
 
+void Constant::acceptRecursive(ITermVisitor* visitor)
+{
+    visitor->visit(this);
+}
+
 TermPtr Constant::aggregateConstants()
 {
     return this;

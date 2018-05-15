@@ -9,6 +9,7 @@ class ConstPower : public Term
 {
   public:
     int accept(ITermVisitor* visitor) override;
+    void acceptRecursive(ITermVisitor* visitor) override;
 
     TermPtr aggregateConstants() override;
     TermPtr derivative(VarPtr v) const override;
@@ -24,6 +25,8 @@ class ConstPower : public Term
         params[0].asIdx = _base->getTapeIdx();
         params[1].asDouble = _exponent;
     }
+    double getExponent() const { return _exponent; }
+    TermPtr getBase() const { return _base; }
 
   private:
     friend TermHolder;

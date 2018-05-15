@@ -23,8 +23,13 @@ Exp::Exp(TermPtr arg, TermHolder* owner)
 
 int Exp::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+
+void Exp::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Exp::aggregateConstants()

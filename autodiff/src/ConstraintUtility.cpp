@@ -23,9 +23,14 @@ ConstraintUtility::ConstraintUtility(TermPtr constraint, TermPtr utility, TermHo
 
 int ConstraintUtility::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+
+void ConstraintUtility::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr ConstraintUtility::aggregateConstants()

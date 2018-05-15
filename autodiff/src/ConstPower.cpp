@@ -24,8 +24,12 @@ ConstPower::ConstPower(TermPtr baseTerm, double exponent, TermHolder* owner)
 
 int ConstPower::accept(ITermVisitor* visitor)
 {
-    _base->accept(visitor);
     return visitor->visit(this);
+}
+void ConstPower::acceptRecursive(ITermVisitor* visitor)
+{
+    _base->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr ConstPower::aggregateConstants()

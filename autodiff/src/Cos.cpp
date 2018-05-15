@@ -23,8 +23,13 @@ Cos::Cos(TermPtr arg, TermHolder* owner)
 
 int Cos::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+
+void Cos::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Cos::aggregateConstants()

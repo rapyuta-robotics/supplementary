@@ -28,8 +28,13 @@ Sigmoid::Sigmoid(TermPtr arg, double steepness, TermHolder* owner)
 
 int Sigmoid::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+
+void Sigmoid::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Sigmoid::aggregateConstants()

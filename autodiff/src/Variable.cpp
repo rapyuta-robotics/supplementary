@@ -21,6 +21,11 @@ int Variable::accept(ITermVisitor* visitor)
     return visitor->visit(this);
 }
 
+void Variable::acceptRecursive(ITermVisitor* visitor)
+{
+    visitor->visit(this);
+}
+
 TermPtr Variable::aggregateConstants()
 {
     return this;

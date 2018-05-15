@@ -18,8 +18,12 @@ Abs::Abs(TermPtr arg, TermHolder* owner)
 
 int Abs::accept(ITermVisitor* visitor)
 {
-    _arg->accept(visitor);
     return visitor->visit(this);
+}
+void Abs::acceptRecursive(ITermVisitor* visitor)
+{
+    _arg->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Abs::aggregateConstants()

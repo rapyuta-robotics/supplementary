@@ -12,6 +12,8 @@ class BinaryFunction : public Term
         params[0].asIdx = _left->getTapeIdx();
         params[1].asIdx = _right->getTapeIdx();
     }
+    TermPtr getLeft() const { return _left; }
+    TermPtr getRight() const { return _right; }
 
   protected:
     BinaryFunction(TermPtr left, TermPtr right, TermHolder* owner)

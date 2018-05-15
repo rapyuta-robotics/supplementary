@@ -17,9 +17,13 @@ Atan2::Atan2(TermPtr left, TermPtr right, TermHolder* owner)
 
 int Atan2::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
     return visitor->visit(this);
+}
+void Atan2::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr Atan2::aggregateConstants()

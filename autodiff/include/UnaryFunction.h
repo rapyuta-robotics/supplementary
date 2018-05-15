@@ -8,6 +8,7 @@ class UnaryFunction : public Term
 {
   public:
     virtual void fillParameters(Parameter* params) const override { params[0].asIdx = _arg->getTapeIdx(); }
+    TermPtr getArg() const { return _arg; }
 
   protected:
     UnaryFunction(TermPtr arg, TermHolder* owner)

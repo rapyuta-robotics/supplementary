@@ -13,9 +13,14 @@ And::And(TermPtr left, TermPtr right, TermHolder* owner)
 
 int And::accept(ITermVisitor* visitor)
 {
-    _left->accept(visitor);
-    _right->accept(visitor);
+
     return visitor->visit(this);
+}
+void And::acceptRecursive(ITermVisitor* visitor)
+{
+    _left->acceptRecursive(visitor);
+    _right->acceptRecursive(visitor);
+    visitor->visit(this);
 }
 
 TermPtr And::aggregateConstants()
