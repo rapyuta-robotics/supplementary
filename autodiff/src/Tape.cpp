@@ -60,7 +60,6 @@ void Tape::createFrom(TermPtr top, const std::vector<VarPtr>& vars)
         free(_base);
         _base = nullptr;
         _allTerms.clear();
-        _allTermSet.clear();
     }
     prepTerms(top, vars);
 }
@@ -194,9 +193,8 @@ int Tape::visit(Variable* var)
 
 int Tape::visitTerm(Term* t)
 {
-    if (_allTermSet.find(t) == _allTermSet.end()) {
-        _allTermSet.insert(t);
-        _allTerms.push_back(t);
+    if (!_allTerms.contains(t)) {
+        _allTerms.enqueue(t);
     }
     return 0;
 }

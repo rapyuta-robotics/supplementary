@@ -1,10 +1,8 @@
 #pragma once
 #include "ITermVisitor.h"
+#include "TermList.h"
 #include "Types.h"
 #include <alloca.h>
-#include <set>
-#include <vector>
-
 namespace autodiff
 {
 class Tape;
@@ -63,8 +61,7 @@ class Tape : public ITermVisitor
     Parameter* _params;
     EvalFunction* _functions;
     void* _base;
-    std::vector<Term*> _allTerms;
-    std::set<Term*> _allTermSet;
+    TermList _allTerms;
     int _tapeWidth;
     int _tapeLength;
 };

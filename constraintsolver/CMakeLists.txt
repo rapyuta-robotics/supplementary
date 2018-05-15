@@ -35,7 +35,6 @@ add_library(constraintsolver
   src/intervals/RecursivePropagate.cpp
   src/intervals/ResetIntervals.cpp
   src/intervals/SetParents.cpp
-  src/intervals/TermList.cpp
   src/intervals/UnsolveableException.cpp
   src/intervals/UpwardPropagator.cpp
   src/types/Clause.cpp

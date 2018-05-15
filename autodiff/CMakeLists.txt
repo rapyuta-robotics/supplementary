@@ -59,6 +59,7 @@ add_library(autodiff
   src/Tape.cpp
   src/Term.cpp
   src/TermBuilder.cpp
+  src/TermList.cpp
   src/TermHolder.cpp
   src/TermPower.cpp
   src/Variable.cpp
