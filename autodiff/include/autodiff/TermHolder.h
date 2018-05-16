@@ -55,6 +55,13 @@ class TermHolder
     TermPtr constraintUtility(TermPtr constraint, TermPtr utility);
 
     void compile(TermPtr top) { _tape.createFrom(top, _vars); }
+    Tape compileSeparately(TermPtr top) const
+    {
+        Tape ret;
+        ret.createFrom(top, _vars);
+        return ret;
+    }
+    const Tape& getTape() const { return _tape; }
     void evaluate(const double* input, double* output) const { return _tape.evaluate(input, output); }
     template <typename InputIt, typename OutputIt>
     inline void evaluate(InputIt point_begin, InputIt point_end, OutputIt value_begin, OutputIt value_end) const

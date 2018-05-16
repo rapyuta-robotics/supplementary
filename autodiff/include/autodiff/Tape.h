@@ -70,6 +70,7 @@ template <typename InputIt, typename OutputIt>
 inline void Tape::evaluate(InputIt point_begin, InputIt point_end, OutputIt value_begin) const
 {
     const int dim = _tapeWidth - 1;
+    assert(std::distance(point_begin, point_end) == dim);
     double* input = static_cast<double*>(alloca(sizeof(double) * dim));
     std::copy(point_begin, point_end, input);
     for (int i = 0; i < _tapeLength; ++i) {
