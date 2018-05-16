@@ -85,7 +85,6 @@ class Term /*: public alica::SolverTerm */
 
     TermHolder* _owner;
 
-    TermPtr _prev;
     TermPtr _next;
 
     // Interval propagation:

@@ -44,6 +44,7 @@ AndType Term::_andop = AndType::MIN;
 Term::Term(TermHolder* owner)
     : _id(_nextId++)
     , _owner(owner)
+    , _next(nullptr)
 {
     _min = std::numeric_limits<double>::min();
     _max = std::numeric_limits<double>::max();

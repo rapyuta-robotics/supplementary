@@ -93,7 +93,9 @@ void Tape::prepTerms(TermPtr top, const std::vector<VarPtr>& vars)
         ++idx;
     }
     idx = 0;
-    for (Term* t : _allTerms) {
+    // destructively iterate through list:
+    while (!_allTerms.empty()) {
+        TermPtr t = _allTerms.dequeue();
         t->setTapeIdx(idx);
         _functions[idx] = t->getEvalFunction();
         t->fillParameters(_params + (idx * MAXARITY));
