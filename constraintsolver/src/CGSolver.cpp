@@ -5,6 +5,9 @@
 #include <engine/constraintmodul/ProblemDescriptor.h>
 #include <engine/constraintmodul/VariableSyncModule.h>
 #include <engine/model/Variable.h>
+
+#include <autodiff/Variable.h>
+
 #include <limits>
 
 #include <iostream>
@@ -14,6 +17,7 @@ namespace alica
 namespace reasoner
 {
 using alica::VariableGrp;
+using autodiff TermPtr;
 
 CGSolver::CGSolver(AlicaEngine* ae)
     : ISolver(ae)
@@ -21,8 +25,8 @@ CGSolver::CGSolver(AlicaEngine* ae)
     , _lastFEvals(0.0)
     , _lastRuns(0.0)
 {
-    Term::setAnd(AndType::AND);
-    Term::setOr(OrType::MAX);
+    autodiff::Term::setAnd(autodiff::AndType::AND);
+    autodiff::Term::setOr(autodiff::OrType::MAX);
 }
 
 CGSolver::~CGSolver() {}
@@ -38,8 +42,6 @@ bool CGSolver::existsSolutionImpl(const VariableGrp& vars, const std::vector<sha
         ranges[2 * i] = std::numeric_limits<double>::lowest() / 2;
         cVars->at(i) = dynamic_pointer_cast<autodiff::Variable>(vars.at(i)->getSolverVar());
     }
-
-    // TODO: fixed Values
 
     for (auto c : calls) {
         if (dynamic_pointer_cast<autodiff::Term>(c->getConstraint()).get() == nullptr) {

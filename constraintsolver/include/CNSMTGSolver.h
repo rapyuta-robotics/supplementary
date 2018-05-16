@@ -1,48 +1,45 @@
-/*
- * CNSMTGSolver.h
- *
- *  Created on: Dec 4, 2014
- *      Author: Philipp
- */
+#pragma once
 
-#ifndef CNSMTGSOLVER_H_
-#define CNSMTGSOLVER_H_
-
-#include <AutoDiff.h>
 #include <engine/AlicaClock.h>
 
+#include <list>
 #include <memory>
 #include <vector>
-#include <list>
 
 #include <fstream>
 
 using namespace std;
 using namespace autodiff;
 
-namespace autodiff {
+namespace autodiff
+{
 class Term;
 class Variable;
-}  // namespace autodiff
+} // namespace autodiff
 
-namespace alica {
+namespace alica
+{
 
-namespace reasoner {
-namespace intervalpropagation {
+namespace reasoner
+{
+namespace intervalpropagation
+{
 class IntervalPropagator;
-}  // namespace intervalpropagation
+} // namespace intervalpropagation
 
-namespace cnsat {
+namespace cnsat
+{
 class CNSat;
 class FormulaTransform;
 class Var;
-}  // namespace cnsat
+} // namespace cnsat
 
-class CNSMTGSolver : public enable_shared_from_this<CNSMTGSolver> {
-protected:
+class CNSMTGSolver
+{
+  protected:
     class RpropResult;
 
-public:
+  public:
     CNSMTGSolver();
     unsigned long long getTime();
     virtual ~CNSMTGSolver();
@@ -52,15 +49,13 @@ public:
     void logStep();
     void closeLog();
     shared_ptr<vector<double>> solve(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>>> args,
-            shared_ptr<vector<shared_ptr<vector<double>>>>& limits, double& util);
+                                     shared_ptr<vector<shared_ptr<vector<double>>>>& limits, double& util);
     shared_ptr<vector<double>> solve(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>>> args,
-            shared_ptr<vector<shared_ptr<vector<double>>>>& limits,
-            shared_ptr<vector<shared_ptr<vector<double>>>> seeds, double sufficientUtility, double& util);
-    shared_ptr<vector<double>> solveTest(shared_ptr<Term> equation,
-            shared_ptr<vector<shared_ptr<autodiff::Variable>>> args,
-            shared_ptr<vector<shared_ptr<vector<double>>>>& limits);
-    bool intervalPropagate(shared_ptr<vector<shared_ptr<cnsat::Var>>> decisions,
-            shared_ptr<vector<shared_ptr<vector<double>>>>& curRanges);
+                                     shared_ptr<vector<shared_ptr<vector<double>>>>& limits, shared_ptr<vector<shared_ptr<vector<double>>>> seeds,
+                                     double sufficientUtility, double& util);
+    shared_ptr<vector<double>> solveTest(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>>> args,
+                                         shared_ptr<vector<shared_ptr<vector<double>>>>& limits);
+    bool intervalPropagate(shared_ptr<vector<shared_ptr<cnsat::Var>>> decisions, shared_ptr<vector<shared_ptr<vector<double>>>>& curRanges);
     bool probeForSolution(shared_ptr<vector<shared_ptr<cnsat::Var>>> decisions, shared_ptr<vector<double>> solution);
 
     long getRuns();
@@ -85,18 +80,15 @@ public:
     double initialStepSize = 0.005;
     bool optimize;
 
-protected:
-    shared_ptr<RpropResult> rPropFindFeasible(
-            shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<vector<double>> seed);
-    shared_ptr<RpropResult> rPropOptimizeFeasible(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints,
-            shared_ptr<autodiff::Term> ut, shared_ptr<vector<shared_ptr<autodiff::Variable>>> args,
-            shared_ptr<vector<double>>& seed, bool precise);
-    void differentiate(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<vector<double>>& val,
-            shared_ptr<vector<double>>& gradient, double& util);
-    shared_ptr<vector<double>> initialPointFromSeed(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints,
-            shared_ptr<RpropResult> res, shared_ptr<vector<double>>& seed);
-    shared_ptr<vector<double>> initialPoint(
-            shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<RpropResult> res);
+  protected:
+    shared_ptr<RpropResult> rPropFindFeasible(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<vector<double>> seed);
+    shared_ptr<RpropResult> rPropOptimizeFeasible(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<autodiff::Term> ut,
+                                                  shared_ptr<vector<shared_ptr<autodiff::Variable>>> args, shared_ptr<vector<double>>& seed, bool precise);
+    void differentiate(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<vector<double>>& val, shared_ptr<vector<double>>& gradient,
+                       double& util);
+    shared_ptr<vector<double>> initialPointFromSeed(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<RpropResult> res,
+                                                    shared_ptr<vector<double>>& seed);
+    shared_ptr<vector<double>> initialPoint(shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, shared_ptr<RpropResult> res);
     void initializeStepSize();
 
     long runs;
@@ -125,8 +117,9 @@ protected:
     vector<double> rpropStepConvergenceThreshold;
     shared_ptr<vector<shared_ptr<autodiff::Variable>>> currentArgs;
 
-    class RpropResult : public enable_shared_from_this<RpropResult> {
-    public:
+    class RpropResult : public enable_shared_from_this<RpropResult>
+    {
+      public:
         shared_ptr<vector<double>> initialValue;
         shared_ptr<vector<double>> finalValue;
         double initialUtil;
@@ -136,11 +129,9 @@ protected:
         int compareTo(shared_ptr<RpropResult> other);
     };
 
-private:
+  private:
     bool useIntervalProp;
 };
 
 } /* namespace reasoner */
 } /* namespace alica */
-
-#endif /* CNSMTGSOLVER_H_ */

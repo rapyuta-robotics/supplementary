@@ -144,8 +144,9 @@ int UpwardPropagator::visit(autodiff::Cos* cos)
             c = updateInterval(cos, std::min(a, b), std::max(a, b));
         } // multiple extrema, don't update
     }
-    if (c)
+    if (c) {
         addChanged(cos);
+    }
     return c;
 }
 
@@ -229,15 +230,15 @@ int UpwardPropagator::visit(autodiff::Or* or_)
     if (or_->getLeft()->getMin() > 0 || or_->getRight()->getMin() > 0) {
         if (updateInterval(or_, 1, 1)) {
             addChanged(or_);
-            return true;
+            return 1;
         }
     } else if (or_->getLeft()->getMax() <= 0 && or_->getRight()->getMax() <= 0) {
         if (updateInterval(or_, -numeric_limits<double>::infinity(), 0)) {
             addChanged(or_);
-            return true;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }
 
 int UpwardPropagator::visit(autodiff::Product* product)
@@ -260,19 +261,21 @@ int UpwardPropagator::visit(autodiff::Product* product)
     }
     if (updateInterval(product, min, max)) {
         addChanged(product);
-        return true;
+        return 1;
     }
-    return false;
+    return 0;
 }
 
 int UpwardPropagator::visit(autodiff::Reification* dis)
 {
     throw "Reification propagation not implemented";
+    return 0;
 }
 
 int UpwardPropagator::visit(autodiff::Sigmoid* sigmoid)
 {
     throw "Sigmoidal propagation not implemented";
+    return 0;
 }
 
 int UpwardPropagator::visit(autodiff::Sin* sin)
