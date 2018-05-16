@@ -1,6 +1,8 @@
 
 #include "intervals/SetParents.h"
 
+#include <autodiff/AutoDiff.h>
+
 //#define SetParentsDEBUG
 
 namespace alica
@@ -81,7 +83,7 @@ int SetParents::visit(Cos* cos)
     return false;
 }
 
-int SetParents::visit(Exp > exp)
+int SetParents::visit(Exp* exp)
 {
 #ifdef SetParentsDEBUG
     std::cout << "SetParents::visit(Exp* exp)" << std::endl;
@@ -173,7 +175,8 @@ int SetParents::visit(Reification* reif)
 #ifdef SetParentsDEBUG
     std::cout << "SetParents::visit(Reification* reif)" << std::endl;
 #endif
-    reif->getArg()->editParents().push_back(reif);
+    reif->getLeft()->editParents().push_back(reif);
+    reif->getRight()->editParents().push_back(reif);
     return false;
 }
 
@@ -200,8 +203,8 @@ int SetParents::visit(Sum* sum)
 #ifdef SetParentsDEBUG
     std::cout << "SetParents::visit(Sum* sum)" << std::endl;
 #endif
-    sum->getLeft()->editParents().push_back(product);
-    sum->getRight()->editParents().push_back(product);
+    sum->getLeft()->editParents().push_back(sum);
+    sum->getRight()->editParents().push_back(sum);
     return false;
 }
 

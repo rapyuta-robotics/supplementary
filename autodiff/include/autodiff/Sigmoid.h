@@ -25,6 +25,7 @@ class Sigmoid : public Term
         params[0].asIdx = _arg->getTapeIdx();
         params[1].asDouble = _steepness;
     }
+    TermPtr getArg() const { return _arg; }
 
   private:
     friend TermHolder;

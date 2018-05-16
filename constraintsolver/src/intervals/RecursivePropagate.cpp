@@ -25,8 +25,8 @@ namespace intervalpropagation
 
 RecursivePropagate::RecursivePropagate()
 {
-    _dp.setTermQueue(_changed);
-    _up.setTermQueue(_changed);
+    _dp.setTermQueue(&_changed);
+    _up.setTermQueue(&_changed);
 }
 
 RecursivePropagate::~RecursivePropagate() {}
