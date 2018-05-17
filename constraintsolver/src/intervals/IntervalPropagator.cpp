@@ -20,13 +20,14 @@
 
 #include <iostream>
 
+//#define DEBUG_INTERVALPROP
+
 namespace alica
 {
 namespace reasoner
 {
 namespace intervalpropagation
 {
-
 using std::make_shared;
 using std::shared_ptr;
 using std::vector;
@@ -54,10 +55,12 @@ bool IntervalPropagator::propagate(std::shared_ptr<std::vector<std::shared_ptr<c
                                    shared_ptr<std::vector<shared_ptr<vector<double>>>>& completeRanges,
                                    shared_ptr<std::vector<shared_ptr<cnsat::Var>>>& offenders)
 {
+#ifdef DEBUG_INTERVALPROP
     std::cout << "IntervalPropagator::propagate" << std::endl;
     for (auto& it : *decisions) {
-        cout << "\t" << it->toString() << endl;
+        std::cout << "\t" << it->toString() << std::endl;
     }
+#endif
     offenders = nullptr;
     completeRanges = make_shared<vector<shared_ptr<vector<double>>>>(dim);
     completeRanges->insert(completeRanges->begin(), globalRanges->begin(), globalRanges->end());
@@ -83,8 +86,8 @@ bool IntervalPropagator::propagate(std::shared_ptr<std::vector<std::shared_ptr<c
             curRanges = decisions->at(i)->negativeRanges;
         }
         for (int j = dim - 1; j >= 0; j--) {
-            completeRanges->at(j)->at(0) = max(completeRanges->at(j)->at(0), curRanges->at(j)->at(0));
-            completeRanges->at(j)->at(1) = min(completeRanges->at(j)->at(1), curRanges->at(j)->at(1));
+            completeRanges->at(j)->at(0) = std::max(completeRanges->at(j)->at(0), curRanges->at(j)->at(0));
+            completeRanges->at(j)->at(1) = std::min(completeRanges->at(j)->at(1), curRanges->at(j)->at(1));
             if (completeRanges->at(j)->at(0) > completeRanges->at(j)->at(1)) { // ranges collapsed, build offenders
                 offenders = make_shared<vector<shared_ptr<cnsat::Var>>>();
                 for (int k = decisions->size() - 1; k >= i; k--) {

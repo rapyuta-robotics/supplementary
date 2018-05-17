@@ -44,7 +44,7 @@ add_library(constraintsolver
   src/types/Watcher.cpp
   src/CGSolver.cpp
   src/CNSat.cpp
-  src/CNSMTGSolver.cpp
+#  src/CNSMTGSolver.cpp
   src/Decider.cpp
   src/FormulaTransform.cpp
   src/GSolver.cpp
