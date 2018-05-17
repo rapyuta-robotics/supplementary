@@ -214,4 +214,11 @@ void TermHolder::handleNewTerm(TermPtr t)
 {
     _terms.emplace_back(t.get());
 }
+
+void TermHolder::clear()
+{
+    _terms.clear();
+    _vars.clear();
+    _tape = Tape();
+}
 }

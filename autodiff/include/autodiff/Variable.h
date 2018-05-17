@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/constraintmodul/SolverVariable.h>
+#include <alica_solver_interface/SolverVariable.h>
 
 #include "Term.h"
 

@@ -3,6 +3,9 @@
 #include "Tape.h"
 #include "TermPtr.h"
 #include "Types.h"
+
+#include <alica_solver_interface/SolverContext.h>
+
 #include <assert.h>
 #include <memory>
 #include <vector>
@@ -10,11 +13,11 @@
 namespace autodiff
 {
 
-class TermHolder
+class TermHolder : public alica::SolverContext
 {
   public:
     TermHolder();
-    ~TermHolder();
+    virtual ~TermHolder();
     TermHolder(const TermHolder&) = delete;
     TermHolder& operator=(const TermHolder&) = delete;
 
@@ -72,6 +75,7 @@ class TermHolder
     }
 
     int getDim() const { return static_cast<int>(_vars.size()); }
+    virtual void clear() override;
 
   private:
     void handleNewTerm(TermPtr t);

@@ -11,7 +11,7 @@
 #include "ITermVisitor.h"
 #include "TermPtr.h"
 #include "Types.h"
-#include <engine/constraintmodul/SolverTerm.h>
+#include <alica_solver_interface/SolverTerm.h>
 
 #include <string>
 #include <vector>

@@ -22,14 +22,13 @@ set(CMAKE_CXX_FLAGS "-g -fnon-call-exceptions -ggdb -Werror-implicit-function-de
 
 
 find_package(catkin REQUIRED COMPONENTS
- fsystem
- alica_engine
+ alica_solver_interface
 )
 
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES autodiff alica_engine
- CATKIN_DEPENDS fsystem
+ LIBRARIES autodiff
+ CATKIN_DEPENDS alica_solver_interface
 )
 
 include_directories(include include/autodiff ${catkin_INCLUDE_DIRS})
