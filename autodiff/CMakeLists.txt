@@ -10,25 +10,15 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 
-set(CMAKE_CXX_FLAGS "-Werror-implicit-function-declaration -Werror=return-type -Wno-reorder ${CMAKE_CXX_FLAGS}") #-Wall 
-
-set(OPTIMIZATION "-O2 -finline-functions -funroll-loops -fomit-frame-pointer -ffast-math")
-#--ffast-math
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG ${CPP_STD} ${OPTIMIZATION}")
-
-
-
-set(CMAKE_CXX_FLAGS "-g -fnon-call-exceptions -ggdb -Werror-implicit-function-declaration -Werror=return-type -Wall -Wno-reorder ${CMAKE_CXX_FLAGS}")
-
-
 find_package(catkin REQUIRED COMPONENTS
  alica_solver_interface
+ alica_common_config
 )
 
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES autodiff
- CATKIN_DEPENDS alica_solver_interface
+ CATKIN_DEPENDS alica_solver_interface alica_common_config
 )
 
 include_directories(include include/autodiff ${catkin_INCLUDE_DIRS})
