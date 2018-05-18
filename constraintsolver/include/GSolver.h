@@ -55,7 +55,7 @@ class GSolver
         {
         }
         double getUtil() const { return _location[_size - 2]; }
-        double setUtil(double util) { _location[_size - 2] = util; }
+        void setUtil(double util) { _location[_size - 2] = util; }
         const double* getPoint() const { return _location; }
 
         double* editPoint() { return _location; }

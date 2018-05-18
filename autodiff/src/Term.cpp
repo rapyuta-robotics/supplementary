@@ -211,6 +211,11 @@ TermPtr operator>=(const TermPtr left, const TermPtr right)
     return left->getOwner()->lessThanEqual(right, left);
 }
 
+TermPtr operator&=(const TermPtr left, const TermPtr right)
+{
+    return left & right;
+}
+
 // some static dirt...
 AndType Term::getAnd()
 {

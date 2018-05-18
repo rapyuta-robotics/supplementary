@@ -123,6 +123,8 @@ TermPtr operator<(const TermPtr left, const TermPtr right);
 TermPtr operator<=(const TermPtr left, const TermPtr right);
 TermPtr operator>=(const TermPtr left, const TermPtr right);
 
+TermPtr operator&=(const TermPtr left, const TermPtr right);
+
 } /* namespace autodiff */
 
 #endif /* TERM_H_ */
