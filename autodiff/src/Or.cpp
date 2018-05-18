@@ -70,7 +70,7 @@ void Or::Eval(const Tape& tape, const Parameter* params, double* result, const d
     const double* l = tape.getValues(params[0].asIdx);
     const double* r = tape.getValues(params[1].asIdx);
 
-    if (l[0] < 0.0 && r[0] < 0.0) {
+    if (l[0] <= 0.0 && r[0] <= 0.0) {
         for (int i = 0; i <= dim; ++i) {
             result[i] = l[i] + r[i];
         }

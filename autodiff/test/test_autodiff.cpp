@@ -18,10 +18,14 @@ TEST(AutoDiffTest, ABS)
     std::vector<double> gradientAndValue(2);
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-
-    ASSERT_DOUBLE_EQ(13, eval);
+    ASSERT_DOUBLE_EQ(13, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(-1, gradientAndValue[1]);
+
+    point[0] = 4.2;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(4.2, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[1]);
 }
 
 TEST(AutoDiffTest, AND)
@@ -39,11 +43,23 @@ TEST(AutoDiffTest, AND)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-
-    ASSERT_DOUBLE_EQ(1, eval);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
     ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
+
+    point[0] = 0.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0.01, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
+
+    point[1] = -10.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(-0.1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0.01, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0.01, gradientAndValue[2]);
 }
 
 TEST(AutoDiffTest, ATAN2)
@@ -81,10 +97,14 @@ TEST(AutoDiffTest, CONSTPOWER)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-
-    ASSERT_DOUBLE_EQ(169, eval);
+    ASSERT_DOUBLE_EQ(169, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(26, gradientAndValue[1]);
+
+    point[0] = 0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
 }
 
 TEST(AutoDiffTest, CONSTRAINTUTILITY)
@@ -102,11 +122,16 @@ TEST(AutoDiffTest, CONSTRAINTUTILITY)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-
-    ASSERT_DOUBLE_EQ(37, eval);
+    ASSERT_DOUBLE_EQ(37, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
     ASSERT_DOUBLE_EQ(1, gradientAndValue[2]);
+
+    point[0] = 44;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(-0.02, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(-0.01, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
 }
 
 TEST(AutoDiffTest, COS)
@@ -123,9 +148,14 @@ TEST(AutoDiffTest, COS)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-    ASSERT_NEAR(0.907447, eval, 10E-6);
+    ASSERT_NEAR(0.907447, gradientAndValue[0], 10E-6);
     ASSERT_NEAR(-0.420167, gradientAndValue[1], 10E-6);
+
+    point[0] = 0.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_NEAR(1.0, gradientAndValue[0], 10E-12);
+    ASSERT_NEAR(0.0, gradientAndValue[1], 10E-12);
 }
 
 TEST(AutoDiffTest, EXP)
@@ -142,10 +172,15 @@ TEST(AutoDiffTest, EXP)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-
-    ASSERT_NEAR(442413, eval, 10E-1);
     ASSERT_NEAR(442413, gradientAndValue[0], 10E-1);
+    ASSERT_NEAR(442413, gradientAndValue[1], 10E-1);
+
+    point[0] = 0;
+
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_NEAR(1.0, gradientAndValue[0], 10E-1);
+    ASSERT_NEAR(1.0, gradientAndValue[1], 10E-1);
 }
 
 TEST(AutoDiffTest, LINSIGMOID)
@@ -161,9 +196,12 @@ TEST(AutoDiffTest, LINSIGMOID)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
+    ASSERT_DOUBLE_EQ(0.5, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(1.0, gradientAndValue[1]);
 
-    ASSERT_DOUBLE_EQ(0.5, eval);
+    point[0] = 1.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+    ASSERT_NEAR(0.7310586, gradientAndValue[0], 1e-6);
     ASSERT_DOUBLE_EQ(1.0, gradientAndValue[1]);
 }
 
@@ -181,10 +219,15 @@ TEST(AutoDiffTest, LOG)
 
     h.evaluate(&point[0], &gradientAndValue[0]);
 
-    double eval = gradientAndValue[0];
-
-    ASSERT_NEAR(2.56495, eval, 10E-5);
+    ASSERT_NEAR(2.56495, gradientAndValue[0], 10E-5);
     ASSERT_NEAR(0, gradientAndValue[1], 10E-1);
+
+    point[0] = 1.0;
+
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_NEAR(0, gradientAndValue[0], 10E-12);
+    ASSERT_NEAR(1.0, gradientAndValue[1], 10E-12);
 }
 
 TEST(AutoDiffTest, LTCONSTRAINT)
@@ -256,6 +299,15 @@ TEST(AutoDiffTest, MAX)
 
     ASSERT_DOUBLE_EQ(37, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[2]);
+
+    std::swap(point[0], point[1]);
+
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(37, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
 }
 
 TEST(AutoDiffTest, MIN)
@@ -274,6 +326,14 @@ TEST(AutoDiffTest, MIN)
     h.evaluate(&point[0], &gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(13, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(1, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
+
+    std::swap(point[0], point[1]);
+
+    h.evaluate(&point[0], &gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(13, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[2]);
 }
 
 TEST(AutoDiffTest, OR)
@@ -293,6 +353,19 @@ TEST(AutoDiffTest, OR)
 
     ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
+
+    point[0] = 0.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[2]);
+
+    point[1] = 0.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[1]);
+    ASSERT_DOUBLE_EQ(1, gradientAndValue[2]);
 }
 
 TEST(AutoDiffTest, REIFICATION)
@@ -310,6 +383,12 @@ TEST(AutoDiffTest, REIFICATION)
     h.evaluate(&point[0], &gradientAndValue[0]);
 
     ASSERT_DOUBLE_EQ(1, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(0.01, gradientAndValue[1]);
+
+    point[0] = 2.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_DOUBLE_EQ(0.0, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(0.01, gradientAndValue[1]);
 }
 
@@ -329,6 +408,12 @@ TEST(AutoDiffTest, SIN)
 
     ASSERT_NEAR(0.420167, gradientAndValue[0], 10E-6);
     ASSERT_NEAR(0.907447, gradientAndValue[1], 10E-6);
+
+    point[0] = 0.0;
+    h.evaluate(&point[0], &gradientAndValue[0]);
+
+    ASSERT_NEAR(0.0, gradientAndValue[0], 10E-12);
+    ASSERT_NEAR(1.0, gradientAndValue[1], 10E-12);
 }
 
 TEST(AutoDiffTest, TERMPOWER)
@@ -347,6 +432,14 @@ TEST(AutoDiffTest, TERMPOWER)
     ASSERT_DOUBLE_EQ(169, gradientAndValue[0]);
     ASSERT_DOUBLE_EQ(26, gradientAndValue[1]);
     ASSERT_NEAR(433.476441, gradientAndValue[2], 10E-6);
+
+    point[0] = 2.0;
+    point[1] = -1;
+    h.evaluate(point.begin(), point.end(), gradientAndValue.begin(), gradientAndValue.end());
+
+    ASSERT_DOUBLE_EQ(0.5, gradientAndValue[0]);
+    ASSERT_DOUBLE_EQ(-0.25, gradientAndValue[1]);
+    ASSERT_NEAR(0.34657359, gradientAndValue[2], 10E-6);
 }
 
 TEST(AutoDiffTest, EQUALITY)
