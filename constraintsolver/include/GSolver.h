@@ -1,6 +1,7 @@
 #pragma once
 
 #include <engine/AlicaClock.h>
+#include <engine/collections/Interval.h>
 
 #include <autodiff/TermHolder.h>
 #include <autodiff/TermPtr.h>
@@ -26,13 +27,14 @@ class GSolver
   public:
     GSolver();
     ~GSolver();
-    bool solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits, double& out_util, std::vector<double>& o_solution);
-    bool solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits);
+    bool solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits, double& out_util,
+               std::vector<double>& o_solution);
+    bool solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits);
 
-    bool solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits, const std::vector<double>& seeds,
+    bool solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits, const std::vector<double>& seeds,
                double sufficientUtility, double& out_util, std::vector<double>& o_solution);
 
-    bool solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits, const std::vector<double>& seeds);
+    bool solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits, const std::vector<double>& seeds);
 
     int64_t getRuns() const { return _runs; }
     int64_t getFEvals() const { return _fevals; }
@@ -79,15 +81,17 @@ class GSolver
     ResultView getResultView(int count, int dim);
     void writeSolution(ResultView result, std::vector<double>& o_solution) const;
 
-    void initialPointFromSeed(const autodiff::Tape& tape, const double* seed, ResultView o_res, const std::vector<double>& limits, double* o_value) const;
-    void initialPoint(const autodiff::Tape& tape, ResultView o_res, const std::vector<double>& limits, double* o_value);
+    void initialPointFromSeed(const autodiff::Tape& tape, const double* seed, ResultView o_res, const std::vector<Interval<double>>& limits,
+                              double* o_value) const;
+    void initialPoint(const autodiff::Tape& tape, ResultView o_res, const std::vector<Interval<double>>& limits, double* o_value);
 
-    void rPropLoop(const autodiff::Tape& tape, const double* seed, const std::vector<double>& limits, ResultView o_result);
-    void rPropLoop(const autodiff::Tape& tape, const double* seed, const std::vector<double>& limits, ResultView o_result, bool precise);
+    void rPropLoop(const autodiff::Tape& tape, const double* seed, const std::vector<Interval<double>>& limits, ResultView o_result);
+    void rPropLoop(const autodiff::Tape& tape, const double* seed, const std::vector<Interval<double>>& limits, ResultView o_result, bool precise);
 
-    int movePoint(int dim, double minStep, double* pointBuffer, const double* curGradient, const double* oldGradient, const std::vector<double>& limits);
-    void initialStepSize(int dim);
-    bool evalResults(int numResults, int dim);
+    int movePoint(int dim, double minStep, double* pointBuffer, const double* curGradient, const double* oldGradient,
+                  const std::vector<Interval<double>>& limits);
+    void initialStepSize(int dim, const std::vector<Interval<double>>& limits);
+    bool evalResults(int numResults, int dim, const std::vector<Interval<double>>& limits);
 
     std::vector<double> _results;
 
@@ -98,7 +102,6 @@ class GSolver
 
     double _utilitySignificanceThreshold;
 
-    std::vector<double> _ranges;
     std::vector<double> _rpropStepWidth;
     std::vector<double> _rpropStepConvergenceThreshold;
 

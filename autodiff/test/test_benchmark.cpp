@@ -31,8 +31,9 @@ TermPtr makeTest(int64_t seed, TermHolder& holder, int dim, int numLits, int num
 
     std::vector<VarPtr> vars(dim);
     // generate variables
+    int i = 0;
     for (VarPtr& vp : vars) {
-        vp = holder.createVariable();
+        vp = holder.createVariable(i++);
     }
     // generate literals:
     std::vector<TermPtr> lits;

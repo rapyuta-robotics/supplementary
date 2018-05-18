@@ -25,7 +25,8 @@ class TermHolder : public alica::SolverContext
     TermHolder& operator=(TermHolder&& o);
 
     void addVariable(VarPtr v);
-    VarPtr createVariable();
+    VarPtr createVariable(int64_t id);
+    const std::vector<VarPtr>& getVariables() const { return _vars; }
     TermPtr trueConstant() const { return _true.get(); }
     TermPtr zeroConstant() const { return _zero.get(); }
     TermPtr falseConstant() const { return _false.get(); }

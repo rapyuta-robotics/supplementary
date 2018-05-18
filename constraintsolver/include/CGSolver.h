@@ -14,6 +14,7 @@ namespace alica
 {
 class AlicaEngine;
 class IVariableSyncModule;
+class SolverContext;
 
 namespace reasoner
 {
@@ -25,10 +26,11 @@ class CGSolver : public ISolver<CGSolver, double>
     CGSolver(AlicaEngine* ae);
     virtual ~CGSolver();
 
-    bool existsSolutionImpl(const VariableGrp& vars, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls);
-    bool getSolutionImpl(const VariableGrp& vars, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<double>& results);
+    bool existsSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls);
+    bool getSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<double>& results);
 
-    virtual std::shared_ptr<SolverVariable> createVariable(int64_t id) override;
+    virtual SolverVariable* createVariable(int64_t id, alica::SolverContext* context) override;
+    virtual std::unique_ptr<SolverContext> createSolverContext() override;
 
   private:
     GSolver _gs;

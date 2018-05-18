@@ -18,10 +18,10 @@ class Variable : public Term, public alica::SolverVariable
     std::string toString() const override;
     static void Eval(const Tape& tape, const Parameter* params, double* result, const double* vars, int dim);
 
-    void setVarId(int id) { _varId = id; }
+    void setVarIdx(int id) { _varIdx = id; }
 
     virtual EvalFunction getEvalFunction() const override { return &Eval; }
-    virtual void fillParameters(Parameter* params) const override { params[0].asIdx = _varId; }
+    virtual void fillParameters(Parameter* params) const override { params[0].asIdx = _varIdx; }
 
     double getGlobalMin() const { return _globalMin; }
     double getGlobalMax() const { return _globalMax; }
@@ -31,9 +31,9 @@ class Variable : public Term, public alica::SolverVariable
 
   private:
     friend TermHolder;
-    Variable(TermHolder* owner);
+    Variable(TermHolder* owner, int64_t id);
     double _globalMin;
     double _globalMax;
-    int _varId;
+    int _varIdx;
 };
 } /* namespace autodiff */

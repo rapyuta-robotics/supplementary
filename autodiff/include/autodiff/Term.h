@@ -33,7 +33,7 @@ enum OrType
     OR
 };
 
-class Term /*: public alica::SolverTerm */
+class Term : public alica::SolverTerm
 {
   public:
     virtual ~Term();
@@ -45,8 +45,6 @@ class Term /*: public alica::SolverTerm */
      */
     virtual void acceptRecursive(ITermVisitor* visitor) = 0;
     virtual int accept(ITermVisitor* visitor) = 0;
-
-    int getId() const { return _id; }
 
     static AndType getAnd();
     static void setAnd(AndType a);
@@ -95,9 +93,6 @@ class Term /*: public alica::SolverTerm */
     int _tapeIdx;
 
   private:
-    const int _id;
-
-    static int _nextId;
     static OrType _orop;
     static AndType _andop;
 };

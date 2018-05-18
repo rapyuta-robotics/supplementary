@@ -7,7 +7,7 @@ using namespace autodiff;
 TEST(AutoDiffTest, ABS)
 {
     TermHolder h;
-    VarPtr x = h.createVariable();
+    VarPtr x = h.createVariable(1);
 
     TermPtr func = h.abs(x);
 
@@ -27,8 +27,8 @@ TEST(AutoDiffTest, ABS)
 TEST(AutoDiffTest, AND)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.and_(x > h.zeroConstant(), y > h.zeroConstant());
 
@@ -49,8 +49,8 @@ TEST(AutoDiffTest, AND)
 TEST(AutoDiffTest, ATAN2)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.atan2(x, y);
 
@@ -71,7 +71,7 @@ TEST(AutoDiffTest, ATAN2)
 TEST(AutoDiffTest, CONSTPOWER)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.constPower(x, 2);
 
@@ -90,8 +90,8 @@ TEST(AutoDiffTest, CONSTPOWER)
 TEST(AutoDiffTest, CONSTRAINTUTILITY)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.constraintUtility(x < h.constant(42), y);
 
@@ -112,7 +112,7 @@ TEST(AutoDiffTest, CONSTRAINTUTILITY)
 TEST(AutoDiffTest, COS)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.cos(x);
 
@@ -131,7 +131,7 @@ TEST(AutoDiffTest, COS)
 TEST(AutoDiffTest, EXP)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.exp(x);
 
@@ -151,7 +151,7 @@ TEST(AutoDiffTest, EXP)
 TEST(AutoDiffTest, LINSIGMOID)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.linSigmoid(x);
 
@@ -170,7 +170,7 @@ TEST(AutoDiffTest, LINSIGMOID)
 TEST(AutoDiffTest, LOG)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.log(x);
 
@@ -190,8 +190,8 @@ TEST(AutoDiffTest, LOG)
 TEST(AutoDiffTest, LTCONSTRAINT)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.lessThan(x, y);
     std::vector<double> point{13, 37};
@@ -216,8 +216,8 @@ TEST(AutoDiffTest, LTCONSTRAINT)
 TEST(AutoDiffTest, LTECONSTRAINT)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.lessThanEqual(x, y);
 
@@ -242,8 +242,8 @@ TEST(AutoDiffTest, LTECONSTRAINT)
 TEST(AutoDiffTest, MAX)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.max(x, y);
 
@@ -261,8 +261,8 @@ TEST(AutoDiffTest, MAX)
 TEST(AutoDiffTest, MIN)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.min(x, y);
 
@@ -279,8 +279,8 @@ TEST(AutoDiffTest, MIN)
 TEST(AutoDiffTest, OR)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.or_(x, y);
 
@@ -298,7 +298,7 @@ TEST(AutoDiffTest, OR)
 TEST(AutoDiffTest, REIFICATION)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.reify(x > h.constant(3));
 
@@ -316,7 +316,7 @@ TEST(AutoDiffTest, REIFICATION)
 TEST(AutoDiffTest, SIN)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
+    TermPtr x = h.createVariable(1);
 
     TermPtr func = h.sin(x);
 
@@ -334,8 +334,8 @@ TEST(AutoDiffTest, SIN)
 TEST(AutoDiffTest, TERMPOWER)
 {
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     TermPtr func = h.power(x, y);
 
@@ -361,8 +361,8 @@ TEST(AutoDiffTest, COMPILED)
 {
     // we will use a function of two variables
     TermHolder h;
-    TermPtr x = h.createVariable();
-    TermPtr y = h.createVariable();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
 
     // Define our function: func(x, y) = (x + y) * exp(x - y)
     TermPtr func = (x + y) * h.exp(x - y);

@@ -33,7 +33,6 @@
 
 namespace autodiff
 {
-int Term::_nextId = 0;
 
 constexpr double Term::CONSTRAINTSTEEPNESS;
 constexpr double Term::EPSILON;
@@ -42,8 +41,7 @@ OrType Term::_orop = OrType::MAX;
 AndType Term::_andop = AndType::MIN;
 
 Term::Term(TermHolder* owner)
-    : _id(_nextId++)
-    , _owner(owner)
+    : _owner(owner)
     , _next(nullptr)
 {
     _min = std::numeric_limits<double>::min();

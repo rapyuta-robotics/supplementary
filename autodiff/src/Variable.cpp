@@ -8,11 +8,12 @@
 namespace autodiff
 {
 
-Variable::Variable(TermHolder* owner)
+Variable::Variable(TermHolder* owner, int64_t id)
     : Term(owner)
+    , alica::SolverVariable(id)
     , _globalMin(-std::numeric_limits<double>::infinity())
     , _globalMax(std::numeric_limits<double>::infinity())
-    , _varId(-1)
+    , _varIdx(-1)
 {
 }
 
@@ -44,7 +45,7 @@ std::string Variable::toString() const
 {
     std::stringstream str;
     str << "Var";
-    str << std::to_string(_varId);
+    str << std::to_string(_varIdx);
     return str.str();
 }
 

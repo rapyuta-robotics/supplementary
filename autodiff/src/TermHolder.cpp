@@ -58,9 +58,9 @@ TermHolder& TermHolder::operator=(TermHolder&& o)
 
 TermHolder::~TermHolder() {}
 
-VarPtr TermHolder::createVariable()
+VarPtr TermHolder::createVariable(int64_t id)
 {
-    VarPtr ret = new Variable(this);
+    VarPtr ret = new Variable(this, id);
     _vars.push_back(ret);
     handleNewTerm(ret);
     return ret;

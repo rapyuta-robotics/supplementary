@@ -27,11 +27,10 @@ class FormulaTransform
 
     void reset();
     std::shared_ptr<std::list<std::shared_ptr<Clause>>> transformToCNF(autodiff::TermPtr formula, std::shared_ptr<CNSat> solver);
-    std::shared_ptr<Var> getAtoms(int term_id) const;
     int getAtomOccurrence() const;
 
   protected:
-    std::map<int, std::shared_ptr<Var>> atoms;
+    std::map<autodiff::Term*, std::shared_ptr<Var>> atoms;
     int atomOccurrence;
 
     std::shared_ptr<CNSat> solver;

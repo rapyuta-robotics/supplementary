@@ -89,7 +89,7 @@ void Tape::prepTerms(TermPtr top, const std::vector<VarPtr>& vars)
     int idx = 0;
 
     for (VarPtr v : vars) {
-        v->setVarId(idx);
+        v->setVarIdx(idx);
         ++idx;
     }
     idx = 0;

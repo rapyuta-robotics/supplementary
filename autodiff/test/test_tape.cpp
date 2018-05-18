@@ -5,10 +5,10 @@ using namespace autodiff;
 int main(int argc, char** argv)
 {
     TermHolder allStuff;
-    TermPtr x1 = allStuff.createVariable();
-    TermPtr x2 = allStuff.createVariable();
-    TermPtr y1 = allStuff.createVariable();
-    TermPtr y2 = allStuff.createVariable();
+    TermPtr x1 = allStuff.createVariable(0);
+    TermPtr x2 = allStuff.createVariable(1);
+    TermPtr y1 = allStuff.createVariable(2);
+    TermPtr y2 = allStuff.createVariable(3);
     TVec<2> p1(x1, y1);
     TVec<2> p2(x2, y2);
 

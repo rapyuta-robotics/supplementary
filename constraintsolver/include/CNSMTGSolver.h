@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include <autodiff/TermPtr.h>
 #include <autodiff/Types.h>
 
 namespace alica
@@ -37,7 +38,7 @@ class CNSMTGSolver
     virtual ~CNSMTGSolver();
 
     void initLog();
-    void log(double util, shared_ptr<vector<double>>& val);
+    void log(double util, std::shared_ptr<std::vector<double>>& val);
     void logStep();
     void closeLog();
     void solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits, double& out_util,
@@ -78,11 +79,11 @@ class CNSMTGSolver
                                                        std::shared_ptr<autodiff::Term> ut,
                                                        std::shared_ptr<std::vector<std::shared_ptr<autodiff::Variable>>> args,
                                                        std::shared_ptr<std::vector<double>>& seed, bool precise);
-    void differentiate(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints, std::shared_ptr<vector<double>>& val,
+    void differentiate(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints, std::shared_ptr<std::vector<double>>& val,
                        std::shared_ptr<std::vector<double>>& gradient, double& util);
-    std::shared_ptr<vector<double>> initialPointFromSeed(std::shared_ptr<vector<std::shared_ptr<cnsat::Var>>> constraints, std::shared_ptr<RpropResult> res,
-                                                         std::shared_ptr<vector<double>>& seed);
-    std::shared_ptr<vector<double>> initialPoint(std::shared_ptr<vector<shared_ptr<cnsat::Var>>> constraints, std::shared_ptr<RpropResult> res);
+    std::shared_ptr<std::vector<double>> initialPointFromSeed(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints,
+                                                              std::shared_ptr<RpropResult> res, std::shared_ptr<std::vector<double>>& seed);
+    std::shared_ptr<std::vector<double>> initialPoint(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints, std::shared_ptr<RpropResult> res);
     void initializeStepSize();
 
     long runs;
@@ -91,11 +92,11 @@ class CNSMTGSolver
 
     static int fcounter;
     bool seedWithUtilOptimum;
-    shared_ptr<cnsat::CNSat> ss;
+    std::shared_ptr<cnsat::CNSat> ss;
 
     std::shared_ptr<cnsat::FormulaTransform> ft;
     std::shared_ptr<intervalpropagation::IntervalPropagator> ip;
-    std::shared_ptr<vector<double>> lastSeed;
+    std::shared_ptr<std::vector<double>> lastSeed;
 
     std::shared_ptr<RpropResult> r1 = nullptr;
 
@@ -111,7 +112,7 @@ class CNSMTGSolver
     std::vector<double> rpropStepConvergenceThreshold;
     std::shared_ptr<std::vector<std::shared_ptr<autodiff::Variable>>> currentArgs;
 
-    class RpropResult : public enable_shared_from_this<RpropResult>
+    class RpropResult : public std::enable_shared_from_this<RpropResult>
     {
       public:
         std::shared_ptr<std::vector<double>> initialValue;

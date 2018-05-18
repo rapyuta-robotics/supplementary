@@ -70,11 +70,6 @@ void FormulaTransform::reset()
     this->atomOccurrence = 0;
 }
 
-std::shared_ptr<Var> FormulaTransform::getAtoms(int term_id) const
-{
-    return this->atoms.find(term_id)->second;
-}
-
 int FormulaTransform::getAtomOccurrence() const
 {
     return atomOccurrence;
@@ -189,13 +184,13 @@ void FormulaTransform::performStep(std::shared_ptr<Clause>& c, std::shared_ptr<L
 #ifdef USE_EXTENDED_EQUALITY
         if (this->tryGetVar(lit->_atom, &v)) {
 #else
-        if (this->atoms.find(lit->_atom->getId()) != atoms.end()) {
+        if (this->atoms.find(lit->_atom) != atoms.end()) {
 #endif
-            lit->var = atoms[lit->_atom->getId()];
+            lit->var = atoms[lit->_atom];
         } else {
             lit->var = solver->newVar();
             lit->var->_term = lit->_atom;
-            this->atoms[lit->_atom->getId()] = lit->var;
+            this->atoms[lit->_atom] = lit->var;
         }
         c->addChecked(lit);
         newClause1 = c;
@@ -214,13 +209,13 @@ void FormulaTransform::performStep(std::shared_ptr<Clause>& c, std::shared_ptr<L
 #ifdef USE_EXTENDED_EQUALITY
         if (this->tryGetVar(p, &v)) {
 #else
-        if (this->atoms.find(p->getId()) != atoms.end()) {
+        if (this->atoms.find(p) != atoms.end()) {
 #endif
-            lit->var = atoms[p->getId()];
+            lit->var = atoms[p];
         } else {
             lit->var = solver->newVar();
             lit->var->_term = p;
-            this->atoms[p->getId()] = lit->var;
+            this->atoms[p] = lit->var;
         }
         c->addChecked(lit);
         newClause1 = c;
