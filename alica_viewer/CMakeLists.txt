@@ -34,7 +34,11 @@ endif()
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-file(GLOB_RECURSE QT_CPP_HEADERS "include/*.h")
+set(QT_CPP_HEADERS 
+        include/alica_viewer/alica_viewer_main_window.h
+        include/alica_viewer/alica_viewer_ros_interface.h
+        include/alica_viewer/graphics_view_zoom.h
+)
 
 # generate MOC sources
 qt5_wrap_cpp(MOC_SOURCES ${QT_CPP_HEADERS})
