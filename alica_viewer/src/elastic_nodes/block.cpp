@@ -11,6 +11,11 @@ QColor colours[] = {QColor("red"),   QColor("darkRed"),   QColor("darkCyan"), QC
 
 int Block::count = -1;
 
+void Block::reset()
+{
+    count = -1;
+}
+
 Block::Block(Node* sourceNode, Node* destNode)
 {
     count = (count + 1) % ((sizeof(colours) / sizeof(*colours)));

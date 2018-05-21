@@ -42,9 +42,7 @@ class AlicaViewerMainWindow : public QMainWindow
     AlicaViewerInterface _interfaceNode;
     AlicaPlan _alicaPlan;
     AgentGrp _agentIdVector;
-    elastic_nodes::Node* _startBlockNode;
-    elastic_nodes::Node* _endBlockNode;
-    int64_t _prevPlanId;
+    int _offset;
 };
 
 } // namespace alica

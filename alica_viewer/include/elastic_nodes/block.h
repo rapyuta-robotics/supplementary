@@ -12,6 +12,7 @@ class Block : public QGraphicsItem
 {
   public:
     static int count;
+    static void reset();
     Block(Node* sourceNode, Node* destNode);
     enum
     {

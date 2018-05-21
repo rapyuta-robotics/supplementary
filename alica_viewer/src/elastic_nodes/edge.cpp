@@ -65,9 +65,11 @@ Edge::Edge(Node* sourceNode, Node* destNode, Direction direction)
     setAcceptedMouseButtons(0);
     _source = sourceNode;
     _dest = destNode;
-    _source->addEdge(this);
-    _dest->addEdge(this);
-    adjust();
+    if (_source && _dest) {
+        _source->addEdge(this);
+        _dest->addEdge(this);
+        adjust();
+    }
 }
 
 void Edge::adjust()

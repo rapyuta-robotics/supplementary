@@ -68,7 +68,7 @@ class Edge : public QGraphicsItem
         DOWN = 1
     };
 
-    Edge(Node* sourceNode, Node* destNode, Direction direction);
+    Edge(Node* sourceNode, Node* destNode, Direction direction = Direction::DOWN);
     void adjust();
     enum
     {

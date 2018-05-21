@@ -12,7 +12,7 @@ AlicaViewerMainWindow::AlicaViewerMainWindow(int argc, char* argv[], QWidget* pa
     , _scene(new QGraphicsScene(this))
     , _interfaceNode(argc, argv)
     , _alicaPlan(argc, argv)
-    , _prevPlanId(0)
+    , _offset(0)
 {
     _ui.setupUi(this);
 
@@ -49,55 +49,54 @@ AlicaViewerMainWindow::AlicaViewerMainWindow(int argc, char* argv[], QWidget* pa
 
 elastic_nodes::Node* AlicaViewerMainWindow::addStateToScene(const PlanTree* planTreeNode)
 {
-    if (planTreeNode->getX() == 0 && planTreeNode->getY() == 0) {
-        _prevPlanId = 0;
-        elastic_nodes::Block::count = -1;
+    if (planTreeNode == nullptr) {
+        return nullptr;
     }
 
-    AgentGrp robotIds;
-    planTreeNode->getRobotsSorted(robotIds);
-    std::string robotIdList = "[ ";
-    for (const supplementary::AgentID* robotId : robotIds) {
-        robotIdList += _alicaPlan.getAgentInfo(robotId)->name + std::string(", ");
-    }
-    robotIdList.erase(robotIdList.end() - 2, robotIdList.end());
-    robotIdList += std::string(" ]");
-    std::string stateName = planTreeNode->getState()->getName();
-    std::string entrypointName = planTreeNode->getEntryPoint()->getTask()->getName();
-    std::string planName = planTreeNode->getEntryPoint()->getPlan()->getName();
-    elastic_nodes::Node* parentNode = new elastic_nodes::Node(stateName, entrypointName, planName, robotIdList);
-    _scene->addItem(parentNode); // addItem() takes ownership of the arguement
-    int x = planTreeNode->getX() * 300;
-    int y = planTreeNode->getY() * 300;
-    parentNode->setPos(x, y);
+    elastic_nodes::Node* parentNode = nullptr;
 
-    for (const PlanTree* child : planTreeNode->getChildren()) {
-        elastic_nodes::Node* childNode = addStateToScene(child);
-        elastic_nodes::Edge::Direction direction;
-        if (child->getX() != planTreeNode->getX()) {
-            direction = elastic_nodes::Edge::Direction::RIGHT;
-        } else {
-            direction = elastic_nodes::Edge::Direction::DOWN;
+    if (planTreeNode->isValid()) {
+        AgentGrp robotIds;
+        planTreeNode->getRobotsSorted(robotIds);
+        std::string robotIdList = "[ ";
+        for (const supplementary::AgentID* robotId : robotIds) {
+            robotIdList += _alicaPlan.getAgentInfo(robotId)->name + std::string(", ");
         }
-        _scene->addItem(new elastic_nodes::Edge(parentNode, childNode, direction)); // addItem() takes ownership of the arguement
+        robotIdList.erase(robotIdList.end() - 2, robotIdList.end());
+        robotIdList += std::string(" ]");
+
+        std::string stateName = planTreeNode->getState()->getName();
+        std::string entrypointName = planTreeNode->getEntryPoint()->getTask()->getName();
+        std::string planName = planTreeNode->getEntryPoint()->getPlan()->getName();
+
+        parentNode = new elastic_nodes::Node(stateName, entrypointName, planName, robotIdList);
+        _scene->addItem(parentNode); // addItem() takes ownership of the arguement
+        int x = (planTreeNode->getX() + _offset) * 300;
+        int y = planTreeNode->getY() * 300;
+        parentNode->setPos(x, y);
+
+        if (planTreeNode->getParent() == nullptr) {
+            // Draw a bounding rectangle for every plan
+            elastic_nodes::Block* block = new elastic_nodes::Block(parentNode, parentNode);
+            _scene->addItem(block);
+        }
     }
 
-    // Draw a bounding rectangle for every plan
-    // int64_t currentPlanId = planTreeNode->getEntryPoint()->getPlan()->getId();
-    // if (_prevPlanId == 0) {
-    //     _startBlockNode = parentNode;
-    //     _prevPlanId = currentPlanId;
-    // }
-    // if (numOfChildren == 0) {
-    //     _endBlockNode = parentNode;
-    // }
-    // if (_prevPlanId != currentPlanId) {
-    //     elastic_nodes::Block* block = new elastic_nodes::Block(_startBlockNode, _endBlockNode);
-    //     _scene->addItem(block);
-    //     _startBlockNode = parentNode;
-    //     _prevPlanId = currentPlanId;
-    // }
-    // _endBlockNode = parentNode;
+    const PlanTreeVectorMap& children = planTreeNode->getChildren();
+    for (const auto& ptvMapPair : children) {
+        elastic_nodes::Node* startBlockNode = nullptr;
+        elastic_nodes::Node* childNode = nullptr;
+        for (int i = 0; i < static_cast<int>(ptvMapPair.second.size()); ++i) {
+            childNode = addStateToScene(ptvMapPair.second[i]);
+            _scene->addItem(new elastic_nodes::Edge(parentNode, childNode)); // addItem() takes ownership of the arguement
+            if (i == 0) {
+                startBlockNode = childNode;
+            }
+        }
+        // Draw a bounding rectangle for every plan
+        elastic_nodes::Block* block = new elastic_nodes::Block(startBlockNode, childNode);
+        _scene->addItem(block);
+    }
 
     return parentNode;
 }
@@ -107,14 +106,15 @@ void AlicaViewerMainWindow::updateNodes()
     _scene->clear();
     int indexSelected = _ui.agentIdComboBox->currentIndex();
     const PlanTreeMap& ptMap = _alicaPlan.getPlanTrees();
+    elastic_nodes::Block::reset();
+    _offset = 0;
     if (indexSelected == 0) { // Combined
-        const PlanTree* planTree = _alicaPlan.getCombinedPlanTree();
-        for (PlanTree* child : planTree->getChildren()) {
-            addStateToScene(child);
-        }
+        addStateToScene(_alicaPlan.getCombinedPlanTree());
     } else if (indexSelected == 1) { // All
         for (const auto& ptMapPair : ptMap) {
+            elastic_nodes::Block::reset();
             addStateToScene(ptMapPair.second);
+            _offset += 1; // To display each graph separately
         }
     } else { // individual agents
         PlanTreeMap::const_iterator planTreeEntry = ptMap.find(_agentIdVector[indexSelected - 2]);
