@@ -185,12 +185,10 @@ class PlanTree
                                 (*iter)->mergePlanTree(child);
                             }
                         }
-                        std::cout << "Merge children :  " << src->getState()->getName() << "\n";
                         return;
                     }
                 }
             }
-            std::cout << "Add children :  " << src->getState()->getName() << "\n";
             addChildren(new PlanTree(src, this));
         }
     }
@@ -272,11 +270,9 @@ class AlicaPlan
             delete _combinedPlanTree;
         }
         _combinedPlanTree = new PlanTree();
-        std::cout << "Start Combine \n";
         for (const auto& ptMapPair : _planTrees) {
             _combinedPlanTree->mergePlanTree(ptMapPair.second);
         }
-        std::cout << "\n\n";
         return _combinedPlanTree;
     }
 
