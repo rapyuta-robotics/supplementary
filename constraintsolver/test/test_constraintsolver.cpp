@@ -63,11 +63,15 @@ TEST(AutoDiffTest, GSOLVER)
     opps.push_back(TVec<2>(h.constant(2000), h.constant(3300)));
 
     for (int i = 0; i < posCount; ++i) {
-        poses.push_back(TVec<2>(h.createVariable(2 * i), h.createVariable(2 * i + 1)));
+        TermPtr x = h.createVariable(2 * i);
+        TermPtr y = h.createVariable(2 * i + 1);
+        poses.push_back(TVec<2>(x, y));
 
         constraint = constraint & outsideDummyAreas(poses[i]);
-
         constraint = constraint & (distanceSqr(ball, poses[i]) > h.constant(2000 * 2000));
+        constraint = constraint & (distanceSqr(opps[0], poses[i]) > h.constant(800 * 800));
+        constraint = constraint & (distanceSqr(opps[1], poses[i]) > h.constant(800 * 800));
+        constraint = constraint & (distanceSqr(opps[2], poses[i]) > h.constant(800 * 800));
 
         limits[2 * i] = Interval<double>(-FIELDLENGTH / 2, FIELDLENGTH / 2);
         limits[2 * i + 1] = Interval<double>(-FIELDWIDTH / 2, FIELDWIDTH / 2);
@@ -90,7 +94,15 @@ TEST(AutoDiffTest, GSOLVER)
         }
         EXPECT_GT(util, 0.5);
         for (int i = 0; i < posCount; ++i) {
+
             EXPECT_LT(2000 * 2000, (res[2 * i] + 3000) * (res[2 * i] + 3000) + (res[2 * i + 1] + 2000) * (res[2 * i + 1] + 2000));
+            EXPECT_LT(800 * 800, (res[2 * i] - 5000) * (res[2 * i] - 5000) + (res[2 * i + 1]) * (res[2 * i + 1]));
+            EXPECT_LT(800 * 800, (res[2 * i] - 500) * (res[2 * i] - 500) + (res[2 * i + 1] + 2000) * (res[2 * i + 1] + 2000));
+            EXPECT_LT(800 * 800, (res[2 * i] - 2000) * (res[2 * i] - 2000) + (res[2 * i + 1] - 3300) * (res[2 * i + 1] - 3300));
+            EXPECT_LE(-FIELDLENGTH / 2, res[2 * i]);
+            EXPECT_GE(FIELDLENGTH / 2, res[2 * i]);
+            EXPECT_LE(-FIELDWIDTH / 2, res[2 * i + 1]);
+            EXPECT_GE(FIELDWIDTH / 2, res[2 * i + 1]);
         }
     }
     cout << endl;
@@ -98,10 +110,6 @@ TEST(AutoDiffTest, GSOLVER)
 
     cout << "GSolver Took " << (gt / 10000.0) << " ms (avg: " << (gt / (10000.0 * count)) << ")" << endl;
     cout << "GSolver Solved: " << gsolved << " times" << endl;
-    cout << "Result:" << res[0] << " " << res[1] << " with Utility " << util << endl;
-    // double actual = TermUtils::evaluate(csu, vars, res);
-
-    // cout << "Result:" << actual << endl;
 }
 /*
 TEST(AutoDiffTest, GSOLVER_UTIL)
