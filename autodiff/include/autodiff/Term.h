@@ -79,6 +79,7 @@ class Term : public alica::SolverTerm
     static constexpr double EPSILON = 1e-10;
     static constexpr double CONSTRAINTSTEEPNESS = 0.01;
     friend TermList;
+    friend TermHolder;
     Term(TermHolder* owner);
 
     TermHolder* _owner;

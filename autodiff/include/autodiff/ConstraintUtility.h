@@ -21,6 +21,9 @@ class ConstraintUtility : public BinaryFunction
 
     virtual EvalFunction getEvalFunction() const override { return &Eval; }
 
+    TermPtr getConstraint() const { return _left; }
+    TermPtr getUtility() const { return _right; }
+
   private:
     friend TermHolder;
     ConstraintUtility(TermPtr constraint, TermPtr utility, TermHolder* owner);

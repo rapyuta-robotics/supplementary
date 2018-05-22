@@ -44,6 +44,12 @@ TermHolder::TermHolder(TermHolder&& o)
     , _terms(std::move(o._terms))
     , _tape(std::move(o._tape))
 {
+    for (std::unique_ptr<Term>& t : _terms) {
+        t->_owner = this;
+    }
+    _true->_owner = this;
+    _zero->_owner = this;
+    _false->_owner = this;
 }
 TermHolder& TermHolder::operator=(TermHolder&& o)
 {
@@ -53,6 +59,12 @@ TermHolder& TermHolder::operator=(TermHolder&& o)
     _vars = std::move(o._vars);
     _terms = std::move(o._terms);
     _tape = std::move(o._tape);
+    for (std::unique_ptr<Term>& t : _terms) {
+        t->_owner = this;
+    }
+    _true->_owner = this;
+    _zero->_owner = this;
+    _false->_owner = this;
     return *this;
 }
 
