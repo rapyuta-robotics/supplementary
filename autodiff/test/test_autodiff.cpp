@@ -4,6 +4,26 @@
 
 using namespace autodiff;
 
+TEST(AutoDiffTest, Distance)
+{
+    TermHolder h;
+    TermPtr constraint = h.trueConstant();
+    TermPtr x = h.createVariable(1);
+    TermPtr y = h.createVariable(2);
+    TVec<2> pos(x, y);
+    TVec<2> ball = TVec<2>(h.constant(-3000), h.constant(-2000));
+
+    constraint = constraint & (distanceSqr(ball, pos) > h.constant(2000 * 2000));
+
+    h.compile(constraint);
+    std::array<double, 2> point{-3900, -1770.5};
+    std::array<double, 3> result;
+    h.evaluate(&point[0], &result[0]);
+    ASSERT_LE(result[0], 0.0);
+    ASSERT_LT(result[1], 0.0);
+    ASSERT_GT(result[2], 0.0);
+}
+
 TEST(AutoDiffTest, ABS)
 {
     TermHolder h;

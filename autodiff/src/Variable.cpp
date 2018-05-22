@@ -45,7 +45,7 @@ std::string Variable::toString() const
 {
     std::stringstream str;
     str << "Var";
-    str << std::to_string(_varIdx);
+    str << std::to_string(getId());
     return str.str();
 }
 
