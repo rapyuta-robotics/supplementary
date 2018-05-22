@@ -279,7 +279,7 @@ bool GSolver::solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& hold
 inline void GSolver::ensureResultSpace(int count, int dim)
 {
     int required = ResultView::getRequiredSize(dim) * count;
-    if (_results.size() < required) {
+    if (static_cast<int>(_results.size()) < required) {
         _results.resize(required);
     }
 }
@@ -292,7 +292,7 @@ void GSolver::writeSolution(ResultView result, std::vector<double>& o_solution) 
 inline GSolver::ResultView GSolver::getResultView(int num, int dim)
 {
     int idx = ResultView::getRequiredSize(dim) * num;
-    assert(_results.size() >= idx + ResultView::getRequiredSize(dim));
+    assert(static_cast<int>(_results.size()) >= idx + ResultView::getRequiredSize(dim));
     return ResultView(&_results[idx], dim);
 }
 

@@ -50,7 +50,7 @@ bool CGSolver::existsSolutionImpl(SolverContext* ctx, const std::vector<std::sha
         }
         constraint = constraint & TermPtr(static_cast<autodiff::Term*>(c->getConstraint()));
         const std::vector<Interval<double>>& allRanges = c->getAllRanges();
-        for (int i = 0; i < c->getAllVariables().size(); ++i) {
+        for (int i = 0; i < static_cast<int>(c->getAllVariables().size()); ++i) {
             for (int j = 0; j < dim; ++j) {
                 if (dynamic_cast<autodiff::Variable*>(c->getAllVariables()[j]) == nullptr) {
                     std::cerr << "CGSolver: Variabletype not compatible with selected solver" << std::endl;
@@ -89,7 +89,7 @@ bool CGSolver::getSolutionImpl(SolverContext* ctx, const std::vector<std::shared
 
     // get some utility significance threshold value if one exists
     double usigVal = calls[0]->getUtilitySignificanceThreshold();
-    for (int i = 1; i < calls.size(); ++i) {
+    for (int i = 1; i < static_cast<int>(calls.size()); ++i) {
         // TODO: fixed Values
         if (calls.at(i)->isSettingUtilitySignificanceThreshold()) {
             usigVal = calls[i]->getUtilitySignificanceThreshold();
@@ -117,7 +117,7 @@ bool CGSolver::getSolutionImpl(SolverContext* ctx, const std::vector<std::shared
 
         // limit ranges according to the ranges of the given calls
         const std::vector<Interval<double>>& allRanges = c->getAllRanges();
-        for (int i = 0; i < c->getAllVariables().size(); ++i) {
+        for (int i = 0; i < static_cast<int>(c->getAllVariables().size()); ++i) {
             TermPtr variableTerm = dynamic_cast<autodiff::VarPtr>(c->getAllVariables()[i]);
             if (variableTerm.get() == nullptr) {
                 std::cerr << "CGSolver: Variable is not of Type autodiff::Term!" << std::endl;

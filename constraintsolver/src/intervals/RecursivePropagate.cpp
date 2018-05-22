@@ -49,6 +49,7 @@ bool RecursivePropagate::propagate(TermPtr term)
         cur->accept(&_up);
         cur = _changed.dequeue();
     }
+    return true;
 }
 
 void RecursivePropagate::addToQueue(TermPtr t)

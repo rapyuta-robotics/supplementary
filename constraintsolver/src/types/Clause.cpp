@@ -42,7 +42,7 @@ void Clause::addChecked(std::shared_ptr<Lit> l)
 {
     bool found = false;
     if (l->isTemporary) {
-        for (int i = 0; i < literals->size(); ++i) {
+        for (int i = 0; i < static_cast<int>(literals->size()); ++i) {
             if (literals->at(i)->isTemporary && l->_atom == literals->at(i)->_atom) {
                 found = true;
                 break;
@@ -53,7 +53,7 @@ void Clause::addChecked(std::shared_ptr<Lit> l)
         }
         return;
     }
-    for (int i = 0; i < literals->size(); ++i) {
+    for (int i = 0; i < static_cast<int>(literals->size()); ++i) {
         if (l->_atom == literals->at(i)->_atom) {
             found = true;
             if (l->sign != literals->at(i)->sign) {

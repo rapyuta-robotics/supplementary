@@ -27,12 +27,12 @@ class IntervalPropagator
 {
   public:
     IntervalPropagator();
-    virtual ~IntervalPropagator();
+    virtual ~IntervalPropagator(){};
 
     static int updates;
     static int visits;
 
-    void setGlobalRanges(std::shared_ptr<std::vector<autodiff::VarPtr>> vars, std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> ranges,
+    void setGlobalRanges(autodiff::TermHolder& holder, std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> ranges,
                          std::shared_ptr<cnsat::CNSat> solver);
     bool propagate(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> decisions,
                    std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>>& completeRanges,

@@ -36,12 +36,12 @@ int IntervalPropagator::visits = 0;
 
 IntervalPropagator::IntervalPropagator() {}
 
-void IntervalPropagator::setGlobalRanges(std::shared_ptr<std::vector<autodiff::VarPtr>> vars,
-                                         std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> ranges, std::shared_ptr<cnsat::CNSat> solver)
+void IntervalPropagator::setGlobalRanges(autodiff::TermHolder& holder, std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> ranges,
+                                         std::shared_ptr<cnsat::CNSat> solver)
 {
-    for (int i = 0; i < vars->size(); ++i) {
-        vars->at(i)->setGlobalMin(ranges->at(i)->at(0));
-        vars->at(i)->setGlobalMax(ranges->at(i)->at(1));
+    for (int i = 0; i < static_cast<int>(holder.getVariables().size()); ++i) {
+        holder.getVariables()[i]->setGlobalMin(ranges->at(i)->at(0));
+        holder.getVariables()[i]->setGlobalMax(ranges->at(i)->at(1));
     }
     this->globalRanges = ranges;
     this->vars = vars;

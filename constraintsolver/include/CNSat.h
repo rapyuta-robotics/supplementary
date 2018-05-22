@@ -9,7 +9,7 @@
 #define CNSAT_H_
 
 #include "types/Assignment.h"
-
+#include <engine/AlicaClock.h>
 #include <memory>
 #include <vector>
 
@@ -45,7 +45,7 @@ class CNSat
     bool preAddIUnitClause(std::shared_ptr<Var> v, Assignment ass);
     bool addIClause(std::shared_ptr<Clause> c);
     void init();
-    bool solve();
+    bool solve(AlicaTime until, CNSMTGSolver* callbackSolver = nullptr);
     void reduceDB(int num);
     std::shared_ptr<Clause> propagate();
     bool resolveConflict(std::shared_ptr<Clause> c);
@@ -57,7 +57,6 @@ class CNSat
     void removeRangeOfDecisions(int index, int count);
 
     bool useIntervalProp;
-    std::weak_ptr<CNSMTGSolver> cnsmtGSolver;
 
     std::shared_ptr<std::vector<std::shared_ptr<Clause>>> clauses;
     std::shared_ptr<std::vector<std::shared_ptr<Clause>>> satClauses;
@@ -66,7 +65,7 @@ class CNSat
     std::shared_ptr<std::vector<std::shared_ptr<Var>>> variables;
     std::shared_ptr<std::vector<std::shared_ptr<Var>>> decisions;
     std::shared_ptr<std::vector<std::shared_ptr<DecisionLevel>>> decisionLevel;
-
+    CNSMTGSolver* cnsmtGSolver;
     int unitDecissions;
 
   protected:
@@ -83,7 +82,7 @@ class CNSat
     std::shared_ptr<DecisionLevel> decisionLevelNull;
     bool recentBacktrack = false;
 
-    AlicaClock* alicaClock;
+    AlicaClock alicaClock;
 };
 } /* namespace cnsat */
 } /* namespace reasoner */

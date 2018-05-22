@@ -3,6 +3,7 @@
 #include "types/Assignment.h"
 
 #include <autodiff/Tape.h>
+#include <autodiff/TermHolder.h>
 #include <autodiff/TermPtr.h>
 #include <autodiff/Types.h>
 
@@ -54,6 +55,24 @@ class Var
     autodiff::Tape _positiveTerm;
     autodiff::Tape _negativeTerm;
     autodiff::Tape* _curTerm;
+    void setToPositive()
+    {
+        if (_curTerm != &_positiveTerm) {
+            if (!_positiveTerm.isSet()) {
+                _positiveTerm = _term->getOwner()->compileSeparately(_term);
+            }
+            _curTerm = &_positiveTerm;
+        }
+    }
+    void setToNegative()
+    {
+        if (_curTerm != &_negativeTerm) {
+            if (!_negativeTerm.isSet()) {
+                _negativeTerm = _term->getOwner()->compileSeparately(_term->negate());
+            }
+            _curTerm = &_negativeTerm;
+        }
+    }
 
   private:
     std::shared_ptr<Clause> reason;

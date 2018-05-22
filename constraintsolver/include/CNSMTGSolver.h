@@ -34,18 +34,19 @@ class CNSMTGSolver
 
   public:
     CNSMTGSolver();
-    AlicaTime getTime();
+    AlicaTime getTime() const;
     virtual ~CNSMTGSolver();
 
     void initLog();
     void log(double util, std::shared_ptr<std::vector<double>>& val);
     void logStep();
     void closeLog();
-    void solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits, double& out_util,
-               std::vector<double>& out_solution);
-    void solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limits, const std::vector<double>& seeds,
-               double sufficientUtility, double& out_util, std::vector<double>& out_solution);
-    void solveTest(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<double>& limit, std::vector<double>& out_solution);
+    std::shared_ptr<std::vector<double>> solve(autodiff::TermPtr equation, autodiff::TermHolder& holder,
+                                               std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>>& limits, double& util);
+    std::shared_ptr<std::vector<double>> solve(autodiff::TermPtr equation, autodiff::TermHolder& holder,
+                                               std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>>& limits,
+                                               std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> seeds, double sufficientUtility,
+                                               double& util);
     bool intervalPropagate(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> decisions,
                            std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>>& curRanges);
     bool probeForSolution(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> decisions, std::shared_ptr<std::vector<double>> solution);
@@ -75,9 +76,8 @@ class CNSMTGSolver
   protected:
     std::shared_ptr<RpropResult> rPropFindFeasible(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints,
                                                    std::shared_ptr<std::vector<double>> seed);
-    std::shared_ptr<RpropResult> rPropOptimizeFeasible(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints,
-                                                       std::shared_ptr<autodiff::Term> ut,
-                                                       std::shared_ptr<std::vector<std::shared_ptr<autodiff::Variable>>> args,
+    std::shared_ptr<RpropResult> rPropOptimizeFeasible(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints, autodiff::TermPtr ut,
+                                                       // std::shared_ptr<std::vector<std::shared_ptr<autodiff::Variable>>> args,
                                                        std::shared_ptr<std::vector<double>>& seed, bool precise);
     void differentiate(std::shared_ptr<std::vector<std::shared_ptr<cnsat::Var>>> constraints, std::shared_ptr<std::vector<double>>& val,
                        std::shared_ptr<std::vector<double>>& gradient, double& util);
