@@ -392,7 +392,7 @@ bool CNSat::solve(AlicaTime until, CNSMTGSolver* callbackSolver)
                         satClauseCount++;
                     }
                 }
-                if (satClauseCount >= clauses->size()) {
+                if (satClauseCount >= static_cast<int>(clauses->size())) {
                     return true;
                 }
             }

@@ -85,7 +85,7 @@ void FormulaTransform::doTransform(std::shared_ptr<std::list<std::shared_ptr<Cla
         std::shared_ptr<Clause> tmpClause = *clauseIter;
         if (!tmpClause->isFinished) {
             bool finished = true;
-            for (j = 0; j < tmpClause->literals->size(); ++j) {
+            for (j = 0; j < static_cast<int>(tmpClause->literals->size()); ++j) {
                 if (tmpClause->literals->at(j)->isTemporary) {
                     finished = false;
                     curClause = tmpClause;
