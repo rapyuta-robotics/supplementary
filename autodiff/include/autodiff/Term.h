@@ -1,12 +1,4 @@
-/*
- * Term.h
- *
- *  Created on: Jun 5, 2014
- *      Author: psp
- */
-
-#ifndef TERM_H_
-#define TERM_H_
+#pragma once
 
 #include "ITermVisitor.h"
 #include "TermPtr.h"
@@ -81,17 +73,18 @@ class Term : public alica::SolverTerm
     friend TermList;
     friend TermHolder;
     Term(TermHolder* owner);
-
+    // backptr to owner object:
     TermHolder* _owner;
-
+    // intrusive list for tape generation & interval propagation
     TermPtr _next;
-
-    // Interval propagation:
+    // index to tape representation
+    int _tapeIdx;
+    // intentional padding
+    // DAG backptrs for interval propgation
     std::vector<TermPtr> _parents;
+    // Interval values
     double _min;
     double _max;
-
-    int _tapeIdx;
 
   private:
     static OrType _orop;
@@ -127,5 +120,3 @@ TermPtr operator>=(const TermPtr left, const TermPtr right);
 TermPtr operator&=(const TermPtr left, const TermPtr right);
 
 } /* namespace autodiff */
-
-#endif /* TERM_H_ */
