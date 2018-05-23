@@ -1,8 +1,8 @@
 #pragma once
 
-#include <alica_solver_interface/SolverVariable.h>
-
 #include "Term.h"
+#include <alica_solver_interface/Interval.h>
+#include <alica_solver_interface/SolverVariable.h>
 
 namespace autodiff
 {
@@ -23,17 +23,14 @@ class Variable : public Term, public alica::SolverVariable
     virtual EvalFunction getEvalFunction() const override { return &Eval; }
     virtual void fillParameters(Parameter* params) const override { params[0].asIdx = _varIdx; }
 
-    double getGlobalMin() const { return _globalMin; }
-    double getGlobalMax() const { return _globalMax; }
-
-    void setGlobalMin(double m) { _globalMin = m; }
-    void setGlobalMax(double m) { _globalMax = m; }
+    // This is the total range of possible values of this variable
+    alica::Interval<double> getRange() const { return _globalRange; }
+    alica::Interval<double>& editRange() { return _globalRange; }
 
   private:
     friend TermHolder;
     Variable(TermHolder* owner, int64_t id);
-    double _globalMin;
-    double _globalMax;
+    alica::Interval<double> _globalRange;
     int _varIdx;
 };
 } /* namespace autodiff */

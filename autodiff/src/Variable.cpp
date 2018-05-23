@@ -11,8 +11,7 @@ namespace autodiff
 Variable::Variable(TermHolder* owner, int64_t id)
     : Term(owner)
     , alica::SolverVariable(id)
-    , _globalMin(-std::numeric_limits<double>::infinity())
-    , _globalMax(std::numeric_limits<double>::infinity())
+    , _globalRange(-SolverVariable::minExpressibleValue, -SolverVariable::maxExpressibleValue)
     , _varIdx(-1)
 {
 }

@@ -42,29 +42,23 @@ bool CGSolver::existsSolutionImpl(SolverContext* ctx, const std::vector<std::sha
 
     std::vector<Interval<double>> ranges(dim, Interval<double>(std::numeric_limits<double>::lowest() / 2, std::numeric_limits<double>::max() / 2));
 
+    int i = 0;
+    for (const autodiff::Variable* v : holder->getVariables()) {
+        if (!v->getRange().isValid()) {
+            return false;
+        }
+        ranges[i] = v->getRange();
+        ++i;
+    }
+
     for (const std::shared_ptr<ProblemDescriptor>& c : calls) {
         if (dynamic_cast<autodiff::Term*>(c->getConstraint()) == nullptr) {
             std::cerr << "CGSolver: Constrainttype not compatible with selected solver" << std::endl;
             return false;
         }
         constraint = constraint & TermPtr(static_cast<autodiff::Term*>(c->getConstraint()));
-        const std::vector<Interval<double>>& allRanges = c->getAllRanges();
-        for (int i = 0; i < static_cast<int>(c->getAllVariables().size()); ++i) {
-            for (int j = 0; j < dim; ++j) {
-                if (dynamic_cast<autodiff::Variable*>(c->getAllVariables()[j]) == nullptr) {
-                    std::cerr << "CGSolver: Variabletype not compatible with selected solver" << std::endl;
-                    return false;
-                }
-                if (holder->getVariables()[j] == static_cast<autodiff::VarPtr>(c->getAllVariables()[j])) {
-                    ranges[j] = ranges[j].intersect(allRanges[i]);
-                    if (!ranges[j].isValid()) {
-                        return false;
-                    }
-                    break;
-                }
-            }
-        }
     }
+
     std::vector<Variant> serial_seeds;
     int seed_num = getAlicaEngine()->getResultStore()->getSeeds(holder->getVariables(), ranges, serial_seeds);
 
@@ -84,8 +78,18 @@ bool CGSolver::getSolutionImpl(SolverContext* ctx, const std::vector<std::shared
     const int dim = holder->getDim();
 
     // create lists of constraint variables and corresponding ranges
+
     std::vector<Interval<double>> ranges(dim, Interval<double>(std::numeric_limits<double>::lowest() / 2, std::numeric_limits<double>::max() / 2));
 
+    int i = 0;
+    for (const autodiff::Variable* v : holder->getVariables()) {
+        if (!v->getRange().isValid()) {
+            std::cerr << "CGSolver: Ranges do not allow a solution!" << std::endl;
+            return false;
+        }
+        ranges[i] = v->getRange();
+        ++i;
+    }
     // get some utility significance threshold value if one exists
     double usigVal = calls[0]->getUtilitySignificanceThreshold();
     for (int i = 1; i < static_cast<int>(calls.size()); ++i) {
@@ -113,27 +117,6 @@ bool CGSolver::getSolutionImpl(SolverContext* ctx, const std::vector<std::shared
         utility = utility + utilityTerm;
 
         sufficientUtility += c->getUtilitySufficiencyThreshold();
-
-        // limit ranges according to the ranges of the given calls
-        const std::vector<Interval<double>>& allRanges = c->getAllRanges();
-        for (int i = 0; i < static_cast<int>(c->getAllVariables().size()); ++i) {
-            TermPtr variableTerm = dynamic_cast<autodiff::VarPtr>(c->getAllVariables()[i]);
-            if (variableTerm.get() == nullptr) {
-                std::cerr << "CGSolver: Variable is not of Type autodiff::Term!" << std::endl;
-                return false;
-            }
-
-            for (int j = 0; j < dim; ++j) {
-                if (holder->getVariables()[j] == variableTerm) {
-                    ranges[j] = ranges[j].intersect(allRanges[i]);
-                    if (!ranges[j].isValid()) {
-                        std::cerr << "CGSolver: Ranges do not allow a solution!" << std::endl;
-                        return false;
-                    }
-                    break;
-                }
-            }
-        }
     }
     TermPtr all = holder->constraintUtility(constraint, utility);
 

@@ -177,7 +177,7 @@ int ResetIntervals::visit(autodiff::TermPower* power)
 int ResetIntervals::visit(autodiff::Variable* var)
 {
     var->editParents().clear();
-    updateInterval(var, var->getGlobalMin(), var->getGlobalMax());
+    updateInterval(var, var->getRange().getMin(), var->getRange().getMax());
     return true;
 }
 

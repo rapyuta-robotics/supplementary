@@ -40,8 +40,8 @@ void IntervalPropagator::setGlobalRanges(autodiff::TermHolder& holder, std::shar
                                          std::shared_ptr<cnsat::CNSat> solver)
 {
     for (int i = 0; i < static_cast<int>(holder.getVariables().size()); ++i) {
-        holder.getVariables()[i]->setGlobalMin(ranges->at(i)->at(0));
-        holder.getVariables()[i]->setGlobalMax(ranges->at(i)->at(1));
+        holder.getVariables()[i]->editRange().setMin(ranges->at(i)->at(0));
+        holder.getVariables()[i]->editRange().setMax(ranges->at(i)->at(1));
     }
     this->globalRanges = ranges;
     this->vars = vars;
@@ -142,8 +142,8 @@ bool IntervalPropagator::propagate(autodiff::TermPtr term)
 bool IntervalPropagator::propagateSingle(std::shared_ptr<cnsat::Var> v, bool sign)
 {
     for (int i = dim - 1; i >= 0; --i) {
-        vars->at(i)->setMax(vars->at(i)->getGlobalMax());
-        vars->at(i)->setMin(vars->at(i)->getGlobalMin());
+        vars->at(i)->setMax(vars->at(i)->getRange().getMax());
+        vars->at(i)->setMin(vars->at(i)->getRange().getMin());
     }
 
     if (sign) {
