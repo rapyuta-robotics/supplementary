@@ -40,7 +40,6 @@ bool CGSolver::existsSolutionImpl(SolverContext* ctx, const std::vector<std::sha
     TermPtr constraint = holder->trueConstant();
     const int dim = holder->getDim();
 
-    // auto cVars = make_shared<vector<shared_ptr<autodiff::Variable>>>(dim);
     std::vector<Interval<double>> ranges(dim, Interval<double>(std::numeric_limits<double>::lowest() / 2, std::numeric_limits<double>::max() / 2));
 
     for (const std::shared_ptr<ProblemDescriptor>& c : calls) {
