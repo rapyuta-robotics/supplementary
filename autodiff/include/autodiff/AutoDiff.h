@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Abs.h"
 #include "And.h"
 #include "Atan2.h"
