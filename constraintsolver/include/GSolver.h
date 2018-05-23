@@ -1,7 +1,7 @@
 #pragma once
 
+#include <alica_solver_interface/Interval.h>
 #include <engine/AlicaClock.h>
-#include <engine/collections/Interval.h>
 
 #include <autodiff/TermHolder.h>
 #include <autodiff/TermPtr.h>
