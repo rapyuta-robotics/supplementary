@@ -56,11 +56,6 @@ add_library(autodiff
 
 target_link_libraries(autodiff ${catkin_LIBRARIES})
 
-add_executable(test_tape test/test_tape.cpp)
-
-target_link_libraries(test_tape ${PROJECT_NAME} ${catkin_LIBRARIES})
-
-
 add_executable(sine_benchmark test/test_benchmark.cpp)
 
 target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
