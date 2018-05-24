@@ -40,6 +40,9 @@ GSolver::GSolver()
     , _rPropConvergenceStepSize(1E-2)
     , _utilitySignificanceThreshold(1E-22)
     , _initialStepSize(0.005)
+    , _utilityThreshold(1.0)
+    , _runs(0)
+    , _fevals(0)
 {
     autodiff::Term::setAnd(autodiff::AndType::AND);
     autodiff::Term::setOr(autodiff::OrType::MAX);

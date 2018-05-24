@@ -100,7 +100,7 @@ void ManagedExecutable::update(unsigned long long cpuDelta)
 #ifdef MNGD_EXEC_DEBUG
             cout << "ME: No " << this->metaExec->name << " running and none should run!" << endl;
 #endif
-            this->desiredRunState == RunState::SHOULDNT_RUN; // reset from manual started
+            this->desiredRunState = RunState::SHOULDNT_RUN; // reset from manual started
             this->clear();
         }
     } else if (this->queuedPids4Update.size() > 0) // there are processes which run

@@ -9,8 +9,6 @@
 //#define CNSatDebug
 //#define CNSat_Call_Debug
 
-#define CN_SAT_CALLBACK_SOLVER
-
 #include "CNSMTGSolver.h"
 #include "Decider.h"
 #include "types/Clause.h"
@@ -26,6 +24,8 @@
 #include <iostream>
 #include <sstream>
 
+#define CN_SAT_CALLBACK_SOLVER
+
 namespace alica
 {
 namespace reasoner
@@ -33,8 +33,10 @@ namespace reasoner
 namespace cnsat
 {
 
+using std::istringstream;
 using std::shared_ptr;
 using std::string;
+using std::stringstream;
 using std::vector;
 
 void CNSat::readFromCNFFile(string path)
@@ -51,10 +53,8 @@ void CNSat::readFromCNFFile(string path)
         stringstream ss(line);
         string s;
         while (!ss.eof()) {
-            ss >> s;
-            istringstream is(s);
             int val;
-            is >> val;
+            ss >> val;
 
             if (val == 0)
                 continue;
@@ -76,6 +76,7 @@ void CNSat::readFromCNFFile(string path)
 
 CNSat::CNSat()
     : cnsmtGSolver(nullptr)
+    , learntNum(0)
 {
     this->useIntervalProp = true;
     this->decisionLevelNull = make_shared<DecisionLevel>(0);
@@ -917,10 +918,10 @@ void CNSat::emptyClauseList(shared_ptr<vector<shared_ptr<Clause>>> list)
     cout << "CNSat::emptyClauseList()" << endl;
 #endif
     for (shared_ptr<Clause> c : *list) {
-        auto it = find(c->watcher->at(0)->lit->var->watchList->begin(), c->watcher->at(0)->lit->var->watchList->end(), c->watcher->at(0));
+        auto it = std::find(c->watcher->at(0)->lit->var->watchList->begin(), c->watcher->at(0)->lit->var->watchList->end(), c->watcher->at(0));
         c->watcher->at(0)->lit->var->watchList->erase(it);
         c->watcher->at(0)->lit->variableCount--;
-        it = find(c->watcher->at(1)->lit->var->watchList->begin(), c->watcher->at(1)->lit->var->watchList->end(), c->watcher->at(1));
+        it = std::find(c->watcher->at(1)->lit->var->watchList->begin(), c->watcher->at(1)->lit->var->watchList->end(), c->watcher->at(1));
         c->watcher->at(1)->lit->var->watchList->erase(it);
         c->watcher->at(1)->lit->variableCount--;
     }

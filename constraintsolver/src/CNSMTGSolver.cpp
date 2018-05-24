@@ -44,11 +44,15 @@ using std::vector;
 int CNSMTGSolver::fcounter = 0;
 
 CNSMTGSolver::CNSMTGSolver()
+    : dim(0)
+    , utilityThreshold(1.0)
+    , begin()
+    , runs(0)
+    , fevals(0)
+    , seedWithUtilOptimum(true)
 {
     autodiff::Term::setAnd(autodiff::AndType::AND);
     autodiff::Term::setOr(autodiff::OrType::MAX);
-
-    rResults = vector<shared_ptr<RpropResult>>();
 
     ft = make_shared<cnsat::FormulaTransform>();
 
