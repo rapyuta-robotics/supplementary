@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <thread>
@@ -23,6 +24,14 @@
 
 namespace supplementary
 {
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::string;
+using std::stringstream;
+using std::thread;
+using std::vector;
 
 bool ProcessManager::running = false;
 int ProcessManager::numCPUs = 0;
@@ -246,23 +255,23 @@ void ProcessManager::start()
 void ProcessManager::run()
 {
     while (ProcessManager::running) {
-        auto start = chrono::system_clock::now();
+        auto start = std::chrono::system_clock::now();
 
         this->searchProcFS();
         this->updateTotalCPUTimes();
         this->update((this->currentTotalCPUTime - this->lastTotalCPUTime) / ProcessManager::numCPUs);
         this->report();
 
-        auto timePassed = chrono::system_clock::now() - start;
-        chrono::microseconds microsecondsPassed = chrono::duration_cast<chrono::microseconds>(timePassed);
+        auto timePassed = std::chrono::system_clock::now() - start;
+        std::chrono::microseconds microsecondsPassed = std::chrono::duration_cast<std::chrono::microseconds>(timePassed);
 
 #ifdef PM_DEBUG
         cout << "PM: " << microsecondsPassed.count() << " microseconds passed!" << endl << endl;
 #endif
-        chrono::microseconds availTime = this->iterationTime - microsecondsPassed;
+        std::chrono::microseconds availTime = this->iterationTime - microsecondsPassed;
 
         if (availTime.count() > 10) {
-            this_thread::sleep_for(availTime);
+            std::this_thread::sleep_for(availTime);
         }
     }
 }
@@ -670,7 +679,7 @@ int main(int argc, char** argv)
     // Set kernel page size for human readable memory consumption
     supplementary::ManagedExecutable::kernelPageSize = sysconf(_SC_PAGESIZE);
     // Determine number of cores
-    while (supplementary::FileSystem::pathExists("/sys/devices/system/cpu/cpu" + to_string(supplementary::ProcessManager::numCPUs))) {
+    while (supplementary::FileSystem::pathExists("/sys/devices/system/cpu/cpu" + std::to_string(supplementary::ProcessManager::numCPUs))) {
         supplementary::ProcessManager::numCPUs++;
     }
 
@@ -690,8 +699,8 @@ int main(int argc, char** argv)
         pm->start();
 
         while (pm->isRunning()) {
-            chrono::milliseconds dura(500);
-            this_thread::sleep_for(dura);
+            std::chrono::milliseconds dura(500);
+            std::this_thread::sleep_for(dura);
         }
 
         delete pm;

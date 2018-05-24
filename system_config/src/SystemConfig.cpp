@@ -2,6 +2,8 @@
 
 #include "Configuration.h"
 
+#include <unistd.h>
+
 namespace supplementary
 {
 using std::cerr;

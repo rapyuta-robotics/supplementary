@@ -9,6 +9,7 @@
 #include <supplementary/AgentIDManager.h>
 
 #include <iostream>
+#include <string.h>
 
 using std::cerr;
 using std::cout;

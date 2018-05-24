@@ -16,11 +16,11 @@
 #include <autodiff/TermPtr.h>
 
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <sstream>
 #include <stdlib.h> /* srand, rand */
 #include <string>
-#include <time.h> /* time */
 
 #include <iostream>
 

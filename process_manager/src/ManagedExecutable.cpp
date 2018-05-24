@@ -21,6 +21,16 @@
 
 namespace supplementary
 {
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::string;
+using std::stringstream;
+using std::thread;
+using std::to_string;
+using std::vector;
+
 long ManagedExecutable::kernelPageSize = 0;
 
 ManagedExecutable::ManagedExecutable(ExecutableMetaData const* const metaExec, long pid, string robotName, ProcessManager* procMan)
@@ -69,7 +79,7 @@ void ManagedExecutable::update(unsigned long long cpuDelta)
 {
     if (this->queuedPids4Update.size() == 0) {
         if (this->desiredRunState == RunState::SHOULD_RUN) {
-            if (chrono::steady_clock::now() - this->lastTimeTried > std::chrono::milliseconds(1000)) // TODO: make the wait time a parameter
+            if (std::chrono::steady_clock::now() - this->lastTimeTried > std::chrono::milliseconds(1000)) // TODO: make the wait time a parameter
             {
 #ifdef MNGD_EXEC_DEBUG
                 cout << "ME: Starting " << this->metaExec->name << "!" << endl;
@@ -554,7 +564,7 @@ void ManagedExecutable::startProcess(vector<char*>& params)
         }
     } else if (pid > 0) // parent process
     {
-        this->lastTimeTried = chrono::steady_clock::now();
+        this->lastTimeTried = std::chrono::steady_clock::now();
         this->managedPid = pid;
         for (auto param : startParams) {
             free(param);
@@ -588,7 +598,7 @@ void ManagedExecutable::publishLogFile(string logFileName, ros::console::levels:
     ifs.open(logFileName.c_str());
 
     if (ifs.is_open()) {
-        ifs.seekg(0, ios_base::end);
+        ifs.seekg(0, std::ios_base::end);
         std::string line;
         long int bufSize = 2048;
         int idx = 0;

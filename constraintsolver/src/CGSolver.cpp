@@ -10,9 +10,8 @@
 #include <autodiff/TermHolder.h>
 #include <autodiff/Variable.h>
 
-#include <limits>
-
 #include <iostream>
+#include <limits>
 
 namespace alica
 {
