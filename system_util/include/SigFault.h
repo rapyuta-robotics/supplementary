@@ -133,7 +133,7 @@ static inline std::string get_stacktrace(int startindex = 1)
                     }
 
                     startaddr = startaddr.substr(0, startaddr.find("-"));
-                    void* startadd = 0;
+                    void* startadd = nullptr;
 
                     sscanf(startaddr.c_str(), "%p", (void**)&startadd);
                     sprintf(syscom, "addr2line -e %s %p", symbollist[i], (void*)((char*)addrlist[i] - (char*)startadd));
