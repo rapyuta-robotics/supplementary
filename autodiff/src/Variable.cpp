@@ -7,11 +7,13 @@
 
 namespace autodiff
 {
+constexpr double Variable::minExpressibleValue;
+constexpr double Variable::maxExpressibleValue;
 
 Variable::Variable(TermHolder* owner, int64_t id)
     : Term(owner)
     , alica::SolverVariable(id)
-    , _globalRange(-SolverVariable::minExpressibleValue, -SolverVariable::maxExpressibleValue)
+    , _globalRange(-minExpressibleValue, -maxExpressibleValue)
     , _varIdx(-1)
 {
 }
