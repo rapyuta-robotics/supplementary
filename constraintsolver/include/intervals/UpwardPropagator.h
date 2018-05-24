@@ -4,6 +4,8 @@
 #include <autodiff/TermPtr.h>
 #include <autodiff/Types.h>
 
+#include <alica_solver_interface/Interval.h>
+
 namespace alica
 {
 namespace reasoner
@@ -45,8 +47,10 @@ class UpwardPropagator : public autodiff::ITermVisitor
 
   private:
     void addChanged(autodiff::TermPtr t);
-    void outputChange(autodiff::TermPtr t, double oldmin, double oldmax);
-    bool updateInterval(autodiff::TermPtr t, double min, double max);
+    // TODO: unify common functions with downward propagator
+    void outputChange(autodiff::TermPtr t, Interval<double> old) const;
+    bool updateInterval(autodiff::TermPtr t, Interval<double> limit) const;
+    bool updateInterval(autodiff::TermPtr t, double min, double max) const { return updateInterval(t, Interval<double>(min, max)); }
 
     autodiff::TermList* _changed;
     DownwardPropagator* _dp;

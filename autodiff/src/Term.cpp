@@ -43,9 +43,8 @@ AndType Term::_andop = AndType::MIN;
 Term::Term(TermHolder* owner)
     : _owner(owner)
     , _next(nullptr)
+    , _localRange(Variable::minExpressibleValue, Variable::maxExpressibleValue)
 {
-    _min = std::numeric_limits<double>::min();
-    _max = std::numeric_limits<double>::max();
 }
 
 Term::~Term() {}

@@ -333,40 +333,41 @@ void UpwardPropagator::addChanged(autodiff::TermPtr t)
     _changed->enqueueUnique(t);
 }
 
-void UpwardPropagator::outputChange(autodiff::TermPtr t, double oldmin, double oldmax)
+void UpwardPropagator::outputChange(autodiff::TermPtr t, Interval<double> old) const
 {
-    // Console.WriteLine("UW: Interval of {0} is now [{1}, {2}]",t,t->getMin(),t->getMax());
-    double oldwidth = oldmax - oldmin;
-    double newwidth = t->getMax() - t->getMin();
+    double oldwidth = old.size();
+    double newwidth = t->getLocalRange().size();
     if (dynamic_cast<autodiff::Variable*>(t.get()) != nullptr) {
-        std::cout << "UW shrinking [" << oldmin << ".." << oldmax << "] to [" << t->getMin() << ".." << t->getMax() << "] by " << (oldwidth - newwidth) << " ("
+        std::cout << "UW shrinking " << old << " to " << t->getLocalRange() << " by " << (oldwidth - newwidth) << " ("
                   << ((oldwidth - newwidth) / oldwidth * 100) << "%)" << std::endl;
     }
 }
 
-bool UpwardPropagator::updateInterval(autodiff::TermPtr t, double min, double max)
+bool UpwardPropagator::updateInterval(autodiff::TermPtr t, Interval<double> limit) const
 {
-    bool ret = t->getMin() < min || t->getMax() > max;
-#ifdef DEBUG_UP
-    double oldmin = t->getMin();
-    double oldmax = t->getMax();
+    if (std::isnan(limit.getMax())) {
+        limit.setMax(std::numeric_limits<double>::max());
+    }
+    if (std::isnan(limit.getMin())) {
+        limit.setMin(std::numeric_limits<double>::min());
+    }
+
+    bool changes = !limit.contains(t->getLocalRange());
+    if (changes) {
+#ifdef DEBUG_DP
+        Interval<double> old = t->getLocalRange();
 #endif
-    if (ret) {
-        if (!std::isnan(min))
-            t->setMin(std::max(t->getMin(), min));
-        if (!std::isnan(max))
-            t->setMax(std::min(t->getMax(), max));
-        if (ret) {
-            ++IntervalPropagator::updates;
-        }
-#ifdef DEBUG_UP
-        OutputChange(t, oldmin, oldmax);
+        t->editLocalRange().limitTo(limit);
+        ++IntervalPropagator::updates;
+#ifdef DEBUG_DP
+        OutputChange(t, old);
 #endif
     }
     ++IntervalPropagator::visits;
-    if (t->getMin() > t->getMax())
-        throw 1;
-    return ret;
+    if (!t->getLocalRange().isValid()) {
+        throw 1; // not solvable
+    }
+    return changes;
 }
 
 } /* namespace intervalpropagation */

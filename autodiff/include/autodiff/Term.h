@@ -3,6 +3,7 @@
 #include "ITermVisitor.h"
 #include "TermPtr.h"
 #include "Types.h"
+#include <alica_solver_interface/Interval.h>
 #include <alica_solver_interface/SolverTerm.h>
 
 #include <string>
@@ -58,11 +59,13 @@ class Term : public alica::SolverTerm
     virtual EvalFunction getEvalFunction() const = 0;
     virtual void fillParameters(Parameter* params) const = 0;
 
-    double getMax() const { return _max; }
-    double getMin() const { return _min; }
+    alica::Interval<double> getLocalRange() const { return _localRange; }
+    alica::Interval<double>& editLocalRange() { return _localRange; }
+    double getMax() const { return _localRange.getMax(); }
+    double getMin() const { return _localRange.getMin(); }
 
-    void setMax(double m) { _max = m; }
-    void setMin(double m) { _min = m; }
+    void setMax(double m) { _localRange.setMax(m); }
+    void setMin(double m) { _localRange.setMin(m); }
 
     const std::vector<TermPtr>& getParents() const { return _parents; }
     std::vector<TermPtr>& editParents() { return _parents; }
@@ -83,8 +86,7 @@ class Term : public alica::SolverTerm
     // DAG backptrs for interval propgation
     std::vector<TermPtr> _parents;
     // Interval values
-    double _min;
-    double _max;
+    alica::Interval<double> _localRange;
 
   private:
     static OrType _orop;

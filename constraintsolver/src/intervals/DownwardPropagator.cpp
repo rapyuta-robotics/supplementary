@@ -31,7 +31,8 @@ int DownwardPropagator::visit(Abs* abs)
 #ifdef DownwardPropagator_Call_Debug
     std::cout << "DownwardPropagator::visit(Abs* abs)" << std::endl;
 #endif
-    if (updateInterval(abs->getArg(), -abs->getMax(), abs->getMax())) {
+    double max = abs->getMax();
+    if (updateInterval(abs->getArg(), Interval<double>(-max, max))) {
         addChanged(abs->getArg());
         return true;
     }
@@ -45,11 +46,11 @@ int DownwardPropagator::visit(And* and_)
 #endif
     bool changed = false;
     if (and_->getMin() > 0) {
-        if (updateInterval(and_->getLeft(), 1, 1)) {
+        if (updateInterval(and_->getLeft(), Interval<double>(1, 1))) {
             addChanged(and_->getLeft());
             changed = true;
         }
-        if (updateInterval(and_->getRight(), 1, 1)) {
+        if (updateInterval(and_->getRight(), Interval<double>(1, 1))) {
             addChanged(and_->getRight());
             changed = true;
         }
@@ -564,40 +565,41 @@ void DownwardPropagator::addChanged(TermPtr t)
     _changed->enqueueUnique(t);
 }
 
-void DownwardPropagator::outputChange(TermPtr t, double oldmin, double oldmax)
+void DownwardPropagator::outputChange(TermPtr t, Interval<double> old) const
 {
-    double oldwidth = oldmax - oldmin;
-    double newwidth = t->getMax() - t->getMin();
+    double oldwidth = old.size();
+    double newwidth = t->getLocalRange().size();
     if (dynamic_cast<Variable*>(t.get()) != nullptr) {
-        std::cout << "DW shrinking [" << oldmin << ".." << oldmax << "] to [" << t->getMin() << ".." << t->getMax() << "] by " << (oldwidth - newwidth) << " ("
+        std::cout << "DW shrinking " << old << " to " << t->getLocalRange() << " by " << (oldwidth - newwidth) << " ("
                   << ((oldwidth - newwidth) / oldwidth * 100) << "%)" << std::endl;
     }
 }
 
-bool DownwardPropagator::updateInterval(TermPtr t, double min, double max)
+bool DownwardPropagator::updateInterval(TermPtr t, Interval<double> limit) const
 {
-    bool ret = t->getMin() < min || t->getMax() > max;
-    if (ret) {
+    if (std::isnan(limit.getMax())) {
+        limit.setMax(std::numeric_limits<double>::max());
+    }
+    if (std::isnan(limit.getMin())) {
+        limit.setMin(std::numeric_limits<double>::min());
+    }
+
+    bool changes = !limit.contains(t->getLocalRange());
+    if (changes) {
 #ifdef DEBUG_DP
-        double oldmin = t->getMin();
-        double oldmax = t->getMax();
+        Interval<double> old = t->getLocalRange();
 #endif
-        if (!std::isnan(min)) {
-            t->setMin(std::max(t->getMin(), min));
-        }
-        if (!std::isnan(max)) {
-            t->setMax(std::min(t->getMax(), max));
-        }
+        t->editLocalRange().limitTo(limit);
         ++IntervalPropagator::updates;
 #ifdef DEBUG_DP
-        OutputChange(t, oldmin, oldmax);
+        OutputChange(t, old);
 #endif
     }
     ++IntervalPropagator::visits;
-    if (t->getMin() > t->getMax()) {
+    if (!t->getLocalRange().isValid()) {
         throw 1; // not solvable
     }
-    return ret;
+    return changes;
 }
 } /* namespace intervalpropagation */
 } /* namespace reasoner */
