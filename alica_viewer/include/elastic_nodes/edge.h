@@ -62,10 +62,14 @@ class Node;
 class Edge : public QGraphicsItem
 {
   public:
-    Edge(Node* sourceNode, Node* destNode);
+    enum Direction
+    {
+        RIGHT = 0,
+        DOWN = 1
+    };
 
+    Edge(Node* sourceNode, Node* destNode, Direction direction = Direction::DOWN);
     void adjust();
-
     enum
     {
         Type = UserType + 2
@@ -82,6 +86,7 @@ class Edge : public QGraphicsItem
     QPointF _sourcePoint;
     QPointF _destPoint;
     qreal _arrowSize;
+    Direction _direction;
 };
 
 } // namespace elastic_nodes

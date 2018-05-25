@@ -33,8 +33,7 @@ class AlicaViewerMainWindow : public QMainWindow
     void alicaPlanInfoUpdate(const alica::PlanTreeInfo& msg);
 
   private:
-    elastic_nodes::Node* addStateToScene(const std::shared_ptr<SimplePlanTree>& spt, int x, int y);
-    elastic_nodes::Node* addStateToScene(const std::shared_ptr<CombinedSimplePlanTree>& spt, int x, int y);
+    elastic_nodes::Node* addStateToScene(const PlanTree* planTreeNode);
     void updateNodes();
 
     Ui::AlicaViewerMainWindow _ui;
@@ -42,6 +41,8 @@ class AlicaViewerMainWindow : public QMainWindow
     GraphicsViewZoom* _zoom;
     AlicaViewerInterface _interfaceNode;
     AlicaPlan _alicaPlan;
+    AgentGrp _agentIdVector;
+    int _offset;
 };
 
 } // namespace alica
