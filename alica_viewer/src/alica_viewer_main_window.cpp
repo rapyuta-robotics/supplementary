@@ -9,13 +9,13 @@ namespace alica
 
 AlicaViewerMainWindow::AlicaViewerMainWindow(int argc, char* argv[], QWidget* parent)
     : QMainWindow(parent)
-    , _scene(new QGraphicsScene(this))
     , _interfaceNode(argc, argv)
     , _alicaPlan(argc, argv)
     , _offset(0)
 {
     _ui.setupUi(this);
 
+    _scene = new QGraphicsScene(this);
     _scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     _zoom = new GraphicsViewZoom(_ui.graphicsView);
@@ -94,8 +94,7 @@ elastic_nodes::Node* AlicaViewerMainWindow::addStateToScene(const PlanTree* plan
             }
         }
         // Draw a bounding rectangle for every plan
-        elastic_nodes::Block* block = new elastic_nodes::Block(startBlockNode, childNode);
-        _scene->addItem(block);
+        _scene->addItem(new elastic_nodes::Block(startBlockNode, childNode));
     }
 
     return parentNode;
@@ -109,7 +108,9 @@ void AlicaViewerMainWindow::updateNodes()
     elastic_nodes::Block::reset();
     _offset = 0;
     if (indexSelected == 0) { // Combined
-        addStateToScene(_alicaPlan.getCombinedPlanTree());
+        PlanTree combinedPlanTree;
+        _alicaPlan.getCombinedPlanTree(combinedPlanTree);
+        addStateToScene(&combinedPlanTree);
     } else if (indexSelected == 1) { // All
         for (const auto& ptMapPair : ptMap) {
             elastic_nodes::Block::reset();
