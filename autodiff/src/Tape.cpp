@@ -69,13 +69,13 @@ void Tape::prepTerms(TermPtr top, const std::vector<VarPtr>& vars)
     assert(_allTerms.empty());
     top->acceptRecursive(this);
 
-    int termCount = static_cast<int>(_allTerms.size());
-    int varCount = static_cast<int>(vars.size());
+    const int termCount = static_cast<int>(_allTerms.size());
+    const int varCount = static_cast<int>(vars.size());
     _tapeWidth = varCount + 1;
     _tapeLength = termCount;
 
-    size_t doubleCount = termCount * _tapeWidth;
-    size_t paramCount = termCount * MAXARITY;
+    const size_t doubleCount = termCount * _tapeWidth;
+    const size_t paramCount = termCount * MAXARITY;
 
     _base = malloc(doubleCount * sizeof(double) + paramCount * sizeof(Parameter) + termCount * sizeof(EvalFunction));
     assert(_base != nullptr);

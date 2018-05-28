@@ -3,14 +3,13 @@
 namespace autodiff
 {
 
-class ConstraintBuilder
+namespace Constraints
 {
-  public:
-    static TermPtr equals(TermPtr t1, TermPtr t2, TermPtr tolerance);
-    static TermPtr ifThen(TermPtr tif, TermPtr tthen);
-    static TermPtr ifThenElse(TermPtr tif, TermPtr tthen, TermPtr telse);
-    static TermPtr equiv(TermPtr a, TermPtr b);
-    static TermPtr constraintApply(TermPtr constraint, TermPtr utility);
-};
+TermPtr equals(TermPtr t1, TermPtr t2, TermPtr tolerance);
+TermPtr ifThen(TermPtr tif, TermPtr tthen);
+TermPtr ifThenElse(TermPtr tif, TermPtr tthen, TermPtr telse);
+TermPtr equiv(TermPtr a, TermPtr b);
+TermPtr applyConstraint(TermPtr constraint, TermPtr utility);
+}
 
 } // namespace autodiff

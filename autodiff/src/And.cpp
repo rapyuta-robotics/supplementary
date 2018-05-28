@@ -13,9 +13,9 @@ And::And(TermPtr left, TermPtr right, TermHolder* owner)
 
 int And::accept(ITermVisitor* visitor)
 {
-
     return visitor->visit(this);
 }
+
 void And::acceptRecursive(ITermVisitor* visitor)
 {
     _left->acceptRecursive(visitor);
@@ -75,7 +75,7 @@ void And::Eval(const Tape& tape, const Parameter* params, double* result, const 
     const double* l = tape.getValues(params[0].asIdx);
     const double* r = tape.getValues(params[1].asIdx);
     double val = std::min(l[0], r[0]);
-    result[0] = val > 0.75 ? 1.0 : val;
+    result[0] = val > 0.0 ? 1.0 : val;
     for (int i = 1; i <= dim; ++i) {
         result[i] = l[i] + r[i];
     }

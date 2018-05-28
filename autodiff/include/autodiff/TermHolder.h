@@ -79,6 +79,14 @@ class TermHolder : public alica::SolverContext
     virtual void clear() override;
 
   private:
+    template <typename TermType, typename... Args>
+    TermPtr createTerm(Args... args)
+    {
+        TermPtr ret = new TermType{args..., this};
+        handleNewTerm(ret);
+        return ret;
+    }
+
     void handleNewTerm(TermPtr t);
     std::vector<std::unique_ptr<Term>> _terms;
     std::vector<VarPtr> _vars;

@@ -80,94 +80,74 @@ VarPtr TermHolder::createVariable(int64_t id)
 
 TermPtr TermHolder::constant(double v)
 {
-    TermPtr ret = new Constant(v, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Constant>(v);
 }
 
 TermPtr TermHolder::sum(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new Sum(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Sum>(left, right);
 }
+
 TermPtr TermHolder::product(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new Product(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Product>(left, right);
 }
+
 TermPtr TermHolder::min(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new Min(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Min>(left, right);
 }
+
 TermPtr TermHolder::max(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new Max(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Max>(left, right);
 }
+
 TermPtr TermHolder::and_(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new And(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<And>(left, right);
 }
+
 TermPtr TermHolder::or_(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new Or(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Or>(left, right);
 }
+
 TermPtr TermHolder::lessThan(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new LTConstraint(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<LTConstraint>(left, right);
 }
+
 TermPtr TermHolder::lessThanEqual(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new LTEConstraint(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<LTEConstraint>(left, right);
 }
 
 TermPtr TermHolder::reify(TermPtr arg)
 {
-    TermPtr ret = new Reification(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Reification>(arg);
 }
 
 TermPtr TermHolder::abs(TermPtr arg)
 {
-    TermPtr ret = new Abs(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Abs>(arg);
 }
 
 TermPtr TermHolder::constPower(TermPtr arg, double exponent)
 {
-    TermPtr ret = new ConstPower(arg, exponent, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<ConstPower>(arg, exponent);
 }
 
 TermPtr TermHolder::termPower(TermPtr arg, TermPtr exponent)
 {
-    TermPtr ret = new TermPower(arg, exponent, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<TermPower>(arg, exponent);
 }
 
 TermPtr TermHolder::sigmoid(TermPtr arg, double steepness)
 {
-    TermPtr ret = new Sigmoid(arg, steepness, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Sigmoid>(arg, steepness);
 }
+
 TermPtr TermHolder::sigmoid(TermPtr arg, TermPtr mid, double steepness)
 {
     return sigmoid(arg - mid, steepness);
@@ -175,51 +155,37 @@ TermPtr TermHolder::sigmoid(TermPtr arg, TermPtr mid, double steepness)
 
 TermPtr TermHolder::linSigmoid(TermPtr arg)
 {
-    TermPtr ret = new LinSigmoid(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<LinSigmoid>(arg);
 }
 
 TermPtr TermHolder::sin(TermPtr arg)
 {
-    TermPtr ret = new Sin(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Sin>(arg);
 }
 
 TermPtr TermHolder::cos(TermPtr arg)
 {
-    TermPtr ret = new Cos(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Cos>(arg);
 }
 
 TermPtr TermHolder::exp(TermPtr arg)
 {
-    TermPtr ret = new Exp(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Exp>(arg);
 }
 
 TermPtr TermHolder::log(TermPtr arg)
 {
-    TermPtr ret = new Log(arg, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Log>(arg);
 }
 
 TermPtr TermHolder::atan2(TermPtr left, TermPtr right)
 {
-    TermPtr ret = new Atan2(left, right, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<Atan2>(left, right);
 }
 
 TermPtr TermHolder::constraintUtility(TermPtr constraint, TermPtr utility)
 {
-    TermPtr ret = new ConstraintUtility(constraint, utility, this);
-    handleNewTerm(ret);
-    return ret;
+    return createTerm<ConstraintUtility>(constraint, utility);
 }
 
 void TermHolder::handleNewTerm(TermPtr t)

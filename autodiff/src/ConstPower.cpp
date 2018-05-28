@@ -28,7 +28,7 @@ void ConstPower::acceptRecursive(ITermVisitor* visitor)
 
 TermPtr ConstPower::aggregateConstants()
 {
-    _base = _base->aggregateConstants(); // all your base are belong to us
+    _base = _base->aggregateConstants();
 
     if (_base->isConstant()) {
         return _owner->constant(pow(static_cast<Constant*>(_base)->getValue(), _exponent));

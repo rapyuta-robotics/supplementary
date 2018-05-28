@@ -52,7 +52,11 @@ class Tape : public ITermVisitor
     virtual int visit(TermPower* elem) override;
     virtual int visit(Variable* var) override;
 
-    inline const double* getValues(int idx) const { return _values + (idx * _tapeWidth); }
+    inline const double* getValues(int idx) const
+    {
+        assert(idx < _tapeLength);
+        return _values + (idx * _tapeWidth);
+    }
 
   private:
     int visitTerm(Term* t);

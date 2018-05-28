@@ -42,7 +42,7 @@ namespace autodiff
  */
 TermPtr TermBuilder::quadform(const TermPtr x1, const TermPtr x2, const TermPtr a11, const TermPtr a12, const TermPtr a21, const TermPtr a22)
 {
-    return a11 + x1->getOwner()->constPower(x1, 2) + (a12 + a21) * x1 * x2 + a22 * x2->getOwner()->constPower(x2, 2);
+    return a11 * x1->getOwner()->constPower(x1, 2) + (a12 + a21) * x1 * x2 + a22 * x2->getOwner()->constPower(x2, 2);
 }
 
 TermPtr TermBuilder::sigmoid(const TermPtr arg, const TermPtr upperBound, const TermPtr lowerBound, const TermPtr mid, double steepness)
@@ -52,7 +52,7 @@ TermPtr TermBuilder::sigmoid(const TermPtr arg, const TermPtr upperBound, const 
 
 TermPtr TermBuilder::boundedValue(TermPtr arg, TermPtr leftBound, TermPtr rightBound)
 {
-    return arg->getOwner()->lessThan(leftBound, arg) & arg->getOwner()->lessThan(arg, rightBound);
+    return arg->getOwner()->lessThanEqual(leftBound, arg) & arg->getOwner()->lessThanEqual(arg, rightBound);
 }
 
 TermPtr TermBuilder::boundedRectangle(const TVec<2>& arg, const TVec<2>& rightLower, const TVec<2>& leftUpper)

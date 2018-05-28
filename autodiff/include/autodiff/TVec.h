@@ -25,7 +25,7 @@ class TVec
     }
 
     inline TermPtr normSquared() const;
-    inline TVec<DIM> normalize() const;
+    inline TVec<DIM> normalized() const;
     int dimension() const { return DIM; }
 
     TermPtr getX() const { return _terms[0]; }
@@ -100,12 +100,13 @@ inline TermPtr TVec<DIM>::normSquared() const
     TermHolder* h = _terms[0]->getOwner();
     TermPtr ret = h->constPower(_terms[0], 2.0);
     for (int i = 1; i < DIM; ++i) {
-        ret = ret + h->constPower(_terms[1], 2.0);
+        ret = ret + h->constPower(_terms[i], 2.0);
     }
     return ret;
 }
+
 template <int DIM>
-TVec<DIM> TVec<DIM>::normalize() const
+TVec<DIM> TVec<DIM>::normalized() const
 {
     TermPtr a = normSquared();
     a = a->getOwner()->constPower(a, 0.5);
@@ -171,11 +172,7 @@ TVec<DIM> operator*(const TVec<DIM>& vector, const double scalar)
 template <int DIM>
 TVec<DIM> operator*(TermPtr scalar, const TVec<DIM>& vector)
 {
-    TVec<DIM> ret;
-    for (int i = 0; i < DIM; ++i) {
-        ret[i] = scalar * vector[i];
-    }
-    return ret;
+    return vector * scalar;
 }
 
 template <int DIM>
