@@ -66,10 +66,11 @@ void ConstPower::Eval(const Tape& tape, const Parameter* params, double* result,
 {
     const double* l = tape.getValues(params[0].asIdx);
     const double v = params[1].asDouble;
-
-    result[0] = pow(l[0], v);
+    double val = pow(l[0], v - 1.0);
+    result[0] = val * l[0];
+    val *= v;
     for (int i = 1; i <= dim; ++i) {
-        result[i] = v * pow(l[0], v - 1.0) * l[i];
+        result[i] = val * l[i];
     }
 }
 
