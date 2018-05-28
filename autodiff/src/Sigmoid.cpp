@@ -76,9 +76,8 @@ void Sigmoid::Eval(const Tape& tape, const Parameter* params, double* result, co
     const double* l = tape.getValues(params[0].asIdx);
     const double steep = params[1].asDouble;
     const double e = exp(steep * -l[0]);
-    const double epos = exp(steep * l[0]);
-    const double val = steep * epos / pow(epos + 1.0, 2);
     result[0] = 1.0 / (1.0 + e);
+    const double val = steep * e * result[0] * result[0];
     for (int i = 1; i <= dim; ++i) {
         result[i] = l[i] * val;
     }
