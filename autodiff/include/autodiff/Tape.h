@@ -80,6 +80,6 @@ inline void Tape::evaluate(InputIt point_begin, InputIt point_end, OutputIt valu
     for (int i = 0; i < _tapeLength; ++i) {
         _functions[i](*this, _params + i * MAXARITY, _values + i * _tapeWidth, input, dim);
     }
-    std::copy(_values + (_tapeLength - 1) * _tapeWidth, _values + (_tapeLength)*_tapeWidth, value_begin);
+    std::copy(_values + (_tapeLength - 1) * _tapeWidth, _values + _tapeLength * _tapeWidth, value_begin);
 }
 }
