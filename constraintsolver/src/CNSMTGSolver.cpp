@@ -148,7 +148,7 @@ shared_ptr<vector<double>> CNSMTGSolver::solve(autodiff::TermPtr equation, autod
 
     equation = equation->aggregateConstants();
 
-    autodiff::ConstraintUtility* cu = dynamic_cast<autodiff::ConstraintUtility*>(equation.get());
+    autodiff::ConstraintUtility* cu = static_cast<autodiff::ConstraintUtility*>(equation.get());
 
     bool constraintIsConstant = cu->getConstraint()->isConstant();
     if (constraintIsConstant) {
@@ -585,7 +585,6 @@ shared_ptr<CNSMTGSolver::RpropResult> CNSMTGSolver::rPropOptimizeFeasible(shared
         logStep();
 #endif
         ret->aborted = false;
-        return ret;
     }
     return ret;
 }

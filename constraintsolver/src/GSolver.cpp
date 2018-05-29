@@ -447,6 +447,9 @@ bool GSolver::evalResults(int numResults, int dim, const std::vector<Interval<do
     double* midValue = static_cast<double*>(alloca(sizeof(double) * dim));
     double* valueDev = static_cast<double*>(alloca(sizeof(double) * dim));
 
+    memset(midValue, 0, sizeof(double) * dim);
+    memset(valueDev, 0, sizeof(double) * dim);
+
     for (int i = 0; i < numResults; ++i) {
         ResultView r = getResultView(i, dim);
         if (r.isAborted()) {
