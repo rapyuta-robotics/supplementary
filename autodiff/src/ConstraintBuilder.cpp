@@ -9,23 +9,24 @@
 
 namespace autodiff
 {
-
-TermPtr ConstraintBuilder::equals(TermPtr t1, TermPtr t2, TermPtr tolerance)
+namespace Constraints
+{
+TermPtr equals(TermPtr t1, TermPtr t2, TermPtr tolerance)
 {
     return (t1 < (t2 + tolerance)) & (t1 > (t2 - tolerance));
 }
 
-TermPtr ConstraintBuilder::ifThen(TermPtr tif, TermPtr tthen)
+TermPtr ifThen(TermPtr tif, TermPtr tthen)
 {
     return tif->negate() | tthen;
 }
 
-TermPtr ConstraintBuilder::ifThenElse(TermPtr tif, TermPtr tthen, TermPtr telse)
+TermPtr ifThenElse(TermPtr tif, TermPtr tthen, TermPtr telse)
 {
     return (tif->negate() | tthen) & (tif | telse);
 }
 
-TermPtr ConstraintBuilder::equiv(TermPtr a, TermPtr b)
+TermPtr equiv(TermPtr a, TermPtr b)
 {
     return (a & b) | (a->negate() & b->negate());
 }
@@ -39,8 +40,9 @@ TermPtr ConstraintBuilder::equiv(TermPtr a, TermPtr b)
  *
  * @result A Term
  */
-TermPtr ConstraintBuilder::constraintApply(TermPtr constraint, TermPtr utility)
+TermPtr applyConstraint(TermPtr constraint, TermPtr utility)
 {
     return constraint->getOwner()->constraintUtility(constraint, utility);
 }
-} /* namespace alica */
+}
+} /* namespace autodiff */

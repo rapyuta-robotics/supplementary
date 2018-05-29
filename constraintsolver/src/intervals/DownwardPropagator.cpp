@@ -589,7 +589,7 @@ bool DownwardPropagator::updateInterval(TermPtr t, Interval<double> limit) const
 #ifdef DEBUG_DP
         Interval<double> old = t->getLocalRange();
 #endif
-        t->editLocalRange().limitTo(limit);
+        t->editLocalRange().intersect(limit);
         ++IntervalPropagator::updates;
 #ifdef DEBUG_DP
         OutputChange(t, old);

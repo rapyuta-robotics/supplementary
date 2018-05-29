@@ -31,7 +31,12 @@ class TermList
         TermPtr _t;
     };
 
-    TermList();
+    TermList()
+        : _first(nullptr)
+        , _last(nullptr)
+        , _size(0)
+    {
+    }
 
     TermListIter begin() const { return TermListIter(_first); }
     TermListIter end() const { return TermListIter(nullptr); }

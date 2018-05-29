@@ -7,13 +7,6 @@
 namespace autodiff
 {
 
-TermList::TermList()
-    : _first(nullptr)
-    , _last(nullptr)
-    , _size(0)
-{
-}
-
 bool TermList::contains(const TermPtr t) const
 {
     if (t->_next != nullptr) {

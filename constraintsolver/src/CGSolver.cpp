@@ -10,8 +10,9 @@
 #include <autodiff/TermHolder.h>
 #include <autodiff/Variable.h>
 
-#include <iostream>
 #include <limits>
+
+#include <iostream>
 
 namespace alica
 {
@@ -140,7 +141,7 @@ bool CGSolver::getSolutionImpl(SolverContext* ctx, const std::vector<std::shared
     double util = 0;
     bool solved;
     { // for lock_guard
-        std::lock_guard<std::mutex> lock(_mtx);
+        lock_guard<std::mutex> lock(_mtx);
         _gs.setUtilitySignificanceThreshold(usigVal);
         solved = _gs.solve(all, *holder, ranges, seeds, sufficientUtility, util, results);
     }

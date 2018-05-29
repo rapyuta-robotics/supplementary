@@ -67,10 +67,14 @@ void TermPower::Eval(const Tape& tape, const Parameter* params, double* result, 
 {
     const double* l = tape.getValues(params[0].asIdx);
     const double* r = tape.getValues(params[1].asIdx);
-    result[0] = pow(l[0], r[0]);
     const double outer = pow(l[0], r[0] - 1.0);
+    result[0] = outer * l[0];
+
+    const double lval = outer * r[0];
+    const double rval = result[0] * log(l[0]);
+
     for (int i = 1; i <= dim; ++i) {
-        result[i] = outer * (r[0] * l[i] + l[0] * log(l[0]) * r[i]);
+        result[i] = lval * l[i] + rval * r[i];
     }
 }
 

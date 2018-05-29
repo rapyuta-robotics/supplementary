@@ -9,6 +9,8 @@
 //#define CNSatDebug
 //#define CNSat_Call_Debug
 
+#define CN_SAT_CALLBACK_SOLVER
+
 #include "CNSMTGSolver.h"
 #include "Decider.h"
 #include "types/Clause.h"
@@ -24,8 +26,6 @@
 #include <iostream>
 #include <sstream>
 
-#define CN_SAT_CALLBACK_SOLVER
-
 namespace alica
 {
 namespace reasoner
@@ -33,10 +33,8 @@ namespace reasoner
 namespace cnsat
 {
 
-using std::istringstream;
 using std::shared_ptr;
 using std::string;
-using std::stringstream;
 using std::vector;
 
 void CNSat::readFromCNFFile(string path)
@@ -53,8 +51,10 @@ void CNSat::readFromCNFFile(string path)
         stringstream ss(line);
         string s;
         while (!ss.eof()) {
+            ss >> s;
+            istringstream is(s);
             int val;
-            ss >> val;
+            is >> val;
 
             if (val == 0)
                 continue;
@@ -76,7 +76,6 @@ void CNSat::readFromCNFFile(string path)
 
 CNSat::CNSat()
     : cnsmtGSolver(nullptr)
-    , learntNum(0)
 {
     this->useIntervalProp = true;
     this->decisionLevelNull = make_shared<DecisionLevel>(0);

@@ -9,8 +9,8 @@ namespace autodiff
 class Variable : public Term, public alica::SolverVariable
 {
   public:
-    static constexpr double minExpressibleValue = std::numeric_limits<double>::max() / 2;
-    static constexpr double maxExpressibleValue = std::numeric_limits<double>::lowest() / 2;
+    static constexpr double maxExpressibleValue = std::numeric_limits<double>::max() / 2;
+    static constexpr double minExpressibleValue = std::numeric_limits<double>::lowest() / 2;
 
     int accept(ITermVisitor* visitor) override;
     void acceptRecursive(ITermVisitor* visitor) override;
