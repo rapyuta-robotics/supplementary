@@ -130,7 +130,7 @@ class PlanTree
         }
     }
 
-    bool parentExists() const { return bool(_parent); }
+    bool parentExists() const { return _parent != nullptr; }
 
     const EntryPoint* getEntryPoint() const { return _entryPoint; }
 
