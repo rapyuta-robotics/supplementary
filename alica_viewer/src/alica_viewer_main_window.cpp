@@ -108,7 +108,7 @@ void AlicaViewerMainWindow::updateNodes()
     elastic_nodes::Block::reset();
     _offset = 0;
     if (indexSelected == 0) { // Combined
-        PlanTree combinedPlanTree;
+        PlanTree combinedPlanTree(AlicaClock{}.now());
         _alicaPlan.combinePlanTree(combinedPlanTree);
         addStateToScene(&combinedPlanTree);
     } else if (indexSelected == 1) { // All
