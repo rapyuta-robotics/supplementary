@@ -132,7 +132,6 @@ void PlanTree::mergePlanTree(const PlanTree& src)
             if (iter != ptvEntry->second.end()) {
                 (*iter)->mergeRobots(src.getRobots());
                 for (const auto& ptvMapPair : src._children) {
-                    // TODO: insert sorted
                     for (const auto& child : ptvMapPair.second) {
                         (*iter)->mergePlanTree(*child);
                     }
@@ -181,13 +180,6 @@ AlicaPlan::AlicaPlan(int argc, char* argv[])
     std::cout << "Rolset is: " << roleSetName << std::endl;
 
     _planParser.parsePlanTree(masterPlanName);
-
-    ///@todo remove this once AgentID becomes independent of Globals.conf
-    /*std::shared_ptr<std::vector<std::string>> agentNames = (*supplementary::SystemConfig::getInstance())["Globals"]->getSections("Globals.Team", NULL);
-    for (const std::string& agentName : *agentNames) {
-        int id = (*supplementary::SystemConfig::getInstance())["Globals"]->tryGet<int>(-1, "Globals", "Team", agentName.c_str(), "ID", NULL);
-        _agentInfos.emplace(_agentIDManager.getID(id), AgentInfo(id, agentName));
-    }*/
 
     _teamTimeOut = AlicaTime::milliseconds((*supplementary::SystemConfig::getInstance())["Alica"]->get<uint64_t>("Alica.TeamTimeOut", NULL));
 }
