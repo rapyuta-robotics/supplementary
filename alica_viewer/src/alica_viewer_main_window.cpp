@@ -40,11 +40,11 @@ AlicaViewerMainWindow::AlicaViewerMainWindow(int argc, char* argv[], QWidget* pa
             _ui.agentIdComboBox->addItem(QString::fromStdString(ai->name));
         }
     }
-
     // Connect the signals and slots between interface to main window
     QObject::connect(&_interfaceNode, &AlicaViewerInterface::shutdown, this, &AlicaViewerMainWindow::close);
     QObject::connect(&_interfaceNode, &AlicaViewerInterface::alicaEngineInfoUpdate, this, &AlicaViewerMainWindow::alicaEngineInfoUpdate);
     QObject::connect(&_interfaceNode, &AlicaViewerInterface::alicaPlanInfoUpdate, this, &AlicaViewerMainWindow::alicaPlanInfoUpdate);
+    QObject::connect(&_interfaceNode, &AlicaViewerInterface::updateTicks, this, &AlicaViewerMainWindow::updateTicks);
 }
 
 elastic_nodes::Node* AlicaViewerMainWindow::addStateToScene(const PlanTree* planTreeNode)
@@ -135,6 +135,10 @@ void AlicaViewerMainWindow::alicaEngineInfoUpdate(const AlicaEngineInfo& msg) {}
 void AlicaViewerMainWindow::alicaPlanInfoUpdate(const PlanTreeInfo& msg)
 {
     _alicaPlan.handlePlanTreeInfo(msg);
+}
+
+void AlicaViewerMainWindow::updateTicks()
+{
     updateNodes();
 }
 
