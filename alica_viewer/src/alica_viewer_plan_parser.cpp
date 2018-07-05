@@ -7,7 +7,16 @@ namespace alica
 {
 namespace
 {
-AlicaTime timeout = AlicaTime::seconds(2);
+void sortPlanTrees(std::vector<std::unique_ptr<PlanTree>>& planTrees)
+{
+    std::sort(planTrees.begin(), planTrees.end(), [](const std::unique_ptr<PlanTree>& a, const std::unique_ptr<PlanTree>& b) {
+        if (a->getEntryPoint() == b->getEntryPoint()) {
+            return a->getState()->getId() < b->getState()->getId();
+        } else {
+            return a->getEntryPoint()->getId() < b->getEntryPoint()->getId();
+        }
+    });
+}
 }
 
 PlanTree::PlanTree(AlicaTime creationTime)
@@ -85,6 +94,7 @@ void PlanTree::addChildren(std::unique_ptr<PlanTree> child)
     PlanTreeVectorMap::iterator ptvEntry = _children.find(planId);
     if (ptvEntry != _children.end()) {
         ptvEntry->second.push_back(std::move(child));
+        sortPlanTrees(ptvEntry->second);
     } else {
         std::vector<std::unique_ptr<PlanTree>> childVector;
         childVector.push_back(std::move(child));
@@ -127,6 +137,7 @@ void PlanTree::mergePlanTree(const PlanTree& src)
                         (*iter)->mergePlanTree(*child);
                     }
                 }
+                sortPlanTrees(ptvEntry->second);
                 return;
             }
         }
