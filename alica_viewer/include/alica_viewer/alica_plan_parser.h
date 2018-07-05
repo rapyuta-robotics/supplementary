@@ -27,13 +27,12 @@ class AgentInfo
   public:
     AgentInfo() {}
 
-    AgentInfo(int tmp_id, const std::string& tmp_name)
-        : id(tmp_id)
+    AgentInfo(AgentIDConstPtr idarg, const std::string& tmp_name)
+        : id(idarg)
         , name(tmp_name)
     {
     }
-
-    int id;
+    AgentIDConstPtr id;
     std::string name;
 };
 
