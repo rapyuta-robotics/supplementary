@@ -1,125 +1,122 @@
-/*
- * GSolver.h
- *
- *  Created on: Aug 12, 2014
- *      Author: psp
- */
+#pragma once
 
-#ifndef GSOLVER_H_
-#define GSOLVER_H_
+#include <alica_solver_interface/Interval.h>
+#include <engine/AlicaClock.h>
 
-#include <AutoDiff.h>
+#include <autodiff/TermHolder.h>
+#include <autodiff/TermPtr.h>
 
 #include <memory>
 #include <vector>
 
-#include <fstream>
+//#define GSOLVER_LOG
 
-using namespace std;
+#ifdef GSOLVER_LOG
+#include <fstream>
+#endif
 
 namespace alica
 {
-	class IAlicaClock;
 
-	namespace reasoner
-	{
-		class GSolver : public enable_shared_from_this<GSolver>
-		{
-		protected:
-			class RpropResult;
+namespace reasoner
+{
+class GSolver
+{
+    class RpropResult;
 
-		public:
-			GSolver();
-			~GSolver();
+  public:
+    GSolver();
+    ~GSolver();
+    bool solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits, double& out_util,
+               std::vector<double>& o_solution);
+    bool solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits);
 
-			shared_ptr<vector<double>> solve(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>> > args,
-									shared_ptr<vector<shared_ptr<vector<double>>> > limits, double *util);
-								bool solveSimple(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>> > args,
-								shared_ptr<vector<shared_ptr<vector<double>>> > limits);
-			shared_ptr<vector<double>> solve(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>> > args,
-									shared_ptr<vector<shared_ptr<vector<double>>> > limits, shared_ptr<vector<shared_ptr<vector<double>>>> seeds,
-									double sufficientUtility, double *util);
-			bool solveSimple(shared_ptr<Term> equation, shared_ptr<vector<shared_ptr<autodiff::Variable>> > args,
-								shared_ptr<vector<shared_ptr<vector<double>>> > limits, shared_ptr<vector<shared_ptr<vector<double>>>> seeds);
-			shared_ptr<vector<double>> solveTest(shared_ptr<Term> equation,
-										shared_ptr<vector<shared_ptr<autodiff::Variable>> > args,
-										shared_ptr<vector<shared_ptr<vector<double>>> > limits);
-			shared_ptr<vector<double>> solveTest(shared_ptr<Term> equation,
-										shared_ptr<vector<shared_ptr<autodiff::Variable>> > args,
-										shared_ptr<vector<shared_ptr<vector<double>>> > limits, int maxRuns, bool *found);
+    bool solve(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits, const std::vector<double>& seeds,
+               double sufficientUtility, double& out_util, std::vector<double>& o_solution);
 
-			long getRuns();
-			void setRuns(long runs);
-			long getFEvals();
-			void setFEvals(long fevals);
-			long getMaxFEvals();
-			void setMaxFEvals(long maxfevals);
-			double getRPropConvergenceStepSize();
-			void setRPropConvergenceStepSize(double rPropConvergenceStepSize);
-			void setUtilitySignificanceThreshold(double utilitySignificanceThreshold);
+    bool solveSimple(autodiff::TermPtr equation, autodiff::TermHolder& holder, const std::vector<Interval<double>>& limits, const std::vector<double>& seeds);
 
-			IAlicaClock* getIAlicaClock();
-			void setIAlicaClock(IAlicaClock* clock);
-		protected:
-			static int _fcounter;
-			bool _seedWithUtilOptimum;
+    int64_t getRuns() const { return _runs; }
+    int64_t getFEvals() const { return _fevals; }
+    int64_t getMaxFEvals() const { return _maxfevals; }
+    void setMaxFEvals(int64_t maxfevals) { _maxfevals = maxfevals; }
+    void setRPropConvergenceStepSize(double rPropConvergenceStepSize) { _rPropConvergenceStepSize = rPropConvergenceStepSize; }
+    void setUtilitySignificanceThreshold(double utilitySignificanceThreshold) { _utilityThreshold = utilitySignificanceThreshold; }
 
-			IAlicaClock* alicaClock;
+  private:
+    class ResultView
+    {
+      public:
+        // resulting point, value and status info
+        constexpr static int getRequiredSize(int dim) { return dim + 2; }
+        ResultView(double* mem_loc, int dim)
+            : _location(mem_loc)
+            , _size(getRequiredSize(dim))
+        {
+        }
+        double getUtil() const { return _location[_size - 2]; }
+        void setUtil(double util) { _location[_size - 2] = util; }
+        const double* getPoint() const { return _location; }
 
-			void initLog();
-			void log(double util, shared_ptr<vector<double>>& val);
-			void logStep();
-			void closeLog();
-			shared_ptr<vector<double>> initialPointFromSeed(shared_ptr<RpropResult>& res, shared_ptr<vector<double>>& seed);
-			shared_ptr<vector<double>> initialPoint(shared_ptr<RpropResult>& res);
-			shared_ptr<RpropResult> rPropLoop(shared_ptr<vector<double>> seed);
-			shared_ptr<RpropResult> rPropLoop(shared_ptr<vector<double>> seed, bool precise);
-			shared_ptr<RpropResult> rPropLoopSimple(shared_ptr<vector<double>> seed);
-			void initialStepSize();
-			bool evalResults();
+        double* editPoint() { return _location; }
+        bool isAborted() const { return _location[_size - 1] < 0.0; }
+        void setAborted() { _location[_size - 1] = -1.0; }
+        void setOk() { _location[_size - 1] = 1.0; }
+        int size() const { return _size; }
+        int dim() const { return _size - 2; }
 
-			class RpropResult : public enable_shared_from_this<RpropResult>
-			{
-			public:
-				shared_ptr<vector<double>> _initialValue;
-				shared_ptr<vector<double>> _finalValue;
-				double _initialUtil;
-				double _finalUtil;
-				bool _aborted;
+      private:
+        double* _location;
+        int _size;
+    };
 
-				int compareTo(shared_ptr<RpropResult> other);
-				double distanceTraveled();
-				double distanceTraveledNormed(vector<double> ranges);
+#ifdef GSOLVER_LOG
+    void initLog();
+    void log(double util, const double* point);
+    void logStep();
+    void closeLog();
+#endif
 
-//				friend bool operator<(const shared_ptr<RpropResult>& left, const shared_ptr<RpropResult>& right);
-//				friend bool operator>(const shared_ptr<RpropResult>& left, const shared_ptr<RpropResult>& right);
-			};
+    void ensureResultSpace(int count, int dim);
+    ResultView getResultView(int count, int dim);
+    void writeSolution(ResultView result, std::vector<double>& o_solution) const;
 
-		protected:
-			double _utilitySignificanceThreshold = 1E-22;
-			// Random rand;
-			int _dim;
-			shared_ptr<vector<shared_ptr<vector<double>>> > _limits;
-			vector<double> _ranges;
-			vector<double> _rpropStepWidth;
-			vector<double> _rpropStepConvergenceThreshold;
-			double _utilityThreshold;
-			ulong _maxSolveTime;
-			// //vector<double>[] seeds;
-			shared_ptr<ICompiledTerm> _term;
+    void initialPointFromSeed(const autodiff::Tape& tape, const double* seed, ResultView o_res, const std::vector<Interval<double>>& limits,
+                              double* o_value) const;
+    void initialPoint(const autodiff::Tape& tape, ResultView o_res, const std::vector<Interval<double>>& limits, double* o_value);
 
-			ofstream sw;
+    void rPropLoop(const autodiff::Tape& tape, const double* seed, const std::vector<Interval<double>>& limits, ResultView o_result);
+    void rPropLoop(const autodiff::Tape& tape, const double* seed, const std::vector<Interval<double>>& limits, ResultView o_result, bool precise);
 
-			vector<shared_ptr<RpropResult>> _rResults;
+    int movePoint(int dim, double minStep, double* pointBuffer, const double* curGradient, const double* oldGradient,
+                  const std::vector<Interval<double>>& limits);
+    void initialStepSize(int dim, const std::vector<Interval<double>>& limits);
+    bool evalResults(int numResults, int dim, const std::vector<Interval<double>>& limits);
 
-			long _runs;
-			long _fevals;
-			long _maxfevals;
-			double _initialStepSize = 0.005;
-			double _rPropConvergenceStepSize;
+    std::vector<double> _results;
 
-		};
-	} /* namespace reasoner */
-							} /* namespace alica */
+    static int _fcounter;
+    bool _seedWithUtilOptimum;
 
-#endif /* GSOLVER_H_ */
+    AlicaClock _alicaClock;
+
+    double _utilitySignificanceThreshold;
+
+    std::vector<double> _rpropStepWidth;
+    std::vector<double> _rpropStepConvergenceThreshold;
+
+    double _utilityThreshold;
+    AlicaTime _maxSolveTime;
+
+    double _initialStepSize;
+    double _rPropConvergenceStepSize;
+
+    int64_t _runs;
+    int64_t _fevals;
+    int64_t _maxfevals;
+#ifdef GSOLVER_LOG
+    std::ofstream _sw;
+#endif
+};
+} /* namespace reasoner */
+} /* namespace alica */

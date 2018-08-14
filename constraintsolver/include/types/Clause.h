@@ -1,59 +1,47 @@
-/*
- * Clause.h
- *
- *  Created on: Dec 4, 2014
- *      Author: Philipp
- */
-
-#ifndef CLAUSE_H_
-#define CLAUSE_H_
+#pragma once
 
 #include "types/Lit.h"
 
-#include <vector>
 #include <memory>
-
-using namespace std;
+#include <vector>
 
 namespace alica
 {
-	namespace reasoner
-	{
-		namespace cnsat
-		{
-//			class Lit;
-			class Var;
-			class Watcher;
+namespace reasoner
+{
+namespace cnsat
+{
 
-			class Clause
-			{
-			public:
-				Clause();
-				virtual ~Clause();
+class Var;
+class Watcher;
 
-				void addChecked(shared_ptr<Lit> l);
-				shared_ptr<Clause> clone();
-				void add(shared_ptr<Lit> l);
-				int avgActivity();
-				bool checkSatisfied();
+class Clause
+{
+  public:
+    Clause();
+    ~Clause();
 
-				static bool compareTo(shared_ptr<Clause> ep1, shared_ptr<Clause> ep2);
+    void addChecked(std::shared_ptr<Lit> l);
+    std::shared_ptr<Clause> clone();
+    void add(std::shared_ptr<Lit> l);
+    int avgActivity();
+    bool checkSatisfied();
 
-				void print();
+    static bool compareTo(std::shared_ptr<Clause> ep1, std::shared_ptr<Clause> ep2);
 
-				bool isTautologic;
-				bool isFinished;
+    void print();
 
-				bool satisfied;
-				shared_ptr<vector<Watcher*> > watcher;
-				shared_ptr<Var> lastModVar;
-				int activity;
-				shared_ptr<vector<shared_ptr<Lit>>> literals;
-			};
+    bool isTautologic;
+    bool isFinished;
 
-		}
-	/* namespace cnsat */
-	} /* namespace reasoner */
+    bool satisfied;
+    std::shared_ptr<std::vector<Watcher*>> watcher;
+    std::shared_ptr<Var> lastModVar;
+    int activity;
+    std::shared_ptr<std::vector<std::shared_ptr<Lit>>> literals;
+};
+
+} // namespace cnsat
+/* namespace cnsat */
+} /* namespace reasoner */
 } /* namespace alica */
-
-#endif /* CLAUSE_H_ */

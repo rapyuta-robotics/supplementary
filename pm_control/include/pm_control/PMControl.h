@@ -1,89 +1,79 @@
-#ifndef pm_control__PMControl_H
-#define pm_control__PMControl_H
+#pragma once
 
-#include <rqt_gui_cpp/plugin.h>
-
-#include "ros/ros.h"
-#include <ros/macros.h>
-#include "process_manager/ProcessStats.h"
-#include "process_manager/ProcessStat.h"
+#include "pm_widget/ControlledRobot.h"
 
 #include <ui_PMControl.h>
+#include <process_manager/ProcessStats.h>
+#include <process_manager/ProcessStat.h>
+#include <supplementary/AgentID.h>
+
 #include <QtGui>
 #include <QWidget>
 #include <QDialog>
-
-#include <pm_widget/ControlledRobot.h>
+#include <rqt_gui_cpp/plugin.h>
+#include <ros/ros.h>
+#include <ros/macros.h>
 
 #include <queue>
 #include <mutex>
 #include <utility>
 #include <chrono>
 
-using namespace std;
-
-namespace supplementary
-{
-	class SystemConfig;
-	class RobotExecutableRegistry;
-}
+namespace supplementary {
+class SystemConfig;
+class RobotExecutableRegistry;
+}  // namespace supplementary
 
 namespace pm_widget {
-	class ControlledProcessManager;
+class ControlledProcessManager;
 }
 
-namespace pm_control
-{
-	class PMControl : public rqt_gui_cpp::Plugin
-	{
+namespace pm_control {
+class PMControl : public rqt_gui_cpp::Plugin {
+    Q_OBJECT
 
-	Q_OBJECT
+public:
+    PMControl();
+    virtual void initPlugin(qt_gui_cpp::PluginContext& context);
+    virtual void shutdownPlugin();
+    virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const;
+    virtual void restoreSettings(
+            const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
 
-	public:
+    void sendProcessCommand(const supplementary::AgentID* receiverId,
+            std::vector<const supplementary::AgentID*> robotIds, std::vector<int> execIds, std::vector<int> paramSets,
+            int cmd);
 
-		PMControl();
-		virtual void initPlugin(qt_gui_cpp::PluginContext& context);
-		virtual void shutdownPlugin();
-		virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings, qt_gui_cpp::Settings& instance_settings) const;
-		virtual void restoreSettings(const qt_gui_cpp::Settings& plugin_settings, const qt_gui_cpp::Settings& instance_settings);
+    std::chrono::duration<double> msgTimeOut;
 
-		void sendProcessCommand(int receiverId, vector<int> robotIds, vector<int> execIds, vector<int> paramSets, int cmd);
-//		void addRobot(QFrame* robot);
-//		void removeRobot(QFrame* robot);
+    Ui::PMControlWidget ui_;
+    QWidget* widget_;
 
-		chrono::duration<double> msgTimeOut;
+    supplementary::RobotExecutableRegistry* pmRegistry;
 
-		Ui::PMControlWidget ui_;
-		QWidget* widget_;
+private:
+    ros::NodeHandle* rosNode;
+    ros::Subscriber processStateSub;
+    ros::Publisher processCommandPub;
+    std::queue<std::pair<std::chrono::system_clock::time_point, process_manager::ProcessStatsConstPtr>>
+            processStatMsgQueue;
+    std::mutex msgQueueMutex;
 
-		supplementary::RobotExecutableRegistry* pmRegistry;
+    supplementary::SystemConfig* sc;
 
-	private:
-		ros::NodeHandle* rosNode;
-		ros::Subscriber processStateSub;
-		ros::Publisher processCommandPub;
-		queue<pair<chrono::system_clock::time_point, process_manager::ProcessStatsConstPtr>> processStatMsgQueue;
-		mutex msgQueueMutex;
+    std::map<const supplementary::AgentID*, pm_widget::ControlledProcessManager*, supplementary::AgentIDComparator>
+            processManagersMap;
 
-		supplementary::SystemConfig* sc;
+    void handleProcessStats();
 
-		map<int, pm_widget::ControlledProcessManager*> processManagersMap;
+    void receiveProcessStats(process_manager::ProcessStatsConstPtr psts);
+    pm_widget::ControlledProcessManager* getControlledProcessManager(const std::vector<uint8_t>& processManagerId);
 
+    QTimer* guiUpdateTimer;
 
-		void handleProcessStats();
+public Q_SLOTS:
+    void run();
+    void updateGUI();
+};
 
-		void receiveProcessStats(process_manager::ProcessStatsConstPtr psts);
-		pm_widget::ControlledProcessManager* getControlledProcessManager(int processManagerId);
-
-
-
-		QTimer* guiUpdateTimer;
-
-	public Q_SLOTS:
-		void run();
-		void updateGUI();
-	};
-
-}
-
-#endif 
+}  // namespace pm_control

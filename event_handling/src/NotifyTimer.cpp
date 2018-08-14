@@ -1,14 +1,3 @@
-/*
- * NotifyNotifyTimer.cpp
- *
- *  Created on: Nov 24, 2014
- *      Author: Philipp
- */
+#include "supplementary/NotifyTimer.h"
 
-#include "NotifyTimer.h"
-
-namespace supplementary
-{
-
-
-} /* namespace supplementary */
+namespace supplementary {} /* namespace supplementary */

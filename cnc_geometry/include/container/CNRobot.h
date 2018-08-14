@@ -1,33 +1,25 @@
-/*
- * CNRobot.h
- *
- *  Created on: Feb 27, 2016
- *      Author: Carpe Noctem
- */
-
-#ifndef SUPPLEMENTARY_CNC_GEOMETRY_SRC_CONTAINER_CNROBOT_H_
-#define SUPPLEMENTARY_CNC_GEOMETRY_SRC_CONTAINER_CNROBOT_H_
+#pragma once
 
 #include "container/CNPosition.h"
 
-namespace geometry
-{
-
-	class CNRobot : public CNPosition
-	{
-	public:
-		CNRobot();
-		virtual ~CNRobot();
-		double radius;
-		double velocityX;
-		double velocityY;
-		int id;
-		shared_ptr<vector<int>> opposer;
-		shared_ptr<vector<int>> supporter;
-		double certainty;
-		double rotation;
-		string toString();
-	};
+namespace supplementary {
+class IAgentID;
 }
 
-#endif /* SUPPLEMENTARY_CNC_GEOMETRY_SRC_CONTAINER_CNROBOT_H_ */
+namespace geometry {
+
+class CNRobot : public CNPosition {
+public:
+    CNRobot();
+    virtual ~CNRobot();
+    double radius;
+    double velocityX;
+    double velocityY;
+    const supplementary::IAgentID* id;
+    shared_ptr<vector<int>> opposer;
+    shared_ptr<vector<int>> supporter;
+    double certainty;
+    double rotation;
+    string toString();
+};
+}  // namespace geometry

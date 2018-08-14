@@ -1,9 +1,3 @@
-/*
- * Var.cpp
- *
- *  Created on: Dec 4, 2014
- *      Author: Philipp
- */
 
 #include "types/Var.h"
 
@@ -16,98 +10,91 @@
 
 namespace alica
 {
-	namespace reasoner
-	{
-		namespace cnsat
-		{
+namespace reasoner
+{
+namespace cnsat
+{
 
-			Var::Var(int index, bool prefSign)
-			{
-				this->index = index;
-				this->assignment = Assignment::UNASSIGNED;
-				this->locked = false;
-				this->preferedSign = prefSign;
-				this->activity = 0;
+Var::Var(int index, bool prefSign)
+    : _curTerm(nullptr)
+    , seen(false)
+    , negativeAppearance(0)
+    , positiveAppearance(0)
+    , negativeRangeSize(0.0)
+    , positiveRangeSize(0.0)
+    , index(index)
+    , assignment(Assignment::UNASSIGNED)
+    , locked(false)
+    , preferedSign(prefSign)
+    , activity(0)
+    , negActivity(0)
+    , positiveRanges(nullptr)
+    , negativeRanges(nullptr)
+    , watchList(make_shared<vector<Watcher*>>())
+{
+}
 
-				positiveRanges = nullptr;
-				negativeRanges = nullptr;
+Var::~Var() {}
 
-				watchList = make_shared<vector<Watcher*> >();
-			}
+std::shared_ptr<Clause> Var::getReason() const
+{
+    return reason;
+}
 
-			Var::~Var()
-			{
+void Var::setReason(std::shared_ptr<Clause> reason)
+{
+    if (reason && reason != this->reason) {
+        for (const std::shared_ptr<Lit>& l : *reason->literals) {
+            if (l->var->assignment == Assignment::UNASSIGNED) {
+                cout << this->toString() << " " << l->var->toString();
+                reason->print();
+                cerr << "!!!!!";
+                throw "!!!!!";
+            }
+        }
+    }
+    this->reason = reason;
+}
 
-			}
+void Var::reset()
+{
+    if (locked) {
+        return;
+    }
+    this->reason = nullptr;
+    this->seen = false;
 
-			shared_ptr<Clause> Var::getReason()
-			{
-				return reason;
-			}
+    std::cout << "Var::reset() unass" << std::endl;
+    this->assignment = Assignment::UNASSIGNED;
 
-			void Var::setReason(shared_ptr<Clause> reason)
-			{
-				if (reason && reason != this->reason)
-				{
-					for (shared_ptr<Lit> l : *reason->literals)
-					{
-						if (l->var->assignment == Assignment::UNASSIGNED)
-						{
-							cout << this->toString() << " " << l->var->toString();
-							reason->print();
-							cerr << "!!!!!";
-							throw "!!!!!";
-						}
-					}
-				}
-				this->reason = reason;
-			}
+    this->activity = 0;
+}
 
-			void Var::reset()
-			{
-				if (locked)
-				{
-					return;
-				}
-				this->reason = nullptr;
-				this->seen = false;
+void Var::print() const
+{
+    if (this->assignment == Assignment::FALSE) {
+        std::cout << "-";
+    } else if (this->assignment == Assignment::UNASSIGNED) {
+        std::cout << "o";
+    } else {
+        std::cout << "+";
+    }
+    std::cout << this->index;
+}
 
-				cout << "Var::reset() unass" << endl;
-				this->assignment = Assignment::UNASSIGNED;
+std::string Var::toString() const
+{
+    std::string str;
+    if (this->assignment == Assignment::FALSE)
+        str.append("-");
+    else if (this->assignment == Assignment::TRUE)
+        str.append("+");
+    else
+        str.append("o");
+    str.append(to_string(this->index));
+    return str;
+}
 
-				this->activity = 0;
-			}
-
-			void Var::print()
-			{
-				if (this->assignment == Assignment::FALSE)
-				{
-					cout << "-";
-				}
-				else if (this->assignment == Assignment::UNASSIGNED)
-				{
-					cout << "o";
-				}
-				else
-				{
-					cout << "+";
-				}
-				cout << this->index;
-			}
-
-			string Var::toString()
-			{
-				string str;
-				if (this->assignment == Assignment::FALSE)
-					str.append("-");
-				else if (this->assignment == Assignment::TRUE)
-					str.append("+");
-				else
-					str.append("o");
-				str.append(to_string(this->index));
-				return str;
-			}
-
-		} /* namespace cnsat */
-	} /* namespace reasoner */
+} /* namespace cnsat */
+} /* namespace reasoner */
 } /* namespace alica */

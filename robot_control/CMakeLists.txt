@@ -2,7 +2,17 @@ cmake_minimum_required(VERSION 2.8.3)
 project(robot_control)
 
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp process_manager system_util alica_ros_proxy alica_client pm_control std_msgs message_generation msl_actuator_msgs msl_sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS 
+    rqt_gui 
+    rqt_gui_cpp 
+    process_manager 
+    system_util
+    agent_id 
+    alica_client 
+    pm_control 
+    std_msgs 
+    message_generation 
+)
 
 #find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork REQUIRED)
 find_package(Qt5Core REQUIRED)
@@ -24,15 +34,16 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 	add_definitions (-DCMAKE_ECLIPSE_GENERATE_SOURCE_PROJECT=TRUE)
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
+catkin_python_setup()
+
 add_message_files(
   FILES
   RobotCommand.msg
 )
 
-catkin_python_setup()
-
 generate_messages(
   DEPENDENCIES
+  agent_id
   std_msgs
 )
 
@@ -59,8 +70,12 @@ set(robot_control_INCLUDE_DIRECTORIES
   ${Qt5Gui_INCLUDE_DIRS} 
   ${Qt5Network_INCLUDE_DIRS}
   ${Qt5Widgets_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
+  "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}"
 )
+if(NOT EXISTS "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+  file(MAKE_DIRECTORY "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+endif()
+
 include_directories(${robot_control_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS})
 
 set(robot_control_RCS
@@ -70,13 +85,17 @@ set(robot_control_RCS
 catkin_package(
   INCLUDE_DIRS ${robot_control_INCLUDE_DIRECTORIES}
   LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS rqt_gui rqt_gui_cpp msl_actuator_msgs msl_sensor_msgs
+  CATKIN_DEPENDS rqt_gui rqt_gui_cpp agent_id alica_msgs
 )
 
 
 QT5_WRAP_CPP(robot_control_MOCS ${robot_control_HDRS})
 QT5_ADD_RESOURCES(robot_control_RESOURCES ${robot_control_RCS}) 
+# ensure generated header files are being created in the devel space
+set(_cmake_current_binary_dir "${CMAKE_CURRENT_BINARY_DIR}")
+set(CMAKE_CURRENT_BINARY_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
 QT5_WRAP_UI(robot_control_UIS_H ${robot_control_UIS})
+set(CMAKE_CURRENT_BINARY_DIR "${_cmake_current_binary_dir}")
 
 add_library(${PROJECT_NAME} ${robot_control_SRCS} ${robot_control_MOCS} ${robot_control_UIS_H} ${robot_control_RESOURCES})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Qt5Core_location} ${Qt5Gui_location} ${Qt5Network_location})

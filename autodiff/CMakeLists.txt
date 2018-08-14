@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5.1)
 project(autodiff)
 
 ## Use c++ 11x std
@@ -11,21 +11,19 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 
 find_package(catkin REQUIRED COMPONENTS
- fsystem
- alica_engine
+ alica_solver_interface
+ alica_common_config
 )
 
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES autodiff alica_engine
- CATKIN_DEPENDS fsystem
-# DEPENDS system filesystem
+ LIBRARIES autodiff
+ CATKIN_DEPENDS alica_solver_interface alica_common_config
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include include/autodiff ${catkin_INCLUDE_DIRS})
 
 add_library(autodiff
-  src/CompiledDifferentiator.cpp
   src/Abs.cpp
   src/And.cpp
   src/Atan2.cpp
@@ -35,7 +33,6 @@ add_library(autodiff
   src/ConstraintUtility.cpp
   src/Cos.cpp
   src/Exp.cpp
-  src/Gp.cpp
   src/LinSigmoid.cpp
   src/Log.cpp
   src/LTConstraint.cpp
@@ -48,41 +45,33 @@ add_library(autodiff
   src/Sigmoid.cpp
   src/Sin.cpp
   src/Sum.cpp
+  src/Tape.cpp
   src/Term.cpp
   src/TermBuilder.cpp
+  src/TermList.cpp
+  src/TermHolder.cpp
   src/TermPower.cpp
-  src/TermUtils.cpp
-  src/TVec.cpp
+  src/TermPtr.cpp
   src/Variable.cpp
-  src/Zero.cpp
-  src/compiled/CompiledAbs.cpp
-  src/compiled/CompiledAnd.cpp
-  src/compiled/CompiledAtan2.cpp
-  src/compiled/CompiledConstant.cpp
-  src/compiled/CompiledConstPower.cpp
-  src/compiled/CompiledConstraintUtility.cpp
-  src/compiled/CompiledCos.cpp
-  src/compiled/CompiledExp.cpp
-  src/compiled/CompiledGp.cpp
-  src/compiled/CompiledLinSigmoid.cpp
-  src/compiled/CompiledLog.cpp
-  src/compiled/CompiledLTConstraint.cpp
-  src/compiled/CompiledLTEConstraint.cpp
-  src/compiled/CompiledMax.cpp
-  src/compiled/CompiledMin.cpp
-  src/compiled/CompiledOr.cpp
-  src/compiled/CompiledProduct.cpp
-  src/compiled/CompiledReification.cpp
-  src/compiled/CompiledSigmoid.cpp
-  src/compiled/CompiledSin.cpp
-  src/compiled/CompiledSum.cpp
-  src/compiled/CompiledTermPower.cpp
-  src/compiled/CompiledVariable.cpp
 )
 
 target_link_libraries(autodiff ${catkin_LIBRARIES})
 
-catkin_add_gtest(${PROJECT_NAME}-test test/test_autodiff.cpp)
-if(TARGET ${PROJECT_NAME}-test)
-  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} ${catkin_LIBRARIES})
-endif()
+add_executable(sine_benchmark test/test_benchmark.cpp)
+
+target_link_libraries(sine_benchmark ${PROJECT_NAME} ${catkin_LIBRARIES})
+
+if(CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(${PROJECT_NAME}-test test/test_autodiff.cpp)
+    if(TARGET ${PROJECT_NAME}-test)
+    target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} ${catkin_LIBRARIES})
+    endif()
+else(CATKIN_ENABLE_TESTING)
+    # AUTODIFF TESTS
+    find_package(GTest REQUIRED)
+    include_directories(BEFORE
+    ${GTEST_INCLUDE_DIRS}
+    )
+    add_executable(${PROJECT_NAME}-tests test/test_autodiff.cpp)
+    target_link_libraries(${PROJECT_NAME}-tests ${PROJECT_NAME} pthread ${GTEST_LIBRARIES})
+endif(CATKIN_ENABLE_TESTING)

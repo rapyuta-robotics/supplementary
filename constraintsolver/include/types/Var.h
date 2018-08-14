@@ -1,75 +1,83 @@
-/*
- * Var.h
- *
- *  Created on: Dec 4, 2014
- *      Author: Philipp
- */
-
-#ifndef VAR_H_
-#define VAR_H_
+#pragma once
 
 #include "types/Assignment.h"
 
-#include <AutoDiff.h>
+#include <autodiff/Tape.h>
+#include <autodiff/TermHolder.h>
+#include <autodiff/TermPtr.h>
+#include <autodiff/Types.h>
 
 #include <memory>
 
-using namespace std;
-using namespace autodiff;
-using namespace autodiff::compiled;
-
 namespace alica
 {
-	namespace reasoner
-	{
-		namespace cnsat
-		{
-			class Clause;
-			class DecisionLevel;
-			class Watcher;
+namespace reasoner
+{
+namespace cnsat
+{
+class Clause;
+class DecisionLevel;
+class Watcher;
 
-			class Var
-			{
-			public:
-				Var(int index, bool prefSign = true);
-				virtual ~Var();
+class Var
+{
+  public:
+    Var(int index, bool prefSign = true);
+    ~Var();
 
-				void reset();
-				shared_ptr<Clause> getReason();
-				void setReason(shared_ptr<Clause> reason);
+    void reset();
+    std::shared_ptr<Clause> getReason() const;
+    void setReason(std::shared_ptr<Clause> reason);
 
-				void print();
-				string toString();
+    void print() const;
+    std::string toString() const;
 
-				shared_ptr<vector<Watcher*> > watchList;
-				int index;
-				int activity;
-				int negActivity;
-				bool locked;
-				Assignment assignment;
-				bool seen;
-				bool preferedSign;
-				shared_ptr<DecisionLevel> decisionLevel;
+    std::shared_ptr<std::vector<Watcher*>> watchList;
+    int index;
+    int activity;
+    int negActivity;
+    bool locked;
+    Assignment assignment;
+    bool seen;
+    bool preferedSign;
+    std::shared_ptr<DecisionLevel> decisionLevel;
 
-				int positiveAppearance;
-				int negativeAppearance;
+    int positiveAppearance;
+    int negativeAppearance;
 
-				shared_ptr<Term> term;
-				shared_ptr<vector<shared_ptr<vector<double>> > > positiveRanges;
-				shared_ptr<vector<shared_ptr<vector<double>> > > negativeRanges;
+    autodiff::TermPtr _term;
+    std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> positiveRanges;
+    std::shared_ptr<std::vector<std::shared_ptr<std::vector<double>>>> negativeRanges;
 
-				double positiveRangeSize;
-				double negativeRangeSize;
+    double positiveRangeSize;
+    double negativeRangeSize;
 
-				shared_ptr<ICompiledTerm> positiveTerm;
-				shared_ptr<ICompiledTerm> negativeTerm;
-				shared_ptr<ICompiledTerm> curTerm;
-			private:
-				shared_ptr<Clause> reason;
-			};
+    autodiff::Tape _positiveTerm;
+    autodiff::Tape _negativeTerm;
+    autodiff::Tape* _curTerm;
+    void setToPositive()
+    {
+        if (_curTerm != &_positiveTerm) {
+            if (!_positiveTerm.isSet()) {
+                _positiveTerm = _term->getOwner()->compileSeparately(_term);
+            }
+            _curTerm = &_positiveTerm;
+        }
+    }
+    void setToNegative()
+    {
+        if (_curTerm != &_negativeTerm) {
+            if (!_negativeTerm.isSet()) {
+                _negativeTerm = _term->getOwner()->compileSeparately(_term->negate());
+            }
+            _curTerm = &_negativeTerm;
+        }
+    }
 
-		} /* namespace cnsat */
-	} /* namespace reasoner */
+  private:
+    std::shared_ptr<Clause> reason;
+};
+
+} /* namespace cnsat */
+} /* namespace reasoner */
 } /* namespace alica */
-
-#endif /* VAR_H_ */

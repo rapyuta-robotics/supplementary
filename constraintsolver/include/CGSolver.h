@@ -1,52 +1,47 @@
-/*
- * CGSolver.h
- *
- *  Created on: Oct 10, 2014
- *      Author: Philipp
- */
+#pragma once
 
-#ifndef CGSOLVER_H_
-#define CGSOLVER_H_
+#include "GSolver.h"
 
-#include <AutoDiff.h>
+#include <engine/Types.h>
 #include <engine/constraintmodul/ISolver.h>
-#include <vector>
 #include <memory>
 #include <mutex>
+#include <vector>
 
-using namespace std;
+//#define CGSolver_DEBUG
 
 namespace alica
 {
-	class AlicaEngine;
-	class IVariableSyncModule;
+class AlicaEngine;
+class IVariableSyncModule;
+class SolverContext;
 
-	namespace reasoner
-	{
-		class GSolver;
+namespace reasoner
+{
+class GSolver;
 
-		class CGSolver : public ISolver
-		{
-		public:
-			CGSolver(AlicaEngine* ae);
-			virtual ~CGSolver();
+class CGSolver : public ISolver<CGSolver, double>
+{
+  public:
+    CGSolver(AlicaEngine* ae);
+    virtual ~CGSolver();
 
-			bool existsSolution(vector<Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls);
-			bool getSolution(vector<Variable*>& vars, vector<shared_ptr<ProblemDescriptor>>& calls, vector<void*>& results);
-			shared_ptr<SolverVariable> createVariable(long id);
+    bool existsSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls);
+    bool getSolutionImpl(SolverContext* ctx, const std::vector<std::shared_ptr<ProblemDescriptor>>& calls, std::vector<double>& results);
 
-		protected:
-			shared_ptr<GSolver> gs;
-			shared_ptr<GSolver> sgs;
+    virtual SolverVariable* createVariable(int64_t id, alica::SolverContext* context) override;
+    virtual std::unique_ptr<SolverContext> createSolverContext() override;
 
-			mutex mtx;
+  private:
+    GSolver _gs;
+    GSolver _sgs;
 
-			double lastUtil;
-			double lastRuns;
-			double lastFEvals;
-		};
+    std::mutex _mtx;
 
-	} /* namespace Reasoner */
-} /* namespace Alica */
+    double _lastUtil;
+    double _lastRuns;
+    double _lastFEvals;
+};
 
-#endif /* CGSOLVER_H_ */
+} // namespace reasoner
+} // namespace alica

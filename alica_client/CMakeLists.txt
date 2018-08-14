@@ -10,7 +10,7 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp alica_ros_proxy)
+find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp alica_msgs)
 find_package(Qt5Core REQUIRED)
 get_target_property(Qt5Core_location Qt5::Core LOCATION)
 find_package(Qt5Gui REQUIRED)
@@ -28,15 +28,18 @@ set(alica_client_INCLUDE_DIRECTORIES
   ${Qt5Core_INCLUDE_DIRS}
   ${Qt5Network_INCLUDE_DIRS}
   ${Qt5Gui_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
+  "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}"
 )
+if(NOT EXISTS "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+  file(MAKE_DIRECTORY "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+endif()
 
 include_directories(${alica_client_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS})
 
 catkin_package(
   INCLUDE_DIRS ${alica_client_INCLUDE_DIRECTORIES}
   LIBRARIES ${PROJECT_NAME} AlicaWidget
-  CATKIN_DEPENDS rqt_gui rqt_gui_cpp alica_ros_proxy
+  CATKIN_DEPENDS rqt_gui rqt_gui_cpp alica_msgs
 )
 catkin_python_setup()
 
@@ -58,7 +61,11 @@ class_loader_hide_library_symbols(${PROJECT_NAME})
 set(alica_UIS
   src/alica/AlicaWidget.ui
 )
+# ensure generated header files are being created in the devel space
+set(_cmake_current_binary_dir "${CMAKE_CURRENT_BINARY_DIR}")
+set(CMAKE_CURRENT_BINARY_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
 QT5_WRAP_UI(alica_client_UIS_H ${alica_UIS})
+set(CMAKE_CURRENT_BINARY_DIR "${_cmake_current_binary_dir}")
 
 add_library(AlicaWidget src/alica/AlicaWidget.cpp  ${alica_client_UIS_H})
 
