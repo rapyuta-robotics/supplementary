@@ -8,10 +8,11 @@
 #include <vector>
 
 #include "boost/filesystem.hpp"
-//using namespace boost::filesystem;
 
 #include "../include/RelayedMessage.h"
 #include "RelayedMessage.h"
+
+using boost::filesystem::exists;
 
 
 // trim from start
