@@ -16,6 +16,10 @@ class AgentID
     virtual bool operator!=(const AgentID& obj) const;
     virtual bool operator<(const AgentID& other) const;
     virtual bool operator>(const AgentID& other) const;
+    void operator=(const std::vector<uint8_t>& other_id);
+    operator bool() const { return !id.empty(); }
+    operator unsigned long long() const;
+
     virtual const uint8_t* getRaw() const;
     virtual int getSize() const;
     virtual std::vector<uint8_t> toByteVector() const;

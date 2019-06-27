@@ -65,8 +65,25 @@ bool AgentID::operator>(const AgentID& other) const {
     return false;
 }
 
-const uint8_t* AgentID::getRaw() const {
-    return this->id.data();
+ AgentID::operator unsigned long long() const {
+    // Determine the endianness
+    constexpr short n = 1;
+    bool isLittleEndian = *((char*)(&n)) == 1;
+
+    // moving data
+    long long out = 0;
+    if (isLittleEndian) {
+        std::copy(id.begin(), id.end(), (uint8_t*)(&out));
+    } else {
+        int offset = static_cast<int>(sizeof(long long) - id.size());
+        std::copy(id.begin(), id.end(), (uint8_t*)(&out) + offset);
+    }
+    return out;
+ }
+
+const uint8_t* AgentID::getRaw() const
+{
+    return id.data();
 }
 
 int AgentID::getSize() const {
