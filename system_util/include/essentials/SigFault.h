@@ -2,7 +2,7 @@
 #ifndef SIGFAULTDEBUG_H_
 #define SIGFAULTDEBUG_H_
 
-#include "FileSystem.h"
+#include "essentials/FileSystem.h"
 #include <exception>
 #include <signal.h>
 #include <sstream>

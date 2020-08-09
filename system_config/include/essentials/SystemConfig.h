@@ -36,6 +36,7 @@ class SystemConfig
     std::string robotNodeName(const std::string& nodeName);
     int getOwnRobotID();
     int getRobotID(const std::string& name);
+    std::string getDefaultRole(const std::string& name);
     std::string getHostname();
     void setHostname(const std::string& newHostname);
     void resetHostname();

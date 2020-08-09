@@ -155,12 +155,20 @@ int SystemConfig::getOwnRobotID()
  * @return The robot's ID
  * <deprecated>
  */
-int SystemConfig::getRobotID(const string& name)
+int SystemConfig::getRobotID(const std::string& name)
 {
     // TODO this should be optional for dynamic teams (is it ok to return ints?)
     Configuration* tmp = (SystemConfig::getInstance())["Globals"];
     int ownRobotID = tmp->get<int>("Globals", "Team", name.c_str(), "ID", NULL);
     return ownRobotID;
+}
+
+std::string SystemConfig::getDefaultRole(const std::string& name)
+{
+    // TODO this should be optional for dynamic teams (is it ok to return ints?)
+    Configuration* tmp = (SystemConfig::getInstance())["Globals"];
+    std::string ownDefaultRole = tmp->get<std::string>("Globals", "Team", name.c_str(), "DefaultRole", NULL);
+    return ownDefaultRole;
 }
 
 string SystemConfig::getRootPath()
