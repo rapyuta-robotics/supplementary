@@ -5,6 +5,96 @@
 
 #include <gtest/gtest.h>
 #include <vector>
+#include <chrono>
+#include <random>
+
+TEST(Identifier, MeasureComparison)
+{
+    essentials::IDManager* idManager = new essentials::IDManager();
+    int iterations = 100000;
+
+    std::chrono::nanoseconds totaltime = std::chrono::nanoseconds(0);
+    auto id1 = idManager->generateID();
+    auto id2 = idManager->generateID();
+    for (int i = 0; i < iterations; i++) {
+        auto begin = std::chrono::high_resolution_clock::now();
+        bool equal = id1 == id2;
+        auto end = std::chrono::high_resolution_clock::now();
+        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+    }
+    std::cout << "[Identifier.MeasureComparison] Comparing 16Byte Identifier Pointers takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
+
+    totaltime = std::chrono::nanoseconds(0);
+    id1 = idManager->generateID();
+    id2 = idManager->generateID();
+    for (int i = 0; i < iterations; i++) {
+        auto begin = std::chrono::high_resolution_clock::now();
+        bool equal = *id1 == *id2;
+        auto end = std::chrono::high_resolution_clock::now();
+        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+    }
+    std::cout << "[Identifier.MeasureComparison] Comparing 16Byte Identifier takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
+
+    totaltime = std::chrono::nanoseconds(0);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned long long> dis(
+            std::numeric_limits<std::uint64_t>::min(),
+            std::numeric_limits<std::uint64_t>::max()
+    );
+    uint64_t idInt1 = dis(gen);
+    uint64_t idInt2 = dis(gen);
+    for (int i = 0; i < iterations; i++) {
+        auto begin = std::chrono::high_resolution_clock::now();
+        bool equal = idInt1 == idInt2;
+        auto end = std::chrono::high_resolution_clock::now();
+        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+    }
+    std::cout << "[Identifier.MeasureComparison] Comparing uint64_t's takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
+}
+
+TEST(Identifier, MeasureCopying)
+{
+    essentials::IDManager* idManager = new essentials::IDManager();
+    int iterations = 100000;
+
+    std::chrono::nanoseconds totaltime = std::chrono::nanoseconds(0);
+    auto id1 = idManager->generateID();
+    for (int i = 0; i < iterations; i++) {
+        auto begin = std::chrono::high_resolution_clock::now();
+        essentials::Identifier id2 = id1->toByteVector();
+        auto end = std::chrono::high_resolution_clock::now();
+        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+    }
+    std::cout << "[Identifier.MeasureCopying] Identifier assignment constructor takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
+
+    totaltime = std::chrono::nanoseconds(0);
+    id1 = idManager->generateID();
+    for (int i = 0; i < iterations; i++) {
+        auto begin = std::chrono::high_resolution_clock::now();
+        const essentials::Identifier* id2 = id1;
+        auto end = std::chrono::high_resolution_clock::now();
+        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+    }
+    std::cout << "[Identifier.MeasureCopying] Copying const Identifier* takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
+
+    totaltime = std::chrono::nanoseconds(0);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned long long> dis(
+            std::numeric_limits<std::uint64_t>::min(),
+            std::numeric_limits<std::uint64_t>::max()
+    );
+    uint64_t id1Int = dis(gen);
+    for (int i = 0; i < iterations; i++) {
+
+        auto begin = std::chrono::high_resolution_clock::now();
+        uint64_t id2Int = id1Int;
+        auto end = std::chrono::high_resolution_clock::now();
+        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+    }
+    std::cout << "[Identifier.MeasureComparison] Copying uint64_t's takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
+}
 
 TEST(Identifier, ConstructorCopiesBytes)
 {
