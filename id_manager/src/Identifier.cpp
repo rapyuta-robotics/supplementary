@@ -32,11 +32,6 @@ uint8_t Identifier::getType() const
     return _type;
 }
 
-bool Identifier::operator==(const Identifier& other) const
-{
-    return (_id == other._id);
-}
-
 bool Identifier::operator!=(const Identifier& other) const
 {
     return (_id != other._id);

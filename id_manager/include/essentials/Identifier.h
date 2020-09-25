@@ -17,7 +17,10 @@ public:
     Identifier(const std::vector<uint8_t>& idBytes);
     Identifier(const uint8_t* idBytes, int idSize, uint8_t type = UUID_TYPE);
     virtual ~Identifier();
-    virtual bool operator==(const Identifier& obj) const;
+    bool operator==(const Identifier& obj) const
+    {
+        return _id == obj._id;
+    }
     virtual bool operator!=(const Identifier& obj) const;
     virtual bool operator<(const Identifier& other) const;
     virtual bool operator>(const Identifier& other) const;
