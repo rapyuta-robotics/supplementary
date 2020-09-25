@@ -16,23 +16,24 @@ TEST(Identifier, MeasureComparison)
     std::chrono::nanoseconds totaltime = std::chrono::nanoseconds(0);
     auto id1 = idManager->generateID();
     auto id2 = idManager->generateID();
+    auto begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
-        auto begin = std::chrono::high_resolution_clock::now();
         bool equal = id1 == id2;
-        auto end = std::chrono::high_resolution_clock::now();
-        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     std::cout << "[Identifier.MeasureComparison] Comparing 16Byte Identifier Pointers takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
 
     totaltime = std::chrono::nanoseconds(0);
     id1 = idManager->generateID();
     id2 = idManager->generateID();
+
+    begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
-        auto begin = std::chrono::high_resolution_clock::now();
         bool equal = *id1 == *id2;
-        auto end = std::chrono::high_resolution_clock::now();
-        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     }
+    end = std::chrono::high_resolution_clock::now();
+    totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     std::cout << "[Identifier.MeasureComparison] Comparing 16Byte Identifier takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
 
     totaltime = std::chrono::nanoseconds(0);
@@ -44,12 +45,13 @@ TEST(Identifier, MeasureComparison)
     );
     uint64_t idInt1 = dis(gen);
     uint64_t idInt2 = dis(gen);
+
+    begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
-        auto begin = std::chrono::high_resolution_clock::now();
         bool equal = idInt1 == idInt2;
-        auto end = std::chrono::high_resolution_clock::now();
-        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     }
+    end = std::chrono::high_resolution_clock::now();
+    totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     std::cout << "[Identifier.MeasureComparison] Comparing uint64_t's takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
 }
 
@@ -60,22 +62,24 @@ TEST(Identifier, MeasureCopying)
 
     std::chrono::nanoseconds totaltime = std::chrono::nanoseconds(0);
     auto id1 = idManager->generateID();
+
+    auto begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
-        auto begin = std::chrono::high_resolution_clock::now();
-        essentials::Identifier id2 = id1->toByteVector();
-        auto end = std::chrono::high_resolution_clock::now();
-        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+        essentials::Identifier id2 = *id1;
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     std::cout << "[Identifier.MeasureCopying] Identifier assignment constructor takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
 
     totaltime = std::chrono::nanoseconds(0);
     id1 = idManager->generateID();
+
+    begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
-        auto begin = std::chrono::high_resolution_clock::now();
         const essentials::Identifier* id2 = id1;
-        auto end = std::chrono::high_resolution_clock::now();
-        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     }
+    end = std::chrono::high_resolution_clock::now();
+    totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     std::cout << "[Identifier.MeasureCopying] Copying const Identifier* takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
 
     totaltime = std::chrono::nanoseconds(0);
@@ -86,13 +90,15 @@ TEST(Identifier, MeasureCopying)
             std::numeric_limits<std::uint64_t>::max()
     );
     uint64_t id1Int = dis(gen);
+
+    begin = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < iterations; i++) {
 
-        auto begin = std::chrono::high_resolution_clock::now();
         uint64_t id2Int = id1Int;
-        auto end = std::chrono::high_resolution_clock::now();
-        totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
+
     }
+    end = std::chrono::high_resolution_clock::now();
+    totaltime += std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin);
     std::cout << "[Identifier.MeasureComparison] Copying uint64_t's takes " << (totaltime / iterations).count() << " Nanoseconds!" << std::endl;
 }
 

@@ -21,6 +21,10 @@ public:
     virtual bool operator!=(const Identifier& obj) const;
     virtual bool operator<(const Identifier& other) const;
     virtual bool operator>(const Identifier& other) const;
+    Identifier(const Identifier&) = default;
+    Identifier& operator=(const Identifier&) = default;
+    Identifier(Identifier&&) = default;
+    Identifier& operator=(Identifier&&) = default;
     Identifier& operator=(const std::vector<uint8_t>& other_id);
     explicit operator bool() const { return !_id.empty(); }
     explicit operator uint64_t() const;
