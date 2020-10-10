@@ -1,9 +1,21 @@
 #pragma once
 
+#include <algorithm>
+#include <cstdarg>
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+
 namespace essentials
 {
     class IAlicaConfig
     {
+    public:
         /**
          * Create config object with empty filename.
          */
@@ -19,7 +31,7 @@ namespace essentials
          *
          * @param filename The name of the configuration file to be loaded.
          */
-        virtual IAlicaConfig(std::string filename);
+        IAlicaConfig(std::string filename);
 
         /**
          * Create a configuration with the given filename and the given config content.
@@ -27,7 +39,7 @@ namespace essentials
          * @param filename The name of the configuration.
          * @param content The content of the configuration.
          */
-        virtual IAlicaConfig(std::filename, const std::string content);
+        IAlicaConfig(std::string filename, const std::string content);
 
         /**
          * @param path The path where to look for a value.
@@ -35,7 +47,7 @@ namespace essentials
          * @return Value with type T with the given path in the config file. Only return the first value with the given path.
          */
         template <typename T>
-        virtual T get (const char* path) = 0;
+        T get (const char* path);
 
         /**
          * @param path to the value
@@ -43,7 +55,7 @@ namespace essentials
          * @return A vector of values with type T, with the exact path in the config file (first value with matching path)
          */
         template <typename T>
-        virtual std::vector<T> getList(const char* path) = 0;
+        std::vector<T> getList(const char* path);
 
         /**
          * @param path The path where to look for a value.
@@ -51,7 +63,7 @@ namespace essentials
            @return A pointer to a vector with all values with type T, with the exact path in the config file (all values with matching path).
          */
         template <typename T>
-        virtual std::shared_ptr<std::vector<T>> getAll(const char* path) = 0;
+        std::shared_ptr<std::vector<T>> getAll(const char* path);
 
        /**
         * @param d value with type T to return if no value with the provided path is present in the config.
@@ -60,7 +72,7 @@ namespace essentials
         * @return Value of type T with the exact path in the config file or d.
         */
         template <typename T>
-        virtual T tryGet(T d, const char* path) = 0;
+        T tryGet(T d, const char* path);
 
         /**
          * @param d Value with type T to return in a vector if no value with the given path is present in the config.
@@ -69,7 +81,7 @@ namespace essentials
          * @return A pointer to a vector with all values with a matching path or a vector with only d inside.
          */
         template <typename T>
-        virtual std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path) = 0;
+        std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path);
 
         /**
          * Sets a value at the desired path if the path already exists.
@@ -78,7 +90,7 @@ namespace essentials
          * @param path The path where to set the given value.
          */
         template <typename T>
-        virtual void set(T value, const char* path) = 0;
+        void set(T value, const char* path);
 
         /**
          * Creates a path with the given value if the path does not already exist.
@@ -87,7 +99,7 @@ namespace essentials
          * @param path The path to create if not existent.
          */
         template <typename T>
-        virtual void setCreateIfNotExistent(T value, const char* path) = 0;
+        void setCreateIfNotExistent(T value, const char* path);
 
         /**
          * Load a configuration with the given filename.
@@ -114,7 +126,7 @@ namespace essentials
          *
          * @param filename The name of the configuration file.
          */
-        virtualvoid store(std::string filename) = 0;
+        virtual void store(std::string filename) = 0;
 
         /**
          * Get a list with the names of all sections in the given path.
@@ -144,7 +156,7 @@ namespace essentials
          *
          * @return A vector with all keys of the given path.
          */
-        virtualstd::shared_ptr<std::vector<std::string>> getNames(const char* path) = 0;
+        virtual std::shared_ptr<std::vector<std::string>> getNames(const char* path) = 0;
 
         /**
          * Collect all keys in a given path. It does not include section names.
@@ -157,4 +169,40 @@ namespace essentials
          */
         virtual std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path) = 0;
     };
+
+    //Implementations
+    template <typename T>
+    T get (const char* path) {
+
+    }
+
+    template <typename T>
+    std::vector<T> getList(const char* path) {
+
+    }
+
+    template <typename T>
+    std::shared_ptr<std::vector<T>> getAll(const char* path) {
+
+    }
+
+    template <typename T>
+    T tryGet(T d, const char* path) {
+
+    }
+
+    template <typename T>
+    std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path) {
+
+    }
+
+    template <typename T>
+    void setCreateIfNotExistent(T value, const char* path) {
+
+    }
+
+    template <typename T>
+    void set(T value, const char* path) {
+
+    }
 } /* namespace essentials */

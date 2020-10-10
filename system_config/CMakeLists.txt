@@ -28,7 +28,6 @@ include_directories(
 )
 
 add_library(system_config
-  src/SystemConfig.cpp
   src/Configuration.cpp
 )
 

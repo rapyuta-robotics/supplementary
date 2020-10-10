@@ -1,4 +1,5 @@
 #include "essentials/SystemConfig.h"
+#include "essentials/Configuration.h"
 
 #include <gtest/gtest.h>
 
@@ -8,7 +9,7 @@
 TEST(SystemConfigBasics, readValues)
 {
     // bring up the SystemConfig with the corresponding path
-    essentials::SystemConfig& sc = essentials::SystemConfig::getInstance();
+    essentials::SystemConfig<essentials::Configuration> sc;
     sc.setRootPath(".");
     sc.setConfigPath("./etc");
 
