@@ -181,7 +181,7 @@ namespace essentials
     //Implementations
     template <typename T>
     T get (const char* path) {
-
+        //std::string value = this->get(path);
     }
 
     template <typename T>

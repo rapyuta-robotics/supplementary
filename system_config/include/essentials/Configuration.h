@@ -13,6 +13,7 @@
 
 #include "IAlicaConfig.h"
 #include "ConfigNode.h"
+#include "IAlicaConfigUtil.h"
 
 namespace essentials
 {
@@ -78,7 +79,8 @@ protected:
     std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path, ...);
 
     std::string get(const char* path) {
-        std::shared_ptr<std::vector<std::string>> params = getParams('.', path);
+        IAlicaConfigUtil util;
+        std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
         std::vector<ConfigNode*> nodes;
 
         collect(this->configRoot.get(), params.get(), 0, &nodes);
