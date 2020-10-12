@@ -52,6 +52,13 @@ namespace essentials
         T get (const char* path);
 
         /**
+         * @param path The path where to look for a value.
+         *
+         * @return Value in string representation with the given path in the config file. Only return the first value with the given path.
+         */
+        virtual std::string get(const char* path) = 0;
+
+        /**
          * @param path to the value
          *
          * @return A vector of values with type T, with the exact path in the config file (first value with matching path)
@@ -170,51 +177,43 @@ namespace essentials
          * @return The name of all keys at the given path or a vector with d.
          */
         virtual std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path) = 0;
-
-    protected:
-        /**
-         * @param path The path where to look for a value.
-         *
-         * @return Value in string representation with the given path in the config file. Only return the first value with the given path.
-         */
-        virtual std::string get(const char* path) = 0;
     };
 
     //Implementations
     template <typename T>
-    T get (const char* path) {
+    T IAlicaConfig::get (const char* path) {
         IAlicaConfigUtil util;
         std::string value = this->get(path);
         return util.convert<T>(value);
     }
 
     template <typename T>
-    std::vector<T> getList(const char* path) {
+    std::vector<T> IAlicaConfig::getList(const char* path) {
 
     }
 
     template <typename T>
-    std::shared_ptr<std::vector<T>> getAll(const char* path) {
+    std::shared_ptr<std::vector<T>> IAlicaConfig::getAll(const char* path) {
 
     }
 
     template <typename T>
-    T tryGet(T d, const char* path) {
+    T IAlicaConfig::tryGet(T d, const char* path) {
 
     }
 
     template <typename T>
-    std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path) {
+    std::shared_ptr<std::vector<T>> IAlicaConfig::tryGetAll(T d, const char* path) {
 
     }
 
     template <typename T>
-    void setCreateIfNotExistent(T value, const char* path) {
+    void IAlicaConfig::setCreateIfNotExistent(T value, const char* path) {
 
     }
 
     template <typename T>
-    void set(T value, const char* path) {
+    void IAlicaConfig::set(T value, const char* path) {
 
     }
 } /* namespace essentials */
