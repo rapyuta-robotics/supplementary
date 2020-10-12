@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include "IAlicaConfigUtil.h"
+
 namespace essentials
 {
     class IAlicaConfig
@@ -181,7 +183,9 @@ namespace essentials
     //Implementations
     template <typename T>
     T get (const char* path) {
-        //std::string value = this->get(path);
+        IAlicaConfigUtil util;
+        std::string value = this->get(path);
+        return util.convert<T>(value);
     }
 
     template <typename T>

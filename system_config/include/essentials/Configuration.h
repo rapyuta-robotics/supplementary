@@ -31,13 +31,13 @@ protected:
     void serialize_internal(std::ostringstream* ss, ConfigNode* node);
     void serialize_without_root(std::ostringstream* ss, ConfigNode* node);
 
-    template <typename Target>
-    Target convert(std::string value)
-    {
-        std::string errMsg = "Configuration: Type not handled! Value to be converted was: " + value;
-        std::cerr << errMsg << std::endl;
-        throw std::runtime_error(errMsg);
-    }
+//    template <typename Target>
+//    Target convert(std::string value)
+//    {
+//        std::string errMsg = "Configuration: Type not handled! Value to be converted was: " + value;
+//        std::cerr << errMsg << std::endl;
+//        throw std::runtime_error(errMsg);
+//    }
 
     template <typename Target>
     std::vector<Target> convertList(std::string value)
@@ -271,90 +271,90 @@ protected:
 //    }
 };
 
-template <>
-inline short Configuration::convert<short>(std::string value)
-{
-    return stoi(value);
-}
-
-template <>
-inline unsigned short Configuration::convert<unsigned short>(std::string value)
-{
-    return stoul(value);
-}
-
-template <>
-inline int Configuration::convert<int>(std::string value)
-{
-    return stoi(value);
-}
-
-template <>
-inline unsigned int Configuration::convert<unsigned int>(std::string value)
-{
-    return stoul(value);
-}
-
-template <>
-inline long Configuration::convert<long>(std::string value)
-{
-    return stol(value);
-}
-
-template <>
-inline long double Configuration::convert<long double>(std::string value)
-{
-    return stold(value);
-}
-
-template <>
-inline long long Configuration::convert<long long>(std::string value)
-{
-    return stoll(value);
-}
-
-template <>
-inline unsigned long Configuration::convert<unsigned long>(std::string value)
-{
-    return stoul(value);
-}
-
-template <>
-inline unsigned long long Configuration::convert<unsigned long long>(std::string value)
-{
-    return stoull(value);
-}
-
-template <>
-inline float Configuration::convert<float>(std::string value)
-{
-    return stof(value);
-}
-
-template <>
-inline double Configuration::convert<double>(std::string value)
-{
-    return stod(value);
-}
-
-template <>
-inline std::string Configuration::convert<std::string>(std::string value)
-{
-    return value;
-}
-
-template <>
-inline bool Configuration::convert<bool>(std::string value)
-{
-    if ("false" == value || value == "False" || value == "0" || value == "FALSE") {
-        return false;
-    } else if ("true" == value || value == "True" || value == "1" || value == "TRUE") {
-        return true;
-    }
-    std::string errMsg = "Configuration: unable to parse boolean. Value is: " + value;
-    std::cerr << errMsg << std::endl;
-    throw std::runtime_error(errMsg);
-}
+//template <>
+//inline short Configuration::convert<short>(std::string value)
+//{
+//    return stoi(value);
+//}
+//
+//template <>
+//inline unsigned short Configuration::convert<unsigned short>(std::string value)
+//{
+//    return stoul(value);
+//}
+//
+//template <>
+//inline int Configuration::convert<int>(std::string value)
+//{
+//    return stoi(value);
+//}
+//
+//template <>
+//inline unsigned int Configuration::convert<unsigned int>(std::string value)
+//{
+//    return stoul(value);
+//}
+//
+//template <>
+//inline long Configuration::convert<long>(std::string value)
+//{
+//    return stol(value);
+//}
+//
+//template <>
+//inline long double Configuration::convert<long double>(std::string value)
+//{
+//    return stold(value);
+//}
+//
+//template <>
+//inline long long Configuration::convert<long long>(std::string value)
+//{
+//    return stoll(value);
+//}
+//
+//template <>
+//inline unsigned long Configuration::convert<unsigned long>(std::string value)
+//{
+//    return stoul(value);
+//}
+//
+//template <>
+//inline unsigned long long Configuration::convert<unsigned long long>(std::string value)
+//{
+//    return stoull(value);
+//}
+//
+//template <>
+//inline float Configuration::convert<float>(std::string value)
+//{
+//    return stof(value);
+//}
+//
+//template <>
+//inline double Configuration::convert<double>(std::string value)
+//{
+//    return stod(value);
+//}
+//
+//template <>
+//inline std::string Configuration::convert<std::string>(std::string value)
+//{
+//    return value;
+//}
+//
+//template <>
+//inline bool Configuration::convert<bool>(std::string value)
+//{
+//    if ("false" == value || value == "False" || value == "0" || value == "FALSE") {
+//        return false;
+//    } else if ("true" == value || value == "True" || value == "1" || value == "TRUE") {
+//        return true;
+//    }
+//    std::string errMsg = "Configuration: unable to parse boolean. Value is: " + value;
+//    std::cerr << errMsg << std::endl;
+//    throw std::runtime_error(errMsg);
+//}
 
 template <>
 inline std::vector<int> Configuration::convertList<int>(std::string value)
