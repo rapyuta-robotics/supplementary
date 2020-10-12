@@ -168,6 +168,14 @@ namespace essentials
          * @return The name of all keys at the given path or a vector with d.
          */
         virtual std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path) = 0;
+
+    protected:
+        /**
+         * @param path The path where to look for a value.
+         *
+         * @return Value in string representation with the given path in the config file. Only return the first value with the given path.
+         */
+        virtual std::string get(const char* path) = 0;
     };
 
     //Implementations
