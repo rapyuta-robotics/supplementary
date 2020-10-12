@@ -77,6 +77,21 @@ protected:
     std::shared_ptr<std::vector<std::string>> getNames(const char* path, ...);
     std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path, ...);
 
+    std::string get(const char* path) {
+        std::shared_ptr<std::vector<std::string>> params = getParams('.', path);
+        std::vector<ConfigNode*> nodes;
+
+        collect(this->configRoot.get(), params.get(), 0, &nodes);
+
+        if (nodes.size() == 0) {
+            std::string errMsg = "SC-Conf: " + pathNotFound(params.get());
+            std::cerr << errMsg << std::endl;
+            throw std::runtime_error(errMsg);
+        } else {
+            return nodes[0]->getValue();
+        }
+    }
+
 //    template <typename T>
 //    T get(const char* path, ...)
 //    {
