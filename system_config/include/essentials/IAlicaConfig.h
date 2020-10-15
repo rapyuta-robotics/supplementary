@@ -67,6 +67,13 @@ namespace essentials
         std::vector<T> getList(const char* path);
 
         /**
+         * @param path to the value
+         *
+         * @return A vector of strings with the exact path in the config file (first value with matching path)
+         */
+        virtual std::vector<std::string> getList(const char* path) = 0;
+
+        /**
          * @param path The path where to look for a value.
          *
            @return A pointer to a vector with all values with type T, with the exact path in the config file (all values with matching path).
@@ -74,14 +81,29 @@ namespace essentials
         template <typename T>
         std::shared_ptr<std::vector<T>> getAll(const char* path);
 
+        /**
+         * @param path The path where to look for a value.
+         *
+           @return A pointer to a vector with all values with type T, with the exact path in the config file (all values with matching path).
+         */
+        std::vector<std::string> getAll(const char* path);
+
        /**
-        * @param d value with type T to return if no value with the provided path is present in the config.
+        * @param d Value with type T to return if no value with the provided path is present in the config.
         * @param path The path to the value.
         *
         * @return Value of type T with the exact path in the config file or d.
         */
         template <typename T>
         T tryGet(T d, const char* path);
+
+        /**
+        * @param d String value to return if no value with the provided path is present in the config.
+        * @param path The path to the value.
+        *
+        * @return String value with the exact path in the config file or d.
+        */
+        virtual std::string tryGet(std::string d, const char* path) = 0;
 
         /**
          * @param d Value with type T to return in a vector if no value with the given path is present in the config.
@@ -93,6 +115,14 @@ namespace essentials
         std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path);
 
         /**
+         * @param d String value to return in a vector if no value with the given path is present in the config.
+         * @param path The path where to look for the value.
+         *
+         * @return A pointer to a vector with all values with a matching path or a vector with only d inside.
+         */
+        virtual std::shared_ptr<std::vector<std::string>> tryGetAll(std::string d, const char* path) = 0;
+
+        /**
          * Sets a value at the desired path if the path already exists.
          *
          * @param value The value to set in the config.
@@ -102,6 +132,14 @@ namespace essentials
         void set(T value, const char* path);
 
         /**
+         * Sets a string value at the desired path if the path already exists.
+         *
+         * @param value The string value to set in the config.
+         * @param path The path where to set the given value.
+         */
+        virtual void set(std::string value, const char* path) = 0;
+
+        /**
          * Creates a path with the given value if the path does not already exist.
          *
          * @param value The value to set in the config.
@@ -109,6 +147,14 @@ namespace essentials
          */
         template <typename T>
         void setCreateIfNotExistent(T value, const char* path);
+
+        /**
+         * Creates a path with the given value if the path does not already exist.
+         *
+         * @param value The string value to set in the config.
+         * @param path The path to create if not existent.
+         */
+        virtual void setCreateIfNotExistent(std::string value, const char* path) = 0;
 
         /**
          * Load a configuration with the given filename.
@@ -181,39 +227,70 @@ namespace essentials
 
     //Implementations
     template <typename T>
-    T IAlicaConfig::get (const char* path) {
+    T IAlicaConfig::get(const char* path)
+    {
         IAlicaConfigUtil util;
-        std::string value = this->get(path);
+        auto value = this->get(path);
         return util.convert<T>(value);
     }
 
     template <typename T>
-    std::vector<T> IAlicaConfig::getList(const char* path) {
-
+    std::vector<T> IAlicaConfig::getList(const char* path)
+    {
+        IAlicaConfigUtil util;
+        auto list = this->getList(path);
+        return util.convertList<T>(list);
     }
 
     template <typename T>
-    std::shared_ptr<std::vector<T>> IAlicaConfig::getAll(const char* path) {
+    std::shared_ptr<std::vector<T>> IAlicaConfig::getAll(const char* path)
+    {
+        IAlicaConfigUtil util;
+        auto list = this->getAll(path);
 
+        std::shared_ptr<std::vector<T>> result(new std::vector<T>());
+        for (int i = 0; i < list.size(); i++) {
+            result->push_back(util.convert<T>(list[i]));
+        }
+        return result;
     }
 
     template <typename T>
-    T IAlicaConfig::tryGet(T d, const char* path) {
-
+    T IAlicaConfig::tryGet(T d, const char* path)
+    {
+        IAlicaConfigUtil util;
+        return util.convert<T>(this->tryGet(util.stringify(d), path));
     }
 
     template <typename T>
-    std::shared_ptr<std::vector<T>> IAlicaConfig::tryGetAll(T d, const char* path) {
+    std::shared_ptr<std::vector<T>> IAlicaConfig::tryGetAll(T d, const char* path)
+    {
+        IAlicaConfigUtil util;
+        auto list = this->tryGetAll(util.stringify(d), path);
+        std::shared_ptr<std::vector<T>> result(new std::vector<T>());
 
+        if (list.size() == 1 && list[0] == d) {
+            result->push_back(d);
+            return result;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            result->push_back(util.convert<T>(list[i]->getValue()));
+        }
+        return result;
     }
 
     template <typename T>
-    void IAlicaConfig::setCreateIfNotExistent(T value, const char* path) {
-
+    void IAlicaConfig::setCreateIfNotExistent(T value, const char* path)
+    {
+        IAlicaConfigUtil util;
+        this->setCreateIfNotExistent(util.stringify(value), path);
     }
 
     template <typename T>
-    void IAlicaConfig::set(T value, const char* path) {
-
+    void IAlicaConfig::set(T value, const char* path)
+    {
+        IAlicaConfigUtil util;
+        this->set(util.stringify(value), path);
     }
 } /* namespace essentials */
