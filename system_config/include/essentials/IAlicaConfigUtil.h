@@ -43,6 +43,57 @@ namespace essentials
             throw std::runtime_error(errMsg);
         }
 
+        template <typename Target>
+        std::vector<Target> convertList(std::vector<std::string> value)
+        {
+            std::string errMsg = "Configuration: List Type not handled! Value to be converted was: ";
+            for (int i = 0; i = value.size(); i++) {
+                errMsg += value[i] + " ";
+            }
+            std::cerr << errMsg << std::endl;
+            throw std::runtime_error(errMsg);
+        }
+
+        template <typename Source>
+        std::string stringify(const Source& source) {
+            return std::to_string(source);
+        }
+
+        /**
+         * Removes the given whitespaces at the beginning of the string.
+         * @param str The string which should be trimmed.
+         * @param whitespace The whitespaces which should be removed.
+         * @return The trimmed string.
+         */
+        std::string trimLeft(const std::string& str, const std::string& whitespace)
+        {
+            const auto strBegin = str.find_first_not_of(whitespace);
+            if (strBegin == std::string::npos) {
+                return ""; // no content
+            }
+            return str.substr(strBegin, str.length() - strBegin);
+        }
+
+        /**
+         * Removes the given whitespaces at the beginning and the end of the string.
+         * @param str The string which should be trimmed.
+         * @param whitespace The whitespaces which should be removed.
+         * @return The trimmed string.
+         */
+        std::string trim(const std::string& str, const std::string& whitespace)
+        {
+            const auto strBegin = str.find_first_not_of(whitespace);
+            if (strBegin == std::string::npos) {
+                return ""; // no content
+            }
+            const auto strEnd = str.find_last_not_of(whitespace);
+            const auto strRange = strEnd - strBegin + 1;
+
+            return str.substr(strBegin, strRange);
+        }
+
+    private:
+        const char LIST_ELEMENT_SEPERATOR = ',';
     };
 
 template <>
@@ -128,5 +179,45 @@ inline bool IAlicaConfigUtil::convert<bool>(std::string value)
     std::string errMsg = "Configuration: unable to parse boolean. Value is: " + value;
     std::cerr << errMsg << std::endl;
     throw std::runtime_error(errMsg);
+}
+
+template <>
+inline std::vector<int> IAlicaConfigUtil::convertList<int>(std::vector<std::string> value)
+{
+//    std::istringstream ss(value);
+//    std::string listItem;
+//    std::vector<int> itemVector;
+//    while (std::getline(ss, listItem, LIST_ELEMENT_SEPERATOR)) {
+//        itemVector.push_back(stoi(trim(listItem, " ")));
+//    }
+//    return itemVector;
+}
+
+template <>
+inline std::vector<std::string> IAlicaConfigUtil::convertList<std::string>(std::vector<std::string> value)
+{
+//    std::istringstream ss(value);
+//    std::string listItem;
+//    std::vector<std::string> itemVector;
+//    while (std::getline(ss, listItem, LIST_ELEMENT_SEPERATOR)) {
+//        itemVector.push_back(trim(listItem, " "));
+//    }
+//    return itemVector;
+}
+
+// Compatible with the previous specialization 'Configuration::convert<bool>'
+template <>
+inline std::string IAlicaConfigUtil::stringify<bool>(const bool& source) {
+    return source ? "true" : "false";
+}
+
+template <>
+inline std::string IAlicaConfigUtil::stringify<std::string>(const std::string& source) {
+    return source;
+}
+
+template <>
+inline std::string IAlicaConfigUtil::stringify<const char*>(char const* const& source) {
+    return source;
 }
 }
