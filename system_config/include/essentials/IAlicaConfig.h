@@ -21,19 +21,19 @@ namespace essentials
         /**
          * Create config object with empty filename.
          */
-        IAlicaConfig();
+        IAlicaConfig(){};
 
         /**
         * Destroys AlicaContext object.
         */
-        virtual ~IAlicaConfig();
+        virtual ~IAlicaConfig(){};
 
         /**
          * Create a config object and load the configuration file with the given filename.
          *
          * @param filename The name of the configuration file to be loaded.
          */
-        IAlicaConfig(std::string filename);
+        IAlicaConfig(std::string filename){};
 
         /**
          * Create a configuration with the given filename and the given config content.
@@ -41,7 +41,7 @@ namespace essentials
          * @param filename The name of the configuration.
          * @param content The content of the configuration.
          */
-        IAlicaConfig(std::string filename, const std::string content);
+        IAlicaConfig(std::string filename, const std::string content){};
 
         /**
          * @param path The path where to look for a value.
