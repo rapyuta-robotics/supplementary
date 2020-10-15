@@ -31,7 +31,7 @@ protected:
     void serialize_internal(std::ostringstream* ss, ConfigNode* node);
     void serialize_without_root(std::ostringstream* ss, ConfigNode* node);
 
-  public:
+public:
     Configuration();
     Configuration(std::string filename);
     Configuration(std::string filename, const std::string content);
@@ -56,7 +56,8 @@ protected:
     std::shared_ptr<std::vector<std::string>> getNames(const char* path, ...);
     std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path, ...);
 
-    std::string get(const char* path) {
+    std::string get(const char* path)
+    {
         IAlicaConfigUtil util;
         std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
         std::vector<ConfigNode*> nodes;
@@ -71,4 +72,5 @@ protected:
             return nodes[0]->getValue();
         }
     }
+};
 }
