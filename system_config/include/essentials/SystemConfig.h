@@ -1,7 +1,7 @@
 #pragma once
 
-//#include "Configuration.h"
 #include "IAlicaConfig.h"
+#include "Configuration.h"
 
 #include <essentials/FileSystem.h>
 
@@ -28,7 +28,6 @@ const std::string DOMAIN_CONFIG_FOLDER = "DOMAIN_CONFIG_FOLDER";
 
 namespace essentials
 {
-template <class ConfigType>
 class SystemConfig
 {
 protected:
@@ -37,7 +36,7 @@ protected:
     std::string configPath;
     std::string hostname;
     std::mutex configsMapMutex;
-    std::map<std::string, std::shared_ptr<ConfigType>> configs;
+    std::map<std::string, std::shared_ptr<IAlicaConfig*>> configs;
     const char NODE_NAME_SEPERATOR = '_';
 
 public:
@@ -51,7 +50,7 @@ public:
     void setHostname(const std::string& newHostname);
     void resetHostname();
 
-    ConfigType* operator[](const std::string& s);
+    IAlicaConfig* operator[](const std::string& s);
     std::string getConfigFileName(const std::string& s);
     std::string getRootPath();
     std::string getConfigPath();
@@ -64,8 +63,7 @@ public:
 /**
  * The constructor of the SystemConfig class.
  */
- template <class ConfigType>
- SystemConfig<ConfigType>::SystemConfig()
+ SystemConfig::SystemConfig()
 {
     // set the domain folder (1. by env-variable 2. by cwd)
     char* x = ::getenv(DOMAIN_FOLDER.c_str());
@@ -118,8 +116,7 @@ public:
     cout << "SC: Logging Folder: \"" << logPath << "\"" << endl;
 }
 
- template <class ConfigType>
- void SystemConfig<ConfigType>::shutdown() {}
+ void SystemConfig::shutdown() {}
 
 /**
  * The access operator for choosing the configuration according to the given string
@@ -127,16 +124,15 @@ public:
  * @param s The string which determines the used configuration.
  * @return The demanded configuration.
  */
- template <class ConfigType>
- ConfigType* SystemConfig<ConfigType>::operator[](const std::string& s)
+ IAlicaConfig* SystemConfig::operator[](const std::string& s)
 {
     {
         std::lock_guard<mutex> lock(configsMapMutex);
 
-        typename std::map<std::string, std::shared_ptr<ConfigType>>::iterator itr = configs.find(s);
+        std::map<std::string, std::shared_ptr<IAlicaConfig*>>::iterator itr = configs.find(s);
 
         if (itr != configs.end()) {
-            return itr->second.get();
+            return *(itr->second.get());
         }
     }
 
@@ -145,15 +141,15 @@ public:
         return nullptr;
     } else {
         std::lock_guard<mutex> lock(configsMapMutex);
-        std::shared_ptr<ConfigType> result = std::make_shared<ConfigType>(file_name);
+        std::shared_ptr<IAlicaConfig*> result = std::make_shared<IAlicaConfig*>();
+        (*result.get())->load(file_name);
         configs[s] = result;
 
-        return result.get();
+        return *(result.get());
     }
 }
 
- template <class ConfigType>
- std::string SystemConfig<ConfigType>::getConfigFileName(const std::string& s) {
+ std::string SystemConfig::getConfigFileName(const std::string& s) {
     string file = s + ".conf";
     // Check the host-specific config
     vector<string> files;
@@ -186,8 +182,7 @@ public:
  * @return The own robot's ID
  * <deprecated>
  */
- template <class ConfigType>
- int SystemConfig<ConfigType>::getOwnRobotID()
+ int SystemConfig::getOwnRobotID()
 {
     return SystemConfig::getRobotID(this->getHostname());
 }
@@ -197,49 +192,43 @@ public:
  * @return The robot's ID
  * <deprecated>
  */
- template <class ConfigType>
- int SystemConfig<ConfigType>::getRobotID(const string& name)
+ int SystemConfig::getRobotID(const string& name)
 {
     // TODO this should be optional for dynamic teams (is it ok to return ints?)
-    ConfigType* tmp = this["Globals"];
-    int ownRobotID = tmp.template get<int>("Globals", "Team", name.c_str(), "ID", NULL);
+    IAlicaConfig *tmp = (*this)["Globals"];
+    std::string path = "Globals.Team." + name + ".ID";
+    int ownRobotID = tmp->get<int>(path.c_str());
     return ownRobotID;
 }
 
- template <class ConfigType>
- string SystemConfig<ConfigType>::getRootPath()
+ string SystemConfig::getRootPath()
 {
     return rootPath;
 }
 
- template <class ConfigType>
- string SystemConfig<ConfigType>::getConfigPath()
+ string SystemConfig::getConfigPath()
 {
     return configPath;
 }
 
- template <class ConfigType>
- string SystemConfig<ConfigType>::getLogPath()
+ string SystemConfig::getLogPath()
 {
     return logPath;
 }
 
- template <class ConfigType>
- string SystemConfig<ConfigType>::getHostname()
+ string SystemConfig::getHostname()
 {
     return hostname;
 }
 
- template <class ConfigType>
- void SystemConfig<ConfigType>::setHostname(const std::string& newHostname)
+ void SystemConfig::setHostname(const std::string& newHostname)
 {
     hostname = newHostname;
     configs.clear();
     cout << "SC: Update Hostname:       \"" << hostname << "\"" << endl;
 }
 
- template <class ConfigType>
- void SystemConfig<ConfigType>::setRootPath(string rootPath)
+ void SystemConfig::setRootPath(string rootPath)
 {
     if (!essentials::FileSystem::endsWith(rootPath, essentials::FileSystem::PATH_SEPARATOR)) {
         rootPath = rootPath + essentials::FileSystem::PATH_SEPARATOR;
@@ -248,8 +237,7 @@ public:
     cout << "SC: Update Root:           \"" << rootPath << "\"" << endl;
 }
 
- template <class ConfigType>
- void SystemConfig<ConfigType>::setConfigPath(string configPath)
+ void SystemConfig::setConfigPath(string configPath)
 {
     if (!essentials::FileSystem::endsWith(configPath, essentials::FileSystem::PATH_SEPARATOR)) {
         configPath = configPath + essentials::FileSystem::PATH_SEPARATOR;
@@ -258,8 +246,7 @@ public:
     cout << "SC: Update ConfigRoot:     \"" << configPath << "\"" << endl;
 }
 
- template <class ConfigType>
- void SystemConfig<ConfigType>::resetHostname()
+ void SystemConfig::resetHostname()
 {
     char* envname = ::getenv("ROBOT");
     if ((envname == NULL) || ((*envname) == 0x0)) {
@@ -273,14 +260,12 @@ public:
     configs.clear();
 }
 
- template <class ConfigType>
- string SystemConfig<ConfigType>::robotNodeName(const string& nodeName)
+ string SystemConfig::robotNodeName(const string& nodeName)
 {
     return SystemConfig::getHostname() + NODE_NAME_SEPERATOR + nodeName;
 }
 
- template <class ConfigType>
- string SystemConfig<ConfigType>::getEnv(const string& var)
+ string SystemConfig::getEnv(const string& var)
 {
     const char* val = ::getenv(var.c_str());
     if (val == 0) {
