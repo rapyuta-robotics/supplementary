@@ -304,7 +304,8 @@ std::shared_ptr<std::vector<std::string>> Configuration::getSections(const char*
 {
     va_list ap;
     va_start(ap, path);
-    std::shared_ptr<std::vector<std::string>> params = getParams('.', path, ap);
+    IAlicaConfigUtil util;
+    std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
     va_end(ap);
 
     std::vector<ConfigNode*> nodes;
@@ -336,7 +337,8 @@ std::shared_ptr<std::vector<std::string>> Configuration::getNames(const char* pa
 {
     va_list ap;
     va_start(ap, path);
-    std::shared_ptr<std::vector<std::string>> params = getParams('.', path, ap);
+    IAlicaConfigUtil util;
+    std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
     va_end(ap);
 
     std::vector<ConfigNode*> nodes;
@@ -362,7 +364,8 @@ std::shared_ptr<std::vector<std::string>> Configuration::tryGetSections(std::str
 {
     va_list ap;
     va_start(ap, path);
-    std::shared_ptr<std::vector<std::string>> params = getParams('.', path, ap);
+    IAlicaConfigUtil util;
+    std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
     va_end(ap);
 
     std::vector<ConfigNode*> nodes;
@@ -396,7 +399,8 @@ std::shared_ptr<std::vector<std::string>> Configuration::tryGetNames(std::string
 {
     va_list ap;
     va_start(ap, path);
-    std::shared_ptr<std::vector<std::string>> params = getParams('.', path, ap);
+    IAlicaConfigUtil util;
+    std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
     va_end(ap);
 
     std::vector<ConfigNode*> nodes;
@@ -451,36 +455,5 @@ std::string Configuration::trim(const std::string& str, const std::string& white
     return str.substr(strBegin, strRange);
 }
 
-///**
-// * Splits the given strings if it finds the given seperator.
-// * @param seperator
-// * @param path
-// * @param ap
-// * @return The list of strings after everything was splitted.
-// */
-//std::shared_ptr<std::vector<std::string>> Configuration::getParams(char seperator, const char* path, va_list ap)
-//{
-//    std::shared_ptr<std::vector<std::string>> params = std::make_shared<std::vector<std::string>>();
-//    if (path != NULL) {
-//        const char* temp = path;
-//        do {
-//            std::string::size_type p = 0;
-//            std::string::size_type q;
-//            std::string charString = temp;
-//            while ((q = charString.find(seperator, p)) != std::string::npos) {
-//                //					cout << "SC-Conf: Adding-InLoop: '" << string(temp, p, q-p) <<
-//                //"'"
-//                //<<  endl;
-//                params->emplace_back(temp, p, q - p);
-//                p = q + 1;
-//            }
-//            //				cout << "SC-Conf: Adding-AfterLoop: '" << string(temp, p, charString.length()-p)
-//            //<<
-//            //"'"
-//            //<<  endl;
-//            params->emplace_back(temp, p, charString.length() - p);
-//        } while ((temp = va_arg(ap, const char*)) != NULL);
-//    }
-//    return params;
-//}
+
 } // namespace essentials
