@@ -1,5 +1,6 @@
 #include "essentials/SystemConfig.h"
 #include "essentials/Configuration.h"
+#include "essentials/IAlicaConfig.h"
 
 #include <gtest/gtest.h>
 
@@ -9,7 +10,7 @@
 TEST(SystemConfigBasics, readValues)
 {
     // bring up the SystemConfig with the corresponding path
-    essentials::SystemConfig<essentials::Configuration> sc;
+    essentials::SystemConfig sc;
     sc.setRootPath(".");
     sc.setConfigPath("./etc");
 
@@ -43,10 +44,6 @@ TEST(SystemConfigBasics, readValues)
     // read TestSectionValue1
     std::string testSectionValue1 = sc["Test"]->get<std::string>("TestSection.TestSectionValue1");
     EXPECT_STREQ("TestSectionValue1", testSectionValue1.c_str());
-
-    // read TestSectionValue1 with two conf-path parameters
-    std::string testSectionValue11 = sc["Test"]->get<std::string>("TestSection", "TestSectionValue1");
-    EXPECT_STREQ("TestSectionValue1", testSectionValue11.c_str());
 
     // read TestSectionValue2
     float testSectionValue2 = sc["Test"]->get<float>("TestSection.TestSectionValue2");
