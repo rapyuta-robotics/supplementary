@@ -150,5 +150,12 @@ public:
         }
         return *(vec[0].get());
     }
+
+    ConfigNode& operator=(const std::string value)
+    {
+        this->value = value;
+        this->type = Leaf;
+        return *this;
+    }
 };
 } // namespace essentials
