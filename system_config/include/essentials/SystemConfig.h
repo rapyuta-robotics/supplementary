@@ -1,6 +1,5 @@
 #pragma once
 
-#include "IAlicaConfig.h"
 #include "Configuration.h"
 
 #include <essentials/FileSystem.h>
@@ -28,6 +27,7 @@ const std::string DOMAIN_CONFIG_FOLDER = "DOMAIN_CONFIG_FOLDER";
 
 namespace essentials
 {
+template <class T>
 class SystemConfig
 {
 protected:
@@ -36,7 +36,7 @@ protected:
     std::string configPath;
     std::string hostname;
     std::mutex configsMapMutex;
-    std::map<std::string, std::shared_ptr<IAlicaConfig*>> configs;
+    std::map<std::string, std::shared_ptr<T>> configs;
     const char NODE_NAME_SEPERATOR = '_';
 
 public:
@@ -50,7 +50,7 @@ public:
     void setHostname(const std::string& newHostname);
     void resetHostname();
 
-    IAlicaConfig* operator[](const std::string& s);
+    T& operator[](const std::string& s);
     std::string getConfigFileName(const std::string& s);
     std::string getRootPath();
     std::string getConfigPath();
