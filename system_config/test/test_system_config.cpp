@@ -6,6 +6,20 @@
 
 #include <string>
 
+TEST(SystemConfigBasics, sections)
+{
+essentials::SystemConfig<essentials::Configuration> sc;
+sc.setRootPath(".");
+sc.setConfigPath("./etc");
+
+auto result = sc["Test"].getSections("TestSection").get();
+EXPECT_TRUE(result->empty());
+
+result = sc["Test"].getNames("TestSection").get();
+EXPECT_TRUE(!result->empty());
+//Iterate over result, check if names are correct
+}
+
 // IAlicaConfig *ptr = new Configuration()
 // Configuration *ptr = new Configuration()
 // sc["Test"][Test][Path][intValue]
