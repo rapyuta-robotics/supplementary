@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <memory>
+#include "IAlicaConfigUtil.h"
 
 namespace essentials
 {
@@ -137,6 +138,17 @@ public:
         this->type = other.type;
 
         return *this;
+    }
+
+    ConfigNode& operator[](const std::string key)
+    {
+        auto vec = this->findChildren(key);
+        if (vec.empty()) {
+            std::string errMsg = "SC-Conf: Could not find key: " + key;
+            std::cerr << errMsg << std::endl;
+            throw std::runtime_error(errMsg);
+        }
+        return *(vec[0].get());
     }
 };
 } // namespace essentials
