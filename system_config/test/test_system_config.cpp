@@ -20,6 +20,18 @@ EXPECT_TRUE(!result->empty());
 //Iterate over result, check if names are correct
 }
 
+TEST(SystemConfigBasics, bracketAccess)
+{
+essentials::SystemConfig<essentials::Configuration> sc;
+sc.setRootPath(".");
+sc.setConfigPath("./etc");
+
+EXPECT_EQ(14, sc["Test"]["Example"]["Path"]["intValue"].as<int>());
+
+sc["Test"]["Example"]["Path"]["intValue"] = "15";
+EXPECT_EQ(15, sc["Test"]["Example"]["Path"]["intValue"].as<int>());
+}
+
 // IAlicaConfig *ptr = new Configuration()
 // Configuration *ptr = new Configuration()
 // sc["Test"][Test][Path][intValue]
