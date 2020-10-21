@@ -44,12 +44,9 @@ namespace essentials
         }
 
         template <typename Target>
-        std::vector<Target> convertList(std::vector<std::string> value)
+        std::vector<Target> convertList(std::string value)
         {
-            std::string errMsg = "Configuration: List Type not handled! Value to be converted was: ";
-            for (int i = 0; i = value.size(); i++) {
-                errMsg += value[i] + " ";
-            }
+            std::string errMsg = "Configuration: List Type not handled! Value to be converted was: " + value;
             std::cerr << errMsg << std::endl;
             throw std::runtime_error(errMsg);
         }
@@ -182,27 +179,27 @@ inline bool IAlicaConfigUtil::convert<bool>(std::string value)
 }
 
 template <>
-inline std::vector<int> IAlicaConfigUtil::convertList<int>(std::vector<std::string> value)
+inline std::vector<int> IAlicaConfigUtil::convertList<int>(std::string value)
 {
-//    std::istringstream ss(value);
-//    std::string listItem;
-//    std::vector<int> itemVector;
-//    while (std::getline(ss, listItem, LIST_ELEMENT_SEPERATOR)) {
-//        itemVector.push_back(stoi(trim(listItem, " ")));
-//    }
-//    return itemVector;
+    std::istringstream ss(value);
+    std::string listItem;
+    std::vector<int> itemVector;
+    while (std::getline(ss, listItem, LIST_ELEMENT_SEPERATOR)) {
+        itemVector.push_back(stoi(trim(listItem, " ")));
+    }
+    return itemVector;
 }
 
 template <>
-inline std::vector<std::string> IAlicaConfigUtil::convertList<std::string>(std::vector<std::string> value)
+inline std::vector<std::string> IAlicaConfigUtil::convertList<std::string>(std::string value)
 {
-//    std::istringstream ss(value);
-//    std::string listItem;
-//    std::vector<std::string> itemVector;
-//    while (std::getline(ss, listItem, LIST_ELEMENT_SEPERATOR)) {
-//        itemVector.push_back(trim(listItem, " "));
-//    }
-//    return itemVector;
+    std::istringstream ss(value);
+    std::string listItem;
+    std::vector<std::string> itemVector;
+    while (std::getline(ss, listItem, LIST_ELEMENT_SEPERATOR)) {
+        itemVector.push_back(trim(listItem, " "));
+    }
+    return itemVector;
 }
 
 // Compatible with the previous specialization 'Configuration::convert<bool>'
