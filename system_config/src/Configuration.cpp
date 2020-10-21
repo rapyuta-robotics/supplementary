@@ -19,10 +19,10 @@ Configuration::Configuration(std::string filename, const std::string content)
         : filename(filename)
         , configRoot(new ConfigNode("root"))
 {
-    load(filename, std::shared_ptr<std::istream>(new std::istringstream(content)), false, false);
+    load(filename, std::shared_ptr<std::istream>(new std::istringstream(content)));
 }
 
-void Configuration::load(std::string filename, std::shared_ptr<std::istream> content, bool, bool)
+void Configuration::load(std::string filename, std::shared_ptr<std::istream> content)
 {
     this->filename = filename;
 
@@ -300,13 +300,10 @@ std::string Configuration::pathNotFound(std::vector<std::string>* params)
  * @param path
  * @return A vector with the names of all sections in the given path.
  */
-std::shared_ptr<std::vector<std::string>> Configuration::getSections(const char* path, ...)
+std::shared_ptr<std::vector<std::string>> Configuration::getSections(const char* path)
 {
-    va_list ap;
-    va_start(ap, path);
     IAlicaConfigUtil util;
     std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-    va_end(ap);
 
     std::vector<ConfigNode*> nodes;
 
@@ -333,13 +330,10 @@ std::shared_ptr<std::vector<std::string>> Configuration::getSections(const char*
  * @param path
  * @return A vector with all keys or names of the given path.
  */
-std::shared_ptr<std::vector<std::string>> Configuration::getNames(const char* path, ...)
+std::shared_ptr<std::vector<std::string>> Configuration::getNames(const char* path)
 {
-    va_list ap;
-    va_start(ap, path);
     IAlicaConfigUtil util;
     std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-    va_end(ap);
 
     std::vector<ConfigNode*> nodes;
 
@@ -360,13 +354,10 @@ std::shared_ptr<std::vector<std::string>> Configuration::getNames(const char* pa
     return result;
 }
 
-std::shared_ptr<std::vector<std::string>> Configuration::tryGetSections(std::string d, const char* path, ...)
+std::shared_ptr<std::vector<std::string>> Configuration::tryGetSections(std::string d, const char* path)
 {
-    va_list ap;
-    va_start(ap, path);
     IAlicaConfigUtil util;
     std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-    va_end(ap);
 
     std::vector<ConfigNode*> nodes;
 
@@ -395,13 +386,10 @@ std::shared_ptr<std::vector<std::string>> Configuration::tryGetSections(std::str
  * collected.
  * @return The names of the sections at the given path
  */
-std::shared_ptr<std::vector<std::string>> Configuration::tryGetNames(std::string d, const char* path, ...)
+std::shared_ptr<std::vector<std::string>> Configuration::tryGetNames(std::string d, const char* path)
 {
-    va_list ap;
-    va_start(ap, path);
     IAlicaConfigUtil util;
     std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-    va_end(ap);
 
     std::vector<ConfigNode*> nodes;
 
