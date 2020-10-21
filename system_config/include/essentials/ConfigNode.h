@@ -77,6 +77,13 @@ public:
 
     ~ConfigNode() {}
 
+    template<class T>
+    T as()
+    {
+        IAlicaConfigUtil util;
+        return util.convert<T>(this->value);
+    }
+
     ConfigNode* create(const std::string& name)
     {
         this->children.push_back(ConfigNodePtr(new ConfigNode(name)));
