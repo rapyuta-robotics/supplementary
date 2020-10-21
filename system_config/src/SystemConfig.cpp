@@ -5,7 +5,8 @@ namespace essentials
 /**
  * The constructor of the SystemConfig class.
  */
-SystemConfig::SystemConfig()
+template <class T>
+SystemConfig<T>::SystemConfig()
 {
     // set the domain folder (1. by env-variable 2. by cwd)
     char* x = ::getenv(DOMAIN_FOLDER.c_str());
@@ -58,7 +59,8 @@ SystemConfig::SystemConfig()
     cout << "SC: Logging Folder: \"" << logPath << "\"" << endl;
 }
 
-void SystemConfig::shutdown() {}
+template <class T>
+void SystemConfig<T>::shutdown() {}
 
 /**
  * The access operator for choosing the configuration according to the given string
@@ -66,12 +68,13 @@ void SystemConfig::shutdown() {}
  * @param s The string which determines the used configuration.
  * @return The demanded configuration.
  */
-IAlicaConfig* SystemConfig::operator[](const std::string& s)
+template <class T>
+T& SystemConfig<T>::operator[](const std::string& s)
 {
     {
         std::lock_guard<mutex> lock(configsMapMutex);
 
-        std::map<std::string, std::shared_ptr<IAlicaConfig*>>::iterator itr = configs.find(s);
+        typename std::map<std::string, std::shared_ptr<T>>::iterator itr = configs.find(s);
 
         if (itr != configs.end()) {
             return *(itr->second.get());
@@ -80,18 +83,21 @@ IAlicaConfig* SystemConfig::operator[](const std::string& s)
 
     std::string file_name = getConfigFileName(s);
     if (file_name.empty()) {
-        return nullptr;
+        std::string errMsg = "SC-Conf: Could not find config: " + s;
+        std::cerr << errMsg << std::endl;
+        throw std::runtime_error(errMsg);
     } else {
         std::lock_guard<mutex> lock(configsMapMutex);
-        std::shared_ptr<IAlicaConfig*> result = std::make_shared<IAlicaConfig*>();
-        (*result.get())->load(file_name);
+        std::shared_ptr<T> result = std::make_shared<T>();
+        result.get()->load(file_name);
         configs[s] = result;
 
         return *(result.get());
     }
 }
 
-std::string SystemConfig::getConfigFileName(const std::string& s)
+template <class T>
+std::string SystemConfig<T>::getConfigFileName(const std::string& s)
 {
     string file = s + ".conf";
     // Check the host-specific config
@@ -125,7 +131,8 @@ std::string SystemConfig::getConfigFileName(const std::string& s)
  * @return The own robot's ID
  * <deprecated>
  */
-int SystemConfig::getOwnRobotID()
+template <class T>
+int SystemConfig<T>::getOwnRobotID()
 {
     return SystemConfig::getRobotID(this->getHostname());
 }
@@ -135,43 +142,50 @@ int SystemConfig::getOwnRobotID()
  * @return The robot's ID
  * <deprecated>
  */
-int SystemConfig::getRobotID(const string& name)
+template <class T>
+int SystemConfig<T>::getRobotID(const string& name)
 {
     // TODO this should be optional for dynamic teams (is it ok to return ints?)
-    IAlicaConfig* tmp = (*this)["Globals"];
+    IAlicaConfig& tmp = (*this)["Globals"];
     std::string path = "Globals.Team." + name + ".ID";
-    int ownRobotID = tmp->get<int>(path.c_str());
+    int ownRobotID = tmp.get<int>(path.c_str());
     return ownRobotID;
 }
 
-string SystemConfig::getRootPath()
+template <class T>
+string SystemConfig<T>::getRootPath()
 {
     return rootPath;
 }
 
-string SystemConfig::getConfigPath()
+template <class T>
+string SystemConfig<T>::getConfigPath()
 {
     return configPath;
 }
 
-string SystemConfig::getLogPath()
+template <class T>
+string SystemConfig<T>::getLogPath()
 {
     return logPath;
 }
 
-string SystemConfig::getHostname()
+template <class T>
+string SystemConfig<T>::getHostname()
 {
     return hostname;
 }
 
-void SystemConfig::setHostname(const std::string& newHostname)
+template <class T>
+void SystemConfig<T>::setHostname(const std::string& newHostname)
 {
     hostname = newHostname;
     configs.clear();
     cout << "SC: Update Hostname:       \"" << hostname << "\"" << endl;
 }
 
-void SystemConfig::setRootPath(string rootPath)
+template <class T>
+void SystemConfig<T>::setRootPath(string rootPath)
 {
     if (!essentials::FileSystem::endsWith(rootPath, essentials::FileSystem::PATH_SEPARATOR)) {
         rootPath = rootPath + essentials::FileSystem::PATH_SEPARATOR;
@@ -180,7 +194,8 @@ void SystemConfig::setRootPath(string rootPath)
     cout << "SC: Update Root:           \"" << rootPath << "\"" << endl;
 }
 
-void SystemConfig::setConfigPath(string configPath)
+template <class T>
+void SystemConfig<T>::setConfigPath(string configPath)
 {
     if (!essentials::FileSystem::endsWith(configPath, essentials::FileSystem::PATH_SEPARATOR)) {
         configPath = configPath + essentials::FileSystem::PATH_SEPARATOR;
@@ -189,7 +204,8 @@ void SystemConfig::setConfigPath(string configPath)
     cout << "SC: Update ConfigRoot:     \"" << configPath << "\"" << endl;
 }
 
-void SystemConfig::resetHostname()
+template <class T>
+void SystemConfig<T>::resetHostname()
 {
     char* envname = ::getenv("ROBOT");
     if ((envname == NULL) || ((*envname) == 0x0)) {
@@ -203,12 +219,14 @@ void SystemConfig::resetHostname()
     configs.clear();
 }
 
-string SystemConfig::robotNodeName(const string& nodeName)
+template <class T>
+string SystemConfig<T>::robotNodeName(const string& nodeName)
 {
     return SystemConfig::getHostname() + NODE_NAME_SEPERATOR + nodeName;
 }
 
-string SystemConfig::getEnv(const string& var)
+template <class T>
+string SystemConfig<T>::getEnv(const string& var)
 {
     const char* val = ::getenv(var.c_str());
     if (val == 0) {
@@ -219,4 +237,5 @@ string SystemConfig::getEnv(const string& var)
         return val;
     }
 }
+template class SystemConfig<Configuration>;
 } //namespace essentials
