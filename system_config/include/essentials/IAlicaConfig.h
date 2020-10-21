@@ -148,5 +148,7 @@ namespace essentials
          * @return The name of all keys at the given path or a vector with d.
          */
         virtual std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path) = 0;
+
+        virtual ConfigNode& operator[](const std::string key) = 0;
     };
 } /* namespace essentials */
