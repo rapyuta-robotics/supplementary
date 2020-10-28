@@ -22,6 +22,30 @@ Configuration::Configuration(std::string filename, const std::string content)
     load(filename, std::shared_ptr<std::istream>(new std::istringstream(content)));
 }
 
+ConfigNode& Configuration::operator[](const std::string key)
+{
+    auto vec = configRoot->findChildren(key);
+    if (vec.empty()) {
+        std::string errMsg = "SC-Conf: Could not find key: " + key;
+        std::cerr << errMsg << std::endl;
+        throw std::runtime_error(errMsg);
+    }
+    return *(vec[0].get());
+}
+
+ConfigNode* Configuration::findNode(ConfigNode& node, const char* path, va_list args)
+{
+    ConfigNode* configNode = &node;
+    std::vector<std::string> params;
+
+    const char* temp = path;
+    while (temp != NULL) {
+        configNode = &(configNode->operator[](trim(temp)));
+        temp = va_arg(args, const char*);
+    }
+    return configNode;
+}
+
 void Configuration::load(std::string filename, std::shared_ptr<std::istream> content)
 {
     this->filename = filename;
@@ -292,6 +316,90 @@ std::string Configuration::pathNotFound(std::vector<std::string>* params)
         os << "' not found in " << this->filename << "!" << std::endl;
     }
     return os.str();
+}
+
+std::string Configuration::tryGetString(std::string d, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    return tryGet<std::string>(d, path, args);
+}
+
+int Configuration::tryGetInt(int d, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    return tryGet<int>(d, path, args);
+}
+
+bool Configuration::tryGetBool(bool d, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    return tryGet<bool>(d, path, args);
+}
+
+float Configuration::tryGetFloat(float d, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    return tryGet<float>(d, path, args);
+}
+
+double Configuration::tryGetDouble(double d, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    return tryGet<double>(d, path, args);
+}
+
+unsigned short Configuration::tryGetUShort(unsigned short d, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    return tryGet<unsigned short>(d, path, args);
+}
+
+void Configuration::setCreateIfNotExistentString(std::string value, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    setCreateIfNotExistent<std::string>(value, path, args);
+}
+
+void Configuration::setCreateIfNotExistentInt(int value, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    setCreateIfNotExistent<int>(value, path, args);
+}
+
+void Configuration::setCreateIfNotExistentBool(bool value, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    setCreateIfNotExistent<bool>(value, path, args);
+}
+
+void Configuration::setCreateIfNotExistentUShort(unsigned short value, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    setCreateIfNotExistent<unsigned short>(value, path, args);
+}
+
+void Configuration::setCreateIfNotExistentFloat(float value, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    setCreateIfNotExistent<float>(value, path, args);
+}
+
+void Configuration::setCreateIfNotExistentDouble(double value, const char* path, ...)
+{
+    va_list args;
+    va_start(args, path);
+    setCreateIfNotExistent<double>(value, path, args);
 }
 
 /**
