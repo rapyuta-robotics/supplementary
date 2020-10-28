@@ -53,36 +53,37 @@ public:
     std::shared_ptr<std::vector<std::string>> getNames(const char* path);
     std::shared_ptr<std::vector<std::string>> tryGetNames(std::string d, const char* path);
 
-    std::string trimLeft(const std::string& str, const std::string& whitespace = " \t");
-    static std::string trim(const std::string& str, const std::string& whitespace = " \t");
+    std::string tryGetString(std::string d, const char* path, ...);
+    bool tryGetBool(bool d, const char* path, ...);
+    int tryGetInt(int d, const char* path, ...);
+    float tryGetFloat(float d, const char* path, ...);
+    double tryGetDouble(double d, const char* path, ...);
+    unsigned short tryGetUShort(unsigned short d, const char* path, ...);
 
-    ConfigNode& operator[](const std::string key)
-    {
-        auto vec = configRoot->findChildren(key);
-        if (vec.empty()) {
-            std::string errMsg = "SC-Conf: Could not find key: " + key;
-            std::cerr << errMsg << std::endl;
-            throw std::runtime_error(errMsg);
-        }
-        return *(vec[0].get());
-    }
+    void setCreateIfNotExistentString(std::string value, const char* path, ...);
+    void setCreateIfNotExistentBool(bool value, const char* path, ...);
+    void setCreateIfNotExistentInt(int value, const char* path, ...);
+    void setCreateIfNotExistentFloat(float value, const char* path, ...);
+    void setCreateIfNotExistentDouble(double value, const char* path, ...);
+    void setCreateIfNotExistentUShort(unsigned short value, const char* path, ...);
+
+    std::string trimLeft(const std::string& str, const std::string& whitespace = " \t");
+    std::string trim(const std::string& str, const std::string& whitespace = " \t");
+
+    ConfigNode& operator[](const std::string key);
+    ConfigNode* findNode(ConfigNode& node, const char* path, va_list args);
 
     template <typename T>
-    T get(const char* path)
+    T tryGet(T d, const char* path, va_list args)
     {
-        IAlicaConfigUtil util;
-        std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-        std::vector<ConfigNode*> nodes;
-
-        collect(this->configRoot.get(), params.get(), 0, &nodes);
-
-        if (nodes.size() == 0) {
-            std::string errMsg = "SC-Conf: " + pathNotFound(params.get());
-            std::cerr << errMsg << std::endl;
-            throw std::runtime_error(errMsg);
-        } else {
-            return util.convert<T>(nodes[0]->getValue());
+        T result;
+        try {
+            result = findNode(*configRoot.get(), path, args)->as<T>();
+        } catch (std::runtime_error) {
+            result = d;
         }
+
+        return result;
     }
 
     template <typename T>
@@ -128,23 +129,6 @@ public:
     }
 
     template <typename T>
-    T tryGet(T d, const char* path)
-    {
-        IAlicaConfigUtil util;
-        std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-
-        std::vector<ConfigNode*> nodes;
-
-        collect(this->configRoot.get(), params.get(), 0, &nodes);
-
-        if (nodes.size() == 0) {
-            return d;
-        }
-
-        return util.convert<T>(nodes[0]->getValue());
-    }
-
-    template <typename T>
     std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path)
     {
         IAlicaConfigUtil util;
@@ -170,63 +154,26 @@ public:
         return result;
     }
 
-    template <typename T>
-    void set(T value, const char* path)
-    {
-        IAlicaConfigUtil util;
-        std::shared_ptr<std::vector<std::string>> params = util.getParams('.', path);
-
-        std::vector<ConfigNode*> nodes;
-
-        collect(this->configRoot.get(), params.get(), 0, &nodes);
-
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes[i]->getType() == ConfigNode::Leaf) {
-                nodes[i]->setValue(util.stringify(value));
-            }
-        }
-    }
-
-
     /**
      * This method creates the configuration parameter if it not already exists
      */
     template <typename T>
-    void setCreateIfNotExistent(T value, const char* path)
+    void setCreateIfNotExistent(T value, const char* path, va_list args)
     {
         IAlicaConfigUtil util;
-        std::shared_ptr<std::vector<std::string>> params_ptr = util.getParams('.', path);
+        ConfigNode* configNode = configRoot.get();
 
-        if (params_ptr->size() < 2) {
-            std::string errMsg = "SC-Conf: path cannot be created, not enough params";
-            std::cerr << errMsg << std::endl;
-            throw std::runtime_error(errMsg);
-        }
-
-        std::vector<ConfigNode*> nodes;
-        std::vector<std::string>& params = *params_ptr;
-        collect(this->configRoot.get(), &params, 0, &nodes);
-
-        if (!nodes.empty()) {
-            return;
-        }
-
-        ConfigNode* currentNode = this->configRoot.get();
-        size_t ind = 0;
-        while (ind < params.size()) {
-            auto children = currentNode->findChildren(params[ind]);
-            if (children.empty()) {
-                if (ind == params.size() - 1) {
-                    currentNode = currentNode->create(params[ind], util.stringify(value));
-                } else {
-                    currentNode = currentNode->create(params[ind]);
-                }
+        const char* temp = path;
+        while (temp != NULL) {
+            if (!configNode->findChildren(temp).empty()) {
+                configNode = &(configNode->operator[](trim(temp)));
+                temp = va_arg(args, const char*);
             } else {
-                // We chose the first,  should be the only one !
-                currentNode = children[0].get();
+                configNode = configNode->create(temp);
+                temp = va_arg(args, const char*);
             }
-            ++ind;
         }
+        *configNode = util.stringify<T>(value);
     }
 };
 }
