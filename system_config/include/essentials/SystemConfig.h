@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Configuration.h"
+#include "ConfigNode.h"
 
 #include <essentials/FileSystem.h>
 
