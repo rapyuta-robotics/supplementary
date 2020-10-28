@@ -147,8 +147,7 @@ int SystemConfig<T>::getRobotID(const string& name)
 {
     // TODO this should be optional for dynamic teams (is it ok to return ints?)
     IAlicaConfig& tmp = (*this)["Globals"];
-    std::string path = "Globals.Team." + name + ".ID";
-    int ownRobotID = tmp.get<int>(path.c_str());
+    int ownRobotID = tmp["Globals"]["Team"][name]["ID"].as<int>();
     return ownRobotID;
 }
 
