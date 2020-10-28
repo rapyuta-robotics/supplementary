@@ -37,20 +37,12 @@ namespace essentials
         IAlicaConfig(std::string filename){};
 
         /**
-         * @param path The path where to look for a value.
-         *
-         * @return Value with type T with the given path in the config file. Only return the first value with the given path.
-         */
-        template <typename T>
-        T get (const char* path){};
-
-        /**
          * @param path to the value
          *
          * @return A vector of values with type T, with the exact path in the config file (first value with matching path)
          */
         template <typename T>
-        std::vector<T> getList(const char* path);
+        std::vector<T> getList(const char* path...);
 
         /**
          * @param path The path where to look for a value.
@@ -58,7 +50,7 @@ namespace essentials
            @return A pointer to a vector with all values with type T, with the exact path in the config file (all values with matching path).
          */
         template <typename T>
-        std::shared_ptr<std::vector<T>> getAll(const char* path);
+        std::shared_ptr<std::vector<T>> getAll(const char* path...);
 
        /**
         * @param d Value with type T to return if no value with the provided path is present in the config.
@@ -66,8 +58,12 @@ namespace essentials
         *
         * @return Value of type T with the exact path in the config file or d.
         */
-        template <typename T>
-        T tryGet(T d, const char* path);
+        virtual std::string tryGetString(std::string d, const char* path, ...) = 0;
+        virtual bool tryGetBool(bool d, const char* path, ...) = 0;
+        virtual int tryGetInt(int d, const char* path, ...) = 0;
+        virtual float tryGetFloat(float d, const char* path, ...) = 0;
+        virtual double tryGetDouble(double d, const char* path, ...) = 0;
+        virtual unsigned short tryGetUShort(unsigned short d, const char* path, ...) = 0;
 
         /**
          * @param d Value with type T to return in a vector if no value with the given path is present in the config.
@@ -76,16 +72,7 @@ namespace essentials
          * @return A pointer to a vector with all values with a matching path or a vector with only d inside.
          */
         template <typename T>
-        std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path);
-
-        /**
-         * Sets a value at the desired path if the path already exists.
-         *
-         * @param value The value to set in the config.
-         * @param path The path where to set the given value.
-         */
-        template <typename T>
-        void set(T value, const char* path);
+        std::shared_ptr<std::vector<T>> tryGetAll(T d, const char* path...);
 
         /**
          * Creates a path with the given value if the path does not already exist.
@@ -93,8 +80,12 @@ namespace essentials
          * @param value The value to set in the config.
          * @param path The path to create if not existent.
          */
-        template <typename T>
-        void setCreateIfNotExistent(T value, const char* path);
+        virtual void setCreateIfNotExistentString(std::string value, const char* path, ...) = 0;
+        virtual void setCreateIfNotExistentBool(bool value, const char* path, ...) = 0;
+        virtual void setCreateIfNotExistentInt(int value, const char* path, ...) = 0;
+        virtual void setCreateIfNotExistentFloat(float value, const char* path, ...) = 0;
+        virtual void setCreateIfNotExistentDouble(double value, const char* path, ...) = 0;
+        virtual void setCreateIfNotExistentUShort(unsigned short value, const char* path, ...) = 0;
 
         /**
          * Load a configuration with the given filename.
